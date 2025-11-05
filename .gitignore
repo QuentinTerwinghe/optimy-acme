@@ -26,6 +26,9 @@ docker-compose.override.yml
 /www/database/database.sqlite
 *.sql.gz
 
+# PHPStan
+/www/phpstan-baseline.neon
+
 # Logs
 *.log
 

@@ -76,6 +76,12 @@ composer:
 ssh:
 	docker exec -it ${APP_NAME}_app bash
 
+phpstan:
+	$(call do_phpstan)
+
+phpstan-baseline:
+	$(call do_phpstan_baseline)
+
 help:
 	$(call do_display_commands)
 
@@ -212,6 +218,16 @@ define do_db_seed
 	$(call exec, "php artisan db:seed --force")
 endef
 
+define do_phpstan
+	echo -e 'Running PHPStan analysis...'
+	docker exec -w /var/www/html ${APP_NAME}_app bash -c "./vendor/bin/phpstan analyse"
+endef
+
+define do_phpstan_baseline
+	echo -e 'Generating PHPStan baseline...'
+	docker exec -w /var/www/html ${APP_NAME}_app bash -c "./vendor/bin/phpstan analyse --generate-baseline --allow-empty-baseline"
+endef
+
 define exec
 	docker exec -w /var/www/html -it ${APP_NAME}_app bash -c ${1}
 endef
@@ -249,4 +265,6 @@ define do_display_commands
 	echo -e 'Execute a Composer command: \e[36mmake \e[0m\e[1mcomposer C="COMMAND"\e[0m'
 	echo -e 'Execute a Yarn command: \e[36mmake \e[0m\e[1myarn C="COMMAND"\e[0m'
 	echo -e 'Generate application key: \e[36mmake \e[0m\e[1mkey\e[0m'
+	echo -e 'Run PHPStan static analysis: \e[36mmake \e[0m\e[1mphpstan\e[0m'
+	echo -e 'Generate PHPStan baseline: \e[36mmake \e[0m\e[1mphpstan-baseline\e[0m'
 endef
