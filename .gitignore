@@ -18,7 +18,7 @@
 /www/.vscode
 
 # Docker
-.env.docker
+.env
 docker-compose.override.yml
 .docker/mysql/data/
 
