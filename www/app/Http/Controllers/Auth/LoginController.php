@@ -18,10 +18,16 @@ class LoginController extends Controller
 
         $request->session()->regenerate();
 
-        return response()->json([
-            'message' => 'Login successful',
-            'user' => Auth::user(),
-        ]);
+        // Return JSON for API requests, redirect for web requests
+        if ($request->expectsJson()) {
+            return response()->json([
+                'message' => 'Login successful',
+                'user' => Auth::user(),
+                'redirect' => route('admin.dashboard'),
+            ]);
+        }
+
+        return redirect()->intended(route('admin.dashboard'));
     }
 
     /**
@@ -34,8 +40,13 @@ class LoginController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return response()->json([
-            'message' => 'Logout successful',
-        ]);
+        // Return JSON for API requests, redirect for web requests
+        if ($request->expectsJson()) {
+            return response()->json([
+                'message' => 'Logout successful',
+            ]);
+        }
+
+        return redirect()->route('login.form');
     }
 }
