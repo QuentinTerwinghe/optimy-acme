@@ -1,0 +1,49 @@
+# Laravel
+/www/vendor/
+/www/node_modules/
+/www/public/hot
+/www/public/storage
+/www/storage/*.key
+/www/.env
+/www/.env.backup
+/www/.env.production
+/www/.phpunit.result.cache
+/www/Homestead.json
+/www/Homestead.yaml
+/www/auth.json
+/www/npm-debug.log
+/www/yarn-error.log
+/www/.fleet
+/www/.idea
+/www/.vscode
+
+# Docker
+.env.docker
+docker-compose.override.yml
+.docker/mysql/data/
+
+# Database
+/www/database/database.sqlite
+*.sql.gz
+
+# Logs
+*.log
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.tmp
+*.bak
+*.cache
+
+CLAUDE.md
+/.claude/

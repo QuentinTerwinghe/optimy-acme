@@ -1,0 +1,144 @@
+version: '3.8'
+
+# Load environment variables from .env
+# Copy .env.example to .env and configure your values
+
+services:
+  # Laravel Application with Apache
+  app:
+    env_file:
+      - .env
+    build:
+      context: .
+      dockerfile: .docker/Dockerfile
+    container_name: ${APP_NAME:-optimy}_app
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-9481}:80"
+    volumes:
+      - ./www:/var/www/html
+      - ./www/storage:/var/www/html/storage
+      - ./www/bootstrap/cache:/var/www/html/bootstrap/cache
+    environment:
+      - APP_NAME=${APP_NAME:-optimy}
+      - APP_ENV=local
+      - APP_DEBUG=true
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_DATABASE=${MYSQL_DATABASE:-optimy}
+      - DB_USERNAME=${MYSQL_USER:-optimy}
+      - DB_PASSWORD=${MYSQL_PASSWORD}
+      - MAIL_HOST=mailcatcher
+      - MAIL_PORT=1025
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USER=${RABBITMQ_DEFAULT_USER:-optimy}
+      - RABBITMQ_PASSWORD=${RABBITMQ_DEFAULT_PASS}
+      - MEILISEARCH_HOST=http://meilisearch:7700
+      - MEILISEARCH_KEY=${MEILISEARCH_MASTER_KEY}
+    depends_on:
+      mysql:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      meilisearch:
+        condition: service_started
+      mailcatcher:
+        condition: service_started
+    networks:
+      - optimy_network
+
+  # MySQL Database
+  mysql:
+    env_file:
+      - .env
+    image: mysql:9.1
+    container_name: ${APP_NAME:-optimy}_mysql
+    restart: unless-stopped
+    ports:
+      - "${DATABASE_PORT:-34928}:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_password}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-optimy}
+      MYSQL_USER: ${MYSQL_USER:-optimy}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./.docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+      - ./.docker/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-root_password}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - optimy_network
+
+  # RabbitMQ Message Broker
+  rabbitmq:
+    env_file:
+      - .env
+    image: rabbitmq:4.0-management-alpine
+    container_name: ${APP_NAME:-optimy}_rabbitmq
+    restart: unless-stopped
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER:-optimy}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+      RABBITMQ_DEFAULT_VHOST: /
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - optimy_network
+
+  # MeiliSearch Search Engine
+  meilisearch:
+    env_file:
+      - .env
+    image: getmeili/meilisearch:v1.11
+    container_name: ${APP_NAME:-optimy}_meilisearch
+    restart: unless-stopped
+    ports:
+      - "${MEILISEARCH_PORT:-7855}:7700"
+    environment:
+      MEILI_MASTER_KEY: ${MEILISEARCH_MASTER_KEY}
+      MEILI_ENV: development
+      MEILI_NO_ANALYTICS: true
+    volumes:
+      - meilisearch_data:/meili_data
+    networks:
+      - optimy_network
+
+  # MailCatcher Email Testing
+  mailcatcher:
+    env_file:
+      - .env
+    image: schickling/mailcatcher:latest
+    container_name: ${APP_NAME:-optimy}_mailcatcher
+    restart: unless-stopped
+    ports:
+      - "${MAILCATCHER_PORT:-1786}:1080"
+      - "${MAILCATCHER_PORT_BIS:-17980}:1025"
+    networks:
+      - optimy_network
+
+networks:
+  optimy_network:
+    driver: bridge
+
+volumes:
+  mysql_data:
+    driver: local
+  meilisearch_data:
+    driver: local
+  rabbitmq_data:
+    driver: local
