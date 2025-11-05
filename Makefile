@@ -104,7 +104,7 @@ define do_setup
 	$(call do_docker)
 	$(call exec, "composer install --no-interaction --no-progress --prefer-dist --optimize-autoloader")
 	$(call exec, "php artisan key:generate")
-
+	$(call do_build_front)
 	$(call do_db_migrate_fresh)
 	$(call do_db_seed)
 	$(call do_cc)
@@ -186,8 +186,7 @@ endef
 
 define do_build_front
 	echo -e 'Building front for ${APP_NAME}...'
-	$(call exec, "yarn")
-	$(call exec, "yarn dev")
+	cd www && npm install && npm run dev
 endef
 
 define do_cc
