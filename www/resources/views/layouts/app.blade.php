@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Optimy') }} - @yield('title', 'Dashboard')</title>
+    <title>{{ config('app.name', 'ACME Corp') }} - @yield('title', 'Dashboard')</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -24,7 +24,7 @@
                         <!-- Logo -->
                         <div class="flex items-center">
                             <a href="{{ route('dashboard') }}" class="text-xl font-bold text-gray-900">
-                                {{ config('app.name', 'Optimy') }}
+                                {{ config('app.name', 'ACME Corp') }}
                             </a>
                         </div>
 

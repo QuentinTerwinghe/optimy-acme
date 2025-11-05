@@ -186,7 +186,7 @@ endef
 
 define do_build_front
 	echo -e 'Building front for ${APP_NAME}...'
-	cd www && npm install && npm run dev
+	cd www && npm install && npm run build
 endef
 
 define do_cc

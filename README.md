@@ -1,11 +1,11 @@
-# Optimy - Laravel 12.x LTS Project
+# ACME Corp - Laravel 12.x LTS Project
 
 This is a Laravel 12.x LTS project running on PHP 8.3 with Docker support.
 
 ## Project Structure
 
 ```text
-optimy/
+root/
 ├── .docker/              # Docker configuration files
 ├── www/                  # Laravel application root
 │   ├── app/             # Application code

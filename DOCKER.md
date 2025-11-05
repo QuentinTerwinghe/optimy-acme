@@ -1,6 +1,6 @@
-# Docker Setup for Optimy
+# Docker Setup for ACME Corp
 
-This document explains how to set up and run the Optimy Laravel application using Docker.
+This document explains how to set up and run the ACME Corp Laravel application using Docker.
 
 ## Prerequisites
 
@@ -69,7 +69,7 @@ You should see all services with status "Up" or "healthy".
 
 - **Laravel Application**: http://localhost:9481
 - **MailCatcher**: http://localhost:1786
-- **RabbitMQ Management**: http://localhost:15672 (login: optimy / optimy_password_change_in_production)
+- **RabbitMQ Management**: http://localhost:15672 (login: acme_corp / acme_corp_password_change_in_production)
 - **MeiliSearch**: http://localhost:7700
 
 ## Common Commands
@@ -137,16 +137,16 @@ docker-compose exec app composer require vendor/package
 
 ```bash
 # Access MySQL CLI
-docker-compose exec mysql mysql -u optimy -p optimy
+docker-compose exec mysql mysql -u acme_corp -p acme_corp
 
 # Run MySQL commands from host
-mysql -h 127.0.0.1 -P 34928 -u optimy -p optimy
+mysql -h 127.0.0.1 -P 34928 -u acme_corp -p acme_corp
 
 # Backup database
-docker-compose exec mysql mysqldump -u optimy -p optimy > backup.sql
+docker-compose exec mysql mysqldump -u acme_corp -p acme_corp > backup.sql
 
 # Restore database
-docker-compose exec -T mysql mysql -u optimy -p optimy < backup.sql
+docker-compose exec -T mysql mysql -u acme_corp -p acme_corp < backup.sql
 ```
 
 ### Shell Access

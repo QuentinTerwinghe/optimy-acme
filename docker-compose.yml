@@ -11,7 +11,7 @@ services:
     build:
       context: .
       dockerfile: .docker/Dockerfile
-    container_name: ${APP_NAME:-optimy}_app
+    container_name: ${APP_NAME:-acme_corp}_app
     restart: unless-stopped
     ports:
       - "${APP_PORT:-9481}:80"
@@ -20,19 +20,19 @@ services:
       - ./www/storage:/var/www/html/storage
       - ./www/bootstrap/cache:/var/www/html/bootstrap/cache
     environment:
-      - APP_NAME=${APP_NAME:-optimy}
+      - APP_NAME=${APP_NAME:-acme_corp}
       - APP_ENV=local
       - APP_DEBUG=true
       - DB_HOST=mysql
       - DB_PORT=3306
-      - DB_DATABASE=${MYSQL_DATABASE:-optimy}
-      - DB_USERNAME=${MYSQL_USER:-optimy}
+      - DB_DATABASE=${MYSQL_DATABASE:-acme_corp}
+      - DB_USERNAME=${MYSQL_USER:-acme_corp}
       - DB_PASSWORD=${MYSQL_PASSWORD}
       - MAIL_HOST=mailcatcher
       - MAIL_PORT=1025
       - RABBITMQ_HOST=rabbitmq
       - RABBITMQ_PORT=5672
-      - RABBITMQ_USER=${RABBITMQ_DEFAULT_USER:-optimy}
+      - RABBITMQ_USER=${RABBITMQ_DEFAULT_USER:-acme_corp}
       - RABBITMQ_PASSWORD=${RABBITMQ_DEFAULT_PASS}
       - MEILISEARCH_HOST=http://meilisearch:7700
       - MEILISEARCH_KEY=${MEILISEARCH_MASTER_KEY}
@@ -46,21 +46,21 @@ services:
       mailcatcher:
         condition: service_started
     networks:
-      - optimy_network
+      - acme_corp_network
 
   # MySQL Database
   mysql:
     env_file:
       - .env
     image: mysql:9.1
-    container_name: ${APP_NAME:-optimy}_mysql
+    container_name: ${APP_NAME:-acme_corp}_mysql
     restart: unless-stopped
     ports:
       - "${DATABASE_PORT:-34928}:3306"
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_password}
-      MYSQL_DATABASE: ${MYSQL_DATABASE:-optimy}
-      MYSQL_USER: ${MYSQL_USER:-optimy}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-acme_corp}
+      MYSQL_USER: ${MYSQL_USER:-acme_corp}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
       - mysql_data:/var/lib/mysql
@@ -73,20 +73,20 @@ services:
       retries: 5
       start_period: 30s
     networks:
-      - optimy_network
+      - acme_corp_network
 
   # RabbitMQ Message Broker
   rabbitmq:
     env_file:
       - .env
     image: rabbitmq:4.0-management-alpine
-    container_name: ${APP_NAME:-optimy}_rabbitmq
+    container_name: ${APP_NAME:-acme_corp}_rabbitmq
     restart: unless-stopped
     ports:
       - "5672:5672"
       - "15672:15672"
     environment:
-      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER:-optimy}
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER:-acme_corp}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
       RABBITMQ_DEFAULT_VHOST: /
     volumes:
@@ -98,14 +98,14 @@ services:
       retries: 5
       start_period: 30s
     networks:
-      - optimy_network
+      - acme_corp_network
 
   # MeiliSearch Search Engine
   meilisearch:
     env_file:
       - .env
     image: getmeili/meilisearch:v1.11
-    container_name: ${APP_NAME:-optimy}_meilisearch
+    container_name: ${APP_NAME:-acme_corp}_meilisearch
     restart: unless-stopped
     ports:
       - "${MEILISEARCH_PORT:-7855}:7700"
@@ -116,23 +116,23 @@ services:
     volumes:
       - meilisearch_data:/meili_data
     networks:
-      - optimy_network
+      - acme_corp_network
 
   # MailCatcher Email Testing
   mailcatcher:
     env_file:
       - .env
     image: schickling/mailcatcher:latest
-    container_name: ${APP_NAME:-optimy}_mailcatcher
+    container_name: ${APP_NAME:-acme_corp}_mailcatcher
     restart: unless-stopped
     ports:
       - "${MAILCATCHER_PORT:-1786}:1080"
       - "${MAILCATCHER_PORT_BIS:-17980}:1025"
     networks:
-      - optimy_network
+      - acme_corp_network
 
 networks:
-  optimy_network:
+  acme_corp_network:
     driver: bridge
 
 volumes:
