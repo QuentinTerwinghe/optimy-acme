@@ -23,11 +23,11 @@ class LoginController extends Controller
             return response()->json([
                 'message' => 'Login successful',
                 'user' => Auth::user(),
-                'redirect' => route('admin.dashboard'),
+                'redirect' => route('dashboard'),
             ]);
         }
 
-        return redirect()->intended(route('admin.dashboard'));
+        return redirect()->intended(route('dashboard'));
     }
 
     /**

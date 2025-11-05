@@ -15,11 +15,11 @@ Route::get('/login', function () {
 
 Route::post('/login', [LoginController::class, 'login'])->name('login')->middleware('guest');
 
-// Protected Admin Routes
-Route::prefix('admin')->middleware(['auth'])->group(function () {
+// Protected Routes
+Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', function () {
-        return view('admin.dashboard');
-    })->name('admin.dashboard');
+        return view('dashboard');
+    })->name('dashboard');
 
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 });
