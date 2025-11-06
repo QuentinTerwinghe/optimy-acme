@@ -56,9 +56,9 @@ class AuthService
     /**
      * Get the authenticated user's ID.
      *
-     * @return int|null
+     * @return int|string|null
      */
-    public function getAuthenticatedUserId(): ?int
+    public function getAuthenticatedUserId(): int|string|null
     {
         return Auth::id();
     }

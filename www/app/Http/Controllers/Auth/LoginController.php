@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -12,7 +14,7 @@ class LoginController extends Controller
     /**
      * Handle an authentication attempt.
      */
-    public function login(LoginRequest $request)
+    public function login(LoginRequest $request): JsonResponse|RedirectResponse
     {
         $request->authenticate();
 
@@ -33,7 +35,7 @@ class LoginController extends Controller
     /**
      * Log the user out of the application.
      */
-    public function logout(Request $request)
+    public function logout(Request $request): JsonResponse|RedirectResponse
     {
         Auth::logout();
 
