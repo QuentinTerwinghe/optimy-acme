@@ -6,6 +6,7 @@ namespace App\Providers;
 
 use App\Contracts\Notifications\NotificationRegistryInterface;
 use App\Contracts\Notifications\NotificationServiceInterface;
+use App\Services\Notifications\Handlers\ForgotPasswordHandler;
 use App\Services\Notifications\NotificationRegistry;
 use App\Services\Notifications\NotificationService;
 use Illuminate\Support\ServiceProvider;
@@ -37,10 +38,7 @@ class NotificationServiceProvider extends ServiceProvider
         /** @var NotificationRegistryInterface $registry */
         $registry = $this->app->make(NotificationRegistryInterface::class);
 
-        // Register your notification handlers here
-        // Example:
-        // $registry->register($this->app->make(IncentiveConfirmationHandler::class));
-        // $registry->register($this->app->make(WelcomeEmailHandler::class));
-        // $registry->register($this->app->make(PasswordResetHandler::class));
+        // Register notification handlers
+        $registry->register($this->app->make(ForgotPasswordHandler::class));
     }
 }

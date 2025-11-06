@@ -6,6 +6,5 @@ namespace App\Enums;
 
 enum NotificationType: string
 {
-    // Add your notification types here as needed
-    // Example: case INCENTIVE_CONFIRMATION = 'incentive_confirmation';
+    case FORGOT_PASSWORD = 'forgot_password';
 }
