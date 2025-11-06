@@ -6,6 +6,8 @@ namespace App\Models;
 
 use App\Enums\CampaignStatus;
 use App\Enums\Currency;
+use App\Models\Concerns\HasTimestamps;
+use App\Models\Concerns\HasUserTracking;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
@@ -23,15 +25,23 @@ use Illuminate\Support\Str;
  * @property \Illuminate\Support\Carbon $start_date
  * @property \Illuminate\Support\Carbon $end_date
  * @property CampaignStatus $status
+ * @property \Illuminate\Support\Carbon|null $creation_date
+ * @property \Illuminate\Support\Carbon|null $update_date
+ * @property int|null $created_by
+ * @property int|null $updated_by
+ * @property-read User|null $creator
+ * @property-read User|null $updater
  */
 class Campaign extends Model
 {
     use HasUuids;
+    use HasTimestamps;
+    use HasUserTracking;
 
     /**
      * Indicates if the model should be timestamped.
      */
-    public $timestamps = false;
+    public $timestamps = true;
 
     /**
      * The attributes that are mass assignable.
