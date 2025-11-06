@@ -246,7 +246,6 @@ For detailed implementation guides and examples, see the [documentation](documen
 ### Project Documentation
 
 - [Project Features & Implementation Guides](documentation/) - Detailed guides for implemented features
-- [Project Guidelines (CLAUDE.md)](CLAUDE.md) - Development principles, architecture, and best practices
 
 ### Laravel Documentation
 

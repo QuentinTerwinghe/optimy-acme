@@ -47,5 +47,3 @@ All features in this project follow SOLID principles:
 - **Liskov Substitution**: Implementations are substitutable for their interfaces
 - **Interface Segregation**: Specific interfaces over general-purpose ones
 - **Dependency Inversion**: Depend on abstractions, not concretions
-
-For more details, see the [CLAUDE.md](../CLAUDE.md) file in the project root.
