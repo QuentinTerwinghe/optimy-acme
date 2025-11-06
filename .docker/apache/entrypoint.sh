@@ -10,13 +10,8 @@ done
 
 echo "MySQL is up - executing command"
 
-# Run migrations
-php artisan migrate --force
-
-# Clear and cache config
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
+# Note: Migrations are handled by Makefile commands (make setup, make migrate, etc.)
+# Do not run migrations automatically here to avoid race conditions
 
 # Execute the main container command
 exec "$@"
