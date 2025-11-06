@@ -1,0 +1,74 @@
+# Notification Handlers Directory
+
+Place your concrete notification handler implementations here.
+
+## Example Structure
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace App\Services\Notifications\Handlers;
+
+use App\Enums\NotificationType;
+use App\Models\User;
+use App\Services\Notifications\AbstractNotificationHandler;
+use Illuminate\Support\Facades\Mail;
+
+class ExampleNotificationHandler extends AbstractNotificationHandler
+{
+    public function getNotificationType(): NotificationType
+    {
+        return NotificationType::EXAMPLE_TYPE;
+    }
+
+    protected function validate(User $receiver, array $parameters): void
+    {
+        parent::validate($receiver, $parameters);
+
+        // Add custom validation here
+        // Example: Check for required parameters
+        if (!isset($parameters['example_field'])) {
+            throw new \InvalidArgumentException('Missing required parameter: example_field');
+        }
+    }
+
+    protected function send(User $receiver, array $parameters): bool
+    {
+        // Implement your notification sending logic here
+        // Example: Send email, SMS, push notification, etc.
+
+        try {
+            // Your implementation
+            // Example: Mail::to($receiver->email)->send(new ExampleMailable($parameters));
+
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+}
+```
+
+## Usage
+
+1. Create your notification type in `App\Enums\NotificationType`
+2. Create your handler class extending `AbstractNotificationHandler`
+3. Implement `getNotificationType()` and `send()` methods
+4. Register the handler in `NotificationServiceProvider::boot()`
+
+```php
+// In NotificationServiceProvider::boot()
+$registry->register($this->app->make(ExampleNotificationHandler::class));
+```
+
+5. Use the service to send notifications:
+
+```php
+$notificationService->send(
+    $user,
+    NotificationType::EXAMPLE_TYPE,
+    ['example_field' => 'value']
+);
+```
