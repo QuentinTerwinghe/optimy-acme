@@ -82,6 +82,24 @@ phpstan:
 phpstan-baseline:
 	$(call do_phpstan_baseline)
 
+test:
+	$(call do_test)
+
+test-unit:
+	$(call do_test_unit)
+
+test-feature:
+	$(call do_test_feature)
+
+test-coverage:
+	$(call do_test_coverage)
+
+test-filter:
+	$(call do_test_filter)
+
+pest:
+	$(call do_pest)
+
 help:
 	$(call do_display_commands)
 
@@ -227,6 +245,36 @@ define do_phpstan_baseline
 	docker exec -w /var/www/html ${APP_NAME}_app bash -c "./vendor/bin/phpstan analyse --generate-baseline --allow-empty-baseline"
 endef
 
+define do_test
+	echo -e 'Running all tests...'
+	docker exec -w /var/www/html ${APP_NAME}_app bash -c "php artisan test"
+endef
+
+define do_test_unit
+	echo -e 'Running unit tests...'
+	docker exec -w /var/www/html ${APP_NAME}_app bash -c "php artisan test --testsuite=Unit"
+endef
+
+define do_test_feature
+	echo -e 'Running feature tests...'
+	docker exec -w /var/www/html ${APP_NAME}_app bash -c "php artisan test --testsuite=Feature"
+endef
+
+define do_test_coverage
+	echo -e 'Running tests with coverage...'
+	docker exec -w /var/www/html ${APP_NAME}_app bash -c "./vendor/bin/pest --coverage --min=80"
+endef
+
+define do_test_filter
+	echo -e 'Running filtered tests: \e[36m${F}\e[0m'
+	docker exec -w /var/www/html ${APP_NAME}_app bash -c "php artisan test --filter='${F}'"
+endef
+
+define do_pest
+	echo -e 'Running Pest tests...'
+	docker exec -w /var/www/html ${APP_NAME}_app bash -c "./vendor/bin/pest ${ARGS}"
+endef
+
 define exec
 	docker exec -w /var/www/html -it ${APP_NAME}_app bash -c ${1}
 endef
@@ -266,4 +314,10 @@ define do_display_commands
 	echo -e 'Generate application key: \e[36mmake \e[0m\e[1mkey\e[0m'
 	echo -e 'Run PHPStan static analysis: \e[36mmake \e[0m\e[1mphpstan\e[0m'
 	echo -e 'Generate PHPStan baseline: \e[36mmake \e[0m\e[1mphpstan-baseline\e[0m'
+	echo -e 'Run all tests: \e[36mmake \e[0m\e[1mtest\e[0m'
+	echo -e 'Run unit tests only: \e[36mmake \e[0m\e[1mtest-unit\e[0m'
+	echo -e 'Run feature tests only: \e[36mmake \e[0m\e[1mtest-feature\e[0m'
+	echo -e 'Run tests with coverage: \e[36mmake \e[0m\e[1mtest-coverage\e[0m'
+	echo -e 'Run filtered tests: \e[36mmake \e[0m\e[1mtest-filter F="TestName"\e[0m'
+	echo -e 'Run Pest directly: \e[36mmake \e[0m\e[1mpest\e[0m or \e[36mmake \e[0m\e[1mpest ARGS="--parallel"\e[0m'
 endef

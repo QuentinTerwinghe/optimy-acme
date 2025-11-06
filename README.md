@@ -131,6 +131,20 @@ All Docker operations are managed through convenient Make commands:
 | `make seed` | Seed the database |
 | `make import-data` | Import data (runs seeders) |
 
+### Testing & Code Quality Commands
+
+| Command | Description |
+|---------|-------------|
+| `make test` | Run all tests (Pest PHP) |
+| `make test-unit` | Run only unit tests |
+| `make test-feature` | Run only feature tests |
+| `make test-coverage` | Run tests with code coverage analysis |
+| `make test-filter F="TestName"` | Run specific tests by filter |
+| `make pest` | Run Pest directly |
+| `make pest ARGS="--parallel"` | Run Pest with custom arguments |
+| `make phpstan` | Run PHPStan static analysis |
+| `make phpstan-baseline` | Generate PHPStan baseline |
+
 ### Maintenance Commands
 
 | Command | Description |
@@ -161,7 +175,16 @@ make ssh
 make cc
 
 # Run tests
-make artisan C="test"
+make test
+
+# Run specific tests
+make test-filter F="CampaignTest"
+
+# Run tests with coverage
+make test-coverage
+
+# Run static analysis
+make phpstan
 ```
 
 ## Development Workflow
@@ -212,6 +235,61 @@ This project uses Laravel 12.x LTS (Long Term Support), which provides:
 - Security updates
 - Stability for production applications
 
+## Testing
+
+This project uses **Pest PHP** for testing, providing a modern and elegant testing experience.
+
+### Quick Start
+
+```bash
+# Run all tests
+make test
+
+# Run only unit tests
+make test-unit
+
+# Run only feature tests
+make test-feature
+
+# Run specific test file
+make test-filter F="CampaignTest"
+
+# Run tests with coverage
+make test-coverage
+```
+
+### Test Structure
+
+- **Unit Tests**: `www/tests/Unit/` - Test individual classes and methods
+- **Feature Tests**: `www/tests/Feature/` - Test complete features and HTTP endpoints
+- **Factories**: `www/database/factories/` - Model factories for test data generation
+
+### Current Test Coverage
+
+- ✅ **55 passing tests** for Enums, Models, and core functionality
+- User Model: 18 tests
+- Campaign Model: 38 tests
+- CampaignStatus Enum: 17 tests
+- Currency Enum: 27 tests
+
+For detailed testing documentation, see [Testing Guide](documentation/TESTING.md)
+
+## Code Quality
+
+### Static Analysis
+
+This project uses **PHPStan** for static code analysis to ensure type safety and code quality.
+
+```bash
+# Run PHPStan analysis
+make phpstan
+
+# Generate baseline (for legacy code)
+make phpstan-baseline
+```
+
+**Current Status**: ✅ 0 errors - All code passes static analysis
+
 ## Project Features
 
 This project includes the following implemented features:
@@ -229,6 +307,13 @@ This project includes the following implemented features:
 - Secure token generation and validation
 - Customizable email templates
 - See [Forgot Password Documentation](documentation/FORGOT_PASSWORD_USAGE.md)
+
+### Campaign Management
+
+- Campaign entity with UUID support
+- Multiple currency support (USD, EUR, GBP, CHF, CAD)
+- Campaign status tracking (Draft, Active, Completed, Cancelled)
+- Comprehensive test coverage with Pest PHP
 
 ### Infrastructure
 

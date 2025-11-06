@@ -4,6 +4,16 @@ This directory contains detailed documentation for various features and services
 
 ## Available Documentation
 
+### Testing & Quality Assurance
+
+- **[Testing Guide](TESTING.md)** - Comprehensive guide to testing with Pest PHP:
+  - Running tests with Make commands
+  - Writing unit and feature tests
+  - Using factories for test data
+  - Code coverage and best practices
+  - Pest PHP syntax and expectations
+  - CI/CD integration
+
 ### Notification System
 
 - **[Notification Service](NOTIFICATION.md)** - Complete guide to the notification system architecture, including:
@@ -34,9 +44,11 @@ The notification system is designed to be:
 
 ### Getting Started
 
-1. **To send a notification**: See [NOTIFICATION.md](NOTIFICATION.md#usage)
-2. **To create a new notification type**: See [NOTIFICATION.md](NOTIFICATION.md#step-2-create-a-notification-handler)
-3. **To implement forgot password**: See [FORGOT_PASSWORD_USAGE.md](FORGOT_PASSWORD_USAGE.md#usage-example)
+1. **To run tests**: See [TESTING.md](TESTING.md#running-tests)
+2. **To write new tests**: See [TESTING.md](TESTING.md#writing-tests)
+3. **To send a notification**: See [NOTIFICATION.md](NOTIFICATION.md#usage)
+4. **To create a new notification type**: See [NOTIFICATION.md](NOTIFICATION.md#step-2-create-a-notification-handler)
+5. **To implement forgot password**: See [FORGOT_PASSWORD_USAGE.md](FORGOT_PASSWORD_USAGE.md#usage-example)
 
 ## Architecture Principles
 
