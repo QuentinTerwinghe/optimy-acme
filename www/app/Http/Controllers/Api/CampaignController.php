@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api;
 
-use App\Contracts\Services\CampaignServiceInterface;
+use App\Contracts\Campaign\CampaignQueryServiceInterface;
+use App\Contracts\Campaign\CampaignWriteServiceInterface;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\CampaignResource;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -14,7 +15,7 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
  *
  * Handles HTTP requests for campaign-related operations
  * Follows Single Responsibility Principle - only handles HTTP layer
- * Business logic is delegated to CampaignService
+ * Business logic is delegated to specialized Campaign services
  */
 class CampaignController extends Controller
 {
@@ -22,7 +23,9 @@ class CampaignController extends Controller
      * Create a new controller instance
      */
     public function __construct(
-        private readonly CampaignServiceInterface $campaignService
+        private readonly CampaignQueryServiceInterface $campaignQueryService,
+        /** @phpstan-ignore-next-line property.onlyWritten - Write service will be used for create/update/delete endpoints */
+        private readonly CampaignWriteServiceInterface $campaignWriteService
     ) {}
 
     /**
@@ -32,7 +35,7 @@ class CampaignController extends Controller
      */
     public function getActiveCampaigns(): AnonymousResourceCollection
     {
-        $campaigns = $this->campaignService->getActiveCampaigns();
+        $campaigns = $this->campaignQueryService->getActiveCampaigns();
 
         return CampaignResource::collection($campaigns);
     }

@@ -1,9 +1,17 @@
 <?php
 
-namespace App\Contracts;
+declare(strict_types=1);
+
+namespace App\Contracts\Auth;
 
 use App\Models\User;
 
+/**
+ * Auth Service Interface
+ *
+ * Defines the contract for authentication operations
+ * Follows Single Responsibility Principle - handles only authentication
+ */
 interface AuthServiceInterface
 {
     /**

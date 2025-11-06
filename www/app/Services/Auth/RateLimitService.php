@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Auth;
 
-use App\Contracts\RateLimitServiceInterface;
+use App\Contracts\Auth\RateLimitServiceInterface;
 use Illuminate\Cache\RateLimiter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;

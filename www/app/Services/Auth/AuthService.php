@@ -1,12 +1,19 @@
 <?php
 
-namespace App\Services;
+declare(strict_types=1);
 
-use App\Contracts\AuthServiceInterface;
+namespace App\Services\Auth;
+
+use App\Contracts\Auth\AuthServiceInterface;
 use App\Models\User;
-use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Auth\StatefulGuard;
 
+/**
+ * Auth Service
+ *
+ * Handles authentication operations
+ * Follows Single Responsibility Principle - only authentication logic
+ */
 class AuthService implements AuthServiceInterface
 {
     /**

@@ -13,14 +13,14 @@ class AppServiceProvider extends ServiceProvider
     {
         // Bind AuthService interface to implementation
         $this->app->bind(
-            \App\Contracts\AuthServiceInterface::class,
-            \App\Services\AuthService::class
+            \App\Contracts\Auth\AuthServiceInterface::class,
+            \App\Services\Auth\AuthService::class
         );
 
         // Bind RateLimitService interface to implementation
         $this->app->bind(
-            \App\Contracts\RateLimitServiceInterface::class,
-            \App\Services\RateLimitService::class
+            \App\Contracts\Auth\RateLimitServiceInterface::class,
+            \App\Services\Auth\RateLimitService::class
         );
 
         // Bind PasswordResetService interface to implementation
@@ -29,10 +29,15 @@ class AppServiceProvider extends ServiceProvider
             \App\Services\Auth\PasswordResetService::class
         );
 
-        // Bind CampaignService interface to implementation
+        // Bind Campaign services interfaces to implementations
         $this->app->bind(
-            \App\Contracts\Services\CampaignServiceInterface::class,
-            \App\Services\CampaignService::class
+            \App\Contracts\Campaign\CampaignQueryServiceInterface::class,
+            \App\Services\Campaign\CampaignQueryService::class
+        );
+
+        $this->app->bind(
+            \App\Contracts\Campaign\CampaignWriteServiceInterface::class,
+            \App\Services\Campaign\CampaignWriteService::class
         );
 
         // Bind StatefulGuard for AuthService dependency injection

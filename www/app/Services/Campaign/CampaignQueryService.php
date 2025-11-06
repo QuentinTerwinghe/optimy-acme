@@ -1,0 +1,112 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Services\Campaign;
+
+use App\Contracts\Campaign\CampaignQueryServiceInterface;
+use App\Enums\CampaignStatus;
+use App\Models\Campaign;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Log;
+
+/**
+ * Campaign Query Service
+ *
+ * Handles all read operations for campaigns
+ * Follows Single Responsibility Principle - only queries/reads
+ */
+class CampaignQueryService implements CampaignQueryServiceInterface
+{
+    /**
+     * Get all active campaigns
+     *
+     * Returns campaigns that are:
+     * - Status is ACTIVE
+     * - End date is in the future
+     * - Ordered by end date (soonest first)
+     *
+     * @return Collection<int, Campaign>
+     */
+    public function getActiveCampaigns(): Collection
+    {
+        try {
+            return Campaign::query()
+                ->where('status', CampaignStatus::ACTIVE)
+                ->where('end_date', '>', now())
+                ->orderBy('end_date', 'asc')
+                ->get();
+        } catch (\Exception $e) {
+            Log::error('Failed to fetch active campaigns', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            // Return empty collection on error
+            return new Collection();
+        }
+    }
+
+    /**
+     * Find a campaign by ID
+     *
+     * @param string $id
+     * @return Campaign|null
+     */
+    public function findById(string $id): ?Campaign
+    {
+        try {
+            return Campaign::find($id);
+        } catch (\Exception $e) {
+            Log::error('Failed to find campaign by ID', [
+                'id' => $id,
+                'error' => $e->getMessage(),
+            ]);
+
+            return null;
+        }
+    }
+
+    /**
+     * Get all campaigns
+     *
+     * @return Collection<int, Campaign>
+     */
+    public function getAllCampaigns(): Collection
+    {
+        try {
+            return Campaign::query()
+                ->orderBy('created_at', 'desc')
+                ->get();
+        } catch (\Exception $e) {
+            Log::error('Failed to fetch all campaigns', [
+                'error' => $e->getMessage(),
+            ]);
+
+            return new Collection();
+        }
+    }
+
+    /**
+     * Get campaigns by status
+     *
+     * @param CampaignStatus $status
+     * @return Collection<int, Campaign>
+     */
+    public function getCampaignsByStatus(CampaignStatus $status): Collection
+    {
+        try {
+            return Campaign::query()
+                ->where('status', $status)
+                ->orderBy('created_at', 'desc')
+                ->get();
+        } catch (\Exception $e) {
+            Log::error('Failed to fetch campaigns by status', [
+                'status' => $status->value,
+                'error' => $e->getMessage(),
+            ]);
+
+            return new Collection();
+        }
+    }
+}

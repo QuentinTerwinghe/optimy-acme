@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Contracts\AuthServiceInterface;
-use App\Contracts\RateLimitServiceInterface;
+use App\Contracts\Auth\AuthServiceInterface;
+use App\Contracts\Auth\RateLimitServiceInterface;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Auth\Events\Lockout;
