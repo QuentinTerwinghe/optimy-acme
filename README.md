@@ -212,7 +212,43 @@ This project uses Laravel 12.x LTS (Long Term Support), which provides:
 - Security updates
 - Stability for production applications
 
+## Project Features
+
+This project includes the following implemented features:
+
+### Notification System
+
+- Flexible, SOLID-compliant notification service using Strategy and Registry patterns
+- Support for multiple notification types (email, SMS, etc.)
+- RabbitMQ integration for asynchronous processing
+- See [Notification Documentation](documentation/NOTIFICATION.md)
+
+### Authentication Features
+
+- Forgot password flow with email notifications
+- Secure token generation and validation
+- Customizable email templates
+- See [Forgot Password Documentation](documentation/FORGOT_PASSWORD_USAGE.md)
+
+### Infrastructure
+
+- Docker-based development environment
+- MySQL 9.1 database
+- RabbitMQ 4.0 message broker
+- MeiliSearch 1.11 search engine
+- MailCatcher for email testing
+- Queue worker for background job processing
+
+For detailed implementation guides and examples, see the [documentation](documentation/) directory.
+
 ## Documentation
+
+### Project Documentation
+
+- [Project Features & Implementation Guides](documentation/) - Detailed guides for implemented features
+- [Project Guidelines (CLAUDE.md)](CLAUDE.md) - Development principles, architecture, and best practices
+
+### Laravel Documentation
 
 - [Laravel Documentation](https://laravel.com/docs/12.x)
 - [Laravel API Documentation](https://laravel.com/api/12.x)
