@@ -29,6 +29,12 @@ class AppServiceProvider extends ServiceProvider
             \App\Services\Auth\PasswordResetService::class
         );
 
+        // Bind CampaignService interface to implementation
+        $this->app->bind(
+            \App\Contracts\Services\CampaignServiceInterface::class,
+            \App\Services\CampaignService::class
+        );
+
         // Bind StatefulGuard for AuthService dependency injection
         $this->app->bind(
             \Illuminate\Contracts\Auth\StatefulGuard::class,

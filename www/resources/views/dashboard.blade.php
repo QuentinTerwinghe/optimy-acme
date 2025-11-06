@@ -47,13 +47,8 @@
 
     <!-- Additional Content Area -->
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <!-- Left Column -->
-        <div class="bg-white overflow-hidden shadow-sm rounded-lg">
-            <div class="p-6">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h2>
-                <p class="text-gray-600">Activity feed will go here...</p>
-            </div>
-        </div>
+        <!-- Left Column - Active Campaigns -->
+        <active-campaigns-list></active-campaigns-list>
 
         <!-- Right Column -->
         <div class="bg-white overflow-hidden shadow-sm rounded-lg">

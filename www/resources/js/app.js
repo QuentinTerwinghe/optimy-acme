@@ -4,6 +4,7 @@ import { createApp } from 'vue';
 // Import components
 import StatsCard from './components/Dashboard/StatsCard.vue';
 import LoginForm from './components/Auth/LoginForm.vue';
+import ActiveCampaignsList from './components/Dashboard/ActiveCampaignsList.vue';
 
 // Create Vue app
 const app = createApp({
@@ -21,6 +22,7 @@ const app = createApp({
 // Register global components
 app.component('stats-card', StatsCard);
 app.component('login-form', LoginForm);
+app.component('active-campaigns-list', ActiveCampaignsList);
 
 // Mount the app
 app.mount('#app');
