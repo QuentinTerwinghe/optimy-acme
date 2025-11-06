@@ -40,7 +40,7 @@
                         <!-- User Dropdown -->
                         <div class="flex items-center space-x-4">
                             <span class="text-sm text-gray-700">{{ Auth::user()->name }}</span>
-                            <form method="POST" action="{{ route('logout') }}" class="inline">
+                            <form method="POST" action="{{ route('logout') }}" class="inline" @submit.prevent="handleLogout">
                                 @csrf
                                 <button type="submit" class="text-sm text-gray-500 hover:text-gray-700">
                                     Logout

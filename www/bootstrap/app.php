@@ -12,8 +12,14 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Configure guest and authenticated user redirects
         $middleware->redirectGuestsTo(fn (Request $request) => route('login.form'));
-        $middleware->redirectUsersTo(fn (Request $request) => route('admin.dashboard'));
+        $middleware->redirectUsersTo(fn (Request $request) => route('dashboard'));
+
+        // Ensure CSRF protection is enabled for web routes
+        $middleware->validateCsrfTokens(except: [
+            // Add any routes that should be excluded from CSRF protection
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
