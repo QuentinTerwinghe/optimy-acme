@@ -131,6 +131,37 @@ services:
     networks:
       - acme_corp_network
 
+  # Laravel Queue Worker
+  queue_worker:
+    env_file:
+      - .env
+    build:
+      context: .
+      dockerfile: .docker/Dockerfile
+    container_name: ${APP_NAME:-acme_corp}_queue_worker
+    restart: unless-stopped
+    volumes:
+      - ./www:/var/www/html
+      - ./www/storage:/var/www/html/storage
+      - ./www/bootstrap/cache:/var/www/html/bootstrap/cache
+    environment:
+      - APP_NAME=${APP_NAME:-acme_corp}
+      - APP_ENV=local
+      - APP_DEBUG=true
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_DATABASE=${MYSQL_DATABASE:-acme_corp}
+      - DB_USERNAME=${MYSQL_USER:-acme_corp}
+      - DB_PASSWORD=${MYSQL_PASSWORD}
+      - MAIL_HOST=mailcatcher
+      - MAIL_PORT=1025
+    depends_on:
+      mysql:
+        condition: service_healthy
+    command: php artisan queue:work database --verbose --tries=3 --timeout=90 --sleep=3 --max-time=3600
+    networks:
+      - acme_corp_network
+
 networks:
   acme_corp_network:
     driver: bridge

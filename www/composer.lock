@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c4934d83618c7d1a9e6d13adabb65474",
+    "content-hash": "118f33e18147fc4858f6c3e9579f61e8",
     "packages": [
         {
             "name": "brick/math",
@@ -6123,16 +6123,16 @@
         },
         {
             "name": "vladimir-yuldashev/laravel-queue-rabbitmq",
-            "version": "v14.3.0",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vyuldashev/laravel-queue-rabbitmq.git",
-                "reference": "d06427b3efa6ffd19872a059f9301b030158263d"
+                "reference": "aa273e884dd007d201b79ef9d67e8f169fdc4580"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vyuldashev/laravel-queue-rabbitmq/zipball/d06427b3efa6ffd19872a059f9301b030158263d",
-                "reference": "d06427b3efa6ffd19872a059f9301b030158263d",
+                "url": "https://api.github.com/repos/vyuldashev/laravel-queue-rabbitmq/zipball/aa273e884dd007d201b79ef9d67e8f169fdc4580",
+                "reference": "aa273e884dd007d201b79ef9d67e8f169fdc4580",
                 "shasum": ""
             },
             "require": {
@@ -6152,6 +6152,7 @@
             "suggest": {
                 "ext-pcntl": "Required to use all features of the queue consumer."
             },
+            "default-branch": true,
             "type": "library",
             "extra": {
                 "laravel": {
@@ -6181,9 +6182,9 @@
             "description": "RabbitMQ driver for Laravel Queue. Supports Laravel Horizon.",
             "support": {
                 "issues": "https://github.com/vyuldashev/laravel-queue-rabbitmq/issues",
-                "source": "https://github.com/vyuldashev/laravel-queue-rabbitmq/tree/v14.3.0"
+                "source": "https://github.com/vyuldashev/laravel-queue-rabbitmq/tree/master"
             },
-            "time": "2025-08-22T16:22:52+00:00"
+            "time": "2025-11-03T22:56:32+00:00"
         },
         {
             "name": "vlucas/phpdotenv",
@@ -8893,7 +8894,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {},
+    "stability-flags": {
+        "vladimir-yuldashev/laravel-queue-rabbitmq": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
