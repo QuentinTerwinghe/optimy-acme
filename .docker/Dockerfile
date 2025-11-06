@@ -14,6 +14,8 @@ RUN apt-get update && apt-get install -y \
     zip \
     unzip \
     default-mysql-client \
+    librabbitmq-dev \
+    libssh-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -26,7 +28,11 @@ RUN docker-php-ext-install \
     bcmath \
     gd \
     zip \
-    opcache
+    opcache \
+    sockets
+
+# Install AMQP extension for RabbitMQ
+RUN pecl install amqp && docker-php-ext-enable amqp
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
