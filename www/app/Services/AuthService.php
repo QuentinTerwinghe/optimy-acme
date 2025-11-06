@@ -2,45 +2,54 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\ValidationException;
+use App\Contracts\AuthServiceInterface;
+use App\Models\User;
+use Illuminate\Contracts\Auth\Guard;
+use Illuminate\Contracts\Auth\StatefulGuard;
 
-class AuthService
+class AuthService implements AuthServiceInterface
 {
+    /**
+     * Create a new AuthService instance.
+     *
+     * @param StatefulGuard $auth
+     */
+    public function __construct(
+        private readonly StatefulGuard $auth
+    ) {}
+
     /**
      * Attempt to authenticate a user with the given credentials.
      *
-     * @param string $username
-     * @param string $password
+     * @param array<string, mixed> $credentials
      * @param bool $remember
      * @return bool
      */
-    public function attemptLogin(string $username, string $password, bool $remember = false): bool
+    public function attemptLogin(array $credentials, bool $remember = false): bool
     {
-        return Auth::attempt(
-            ['email' => $username, 'password' => $password],
-            $remember
-        );
+        return $this->auth->attempt($credentials, $remember);
     }
 
     /**
      * Get the currently authenticated user.
      *
-     * @return \Illuminate\Contracts\Auth\Authenticatable|null
+     * @return User|null
      */
-    public function getAuthenticatedUser()
+    public function getAuthenticatedUser(): ?User
     {
-        return Auth::user();
+        $user = $this->auth->user();
+
+        return $user instanceof User ? $user : null;
     }
 
     /**
-     * Log out the current user.
+     * Log the user out of the application.
      *
      * @return void
      */
     public function logout(): void
     {
-        Auth::logout();
+        $this->auth->logout();
     }
 
     /**
@@ -50,16 +59,18 @@ class AuthService
      */
     public function isAuthenticated(): bool
     {
-        return Auth::check();
+        return $this->auth->check();
     }
 
     /**
-     * Get the authenticated user's ID.
+     * Get the ID of the currently authenticated user.
      *
-     * @return int|string|null
+     * @return int|null
      */
-    public function getAuthenticatedUserId(): int|string|null
+    public function getAuthenticatedUserId(): ?int
     {
-        return Auth::id();
+        $id = $this->auth->id();
+
+        return is_int($id) ? $id : null;
     }
 }
