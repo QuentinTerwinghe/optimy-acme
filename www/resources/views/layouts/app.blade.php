@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'ACME Corp') }} - @yield('title', 'Dashboard')</title>
+    <title>@yield('title') - {{ config('app.name', 'ACME Corp') }}</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -14,8 +14,8 @@
     <!-- Vite -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="font-sans antialiased bg-gray-50">
-    <div id="app">
+<body class="font-sans antialiased bg-gray-50 @yield('body-class')">
+    <div id="app" @yield('app-container-class')>
         <!-- Navigation -->
         @auth
             <nav class="bg-white shadow-sm border-b border-gray-200">
@@ -53,7 +53,7 @@
         @endauth
 
         <!-- Page Content -->
-        <main class="py-8">
+        <main @auth class="py-8" @endauth>
             @yield('content')
         </main>
     </div>

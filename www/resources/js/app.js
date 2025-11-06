@@ -3,6 +3,7 @@ import { createApp } from 'vue';
 
 // Import components
 import StatsCard from './components/Dashboard/StatsCard.vue';
+import LoginForm from './components/Auth/LoginForm.vue';
 
 // Create Vue app
 const app = createApp({
@@ -19,6 +20,7 @@ const app = createApp({
 
 // Register global components
 app.component('stats-card', StatsCard);
+app.component('login-form', LoginForm);
 
 // Mount the app
 app.mount('#app');
