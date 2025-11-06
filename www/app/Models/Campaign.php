@@ -10,6 +10,7 @@ use App\Models\Concerns\HasTimestamps;
 use App\Models\Concerns\HasUserTracking;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
@@ -31,9 +32,13 @@ use Illuminate\Support\Str;
  * @property int|null $updated_by
  * @property-read User|null $creator
  * @property-read User|null $updater
+ *
+ * @use HasFactory<\Database\Factories\CampaignFactory>
  */
 class Campaign extends Model
 {
+    /** @use HasFactory<\Database\Factories\CampaignFactory> */
+    use HasFactory;
     use HasUuids;
     use HasTimestamps;
     use HasUserTracking;
