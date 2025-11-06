@@ -86,7 +86,7 @@
                 </div>
 
                 <div class="text-sm">
-                    <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500">
+                    <a :href="forgotPasswordUrl" class="font-medium text-indigo-600 hover:text-indigo-500">
                         Forgot your password?
                     </a>
                 </div>
@@ -146,6 +146,10 @@ const props = defineProps({
     csrfToken: {
         type: String,
         required: true
+    },
+    forgotPasswordUrl: {
+        type: String,
+        default: '/forgot-password'
     },
     oldUsername: {
         type: String,

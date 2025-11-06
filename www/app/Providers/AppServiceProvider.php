@@ -23,6 +23,12 @@ class AppServiceProvider extends ServiceProvider
             \App\Services\RateLimitService::class
         );
 
+        // Bind PasswordResetService interface to implementation
+        $this->app->bind(
+            \App\Contracts\Auth\PasswordResetServiceInterface::class,
+            \App\Services\Auth\PasswordResetService::class
+        );
+
         // Bind StatefulGuard for AuthService dependency injection
         $this->app->bind(
             \Illuminate\Contracts\Auth\StatefulGuard::class,

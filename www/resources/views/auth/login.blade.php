@@ -22,6 +22,7 @@ class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8"
         <login-form
             login-url="{{ route('login') }}"
             csrf-token="{{ csrf_token() }}"
+            forgot-password-url="{{ route('password.request') }}"
             old-username="{{ old('username') }}"
             :server-errors='@json($errors->messages())'
         ></login-form>

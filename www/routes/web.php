@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 
@@ -17,6 +18,21 @@ Route::get('/login', [LoginController::class, 'showLoginForm'])
 Route::post('/login', [LoginController::class, 'login'])
     ->name('login')
     ->middleware('guest');
+
+// Password Reset Routes
+Route::middleware(['guest'])->group(function () {
+    Route::get('/forgot-password', [PasswordResetController::class, 'showForgotPasswordForm'])
+        ->name('password.request');
+
+    Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLink'])
+        ->name('password.email');
+
+    Route::get('/reset-password/{token}', [PasswordResetController::class, 'showResetPasswordForm'])
+        ->name('password.reset');
+
+    Route::post('/reset-password', [PasswordResetController::class, 'resetPassword'])
+        ->name('password.update');
+});
 
 // Protected Routes
 Route::middleware(['auth'])->group(function () {
