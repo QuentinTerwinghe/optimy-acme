@@ -93,16 +93,9 @@ class ForgotPasswordHandler extends AbstractNotificationHandler
      */
     private function buildResetUrl(string $email, string $token): string
     {
-        // When password reset route is implemented, this will generate the correct URL
-        // For now, we use a placeholder route name
-        // Example: route('password.reset', ['token' => $token, 'email' => $email])
-
-        $baseUrl = config('app.url');
-        $queryParams = http_build_query([
+        return route('password.reset', [
             'token' => $token,
             'email' => $email,
         ]);
-
-        return "{$baseUrl}/reset-password?{$queryParams}";
     }
 }
