@@ -13,9 +13,21 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        // Configure guest and authenticated user redirects
-        $middleware->redirectGuestsTo(fn (Request $request) => route('login.form'));
-        $middleware->redirectUsersTo(fn (Request $request) => route('dashboard'));
+        // SPA mode - let Vue Router handle routing
+        // For API requests, return proper JSON responses without redirects
+        $middleware->redirectGuestsTo(function (Request $request) {
+            if ($request->expectsJson() || $request->is('api/*')) {
+                return null; // Don't redirect API requests
+            }
+            return '/login';
+        });
+
+        $middleware->redirectUsersTo(function (Request $request) {
+            if ($request->expectsJson() || $request->is('api/*')) {
+                return null; // Don't redirect API requests
+            }
+            return '/dashboard';
+        });
 
         // Ensure CSRF protection is enabled for web routes
         $middleware->validateCsrfTokens(except: [
