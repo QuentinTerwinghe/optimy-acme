@@ -11,6 +11,8 @@ class DashboardController extends Controller
      */
     public function index(): View
     {
-        return view('dashboard');
+        /** @var view-string $viewName */
+        $viewName = 'dashboard';
+        return view($viewName);
     }
 }

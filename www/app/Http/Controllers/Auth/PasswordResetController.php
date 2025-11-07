@@ -32,7 +32,9 @@ class PasswordResetController extends Controller
      */
     public function showForgotPasswordForm(): View
     {
-        return view('auth.forgot-password');
+        /** @var view-string $viewName */
+        $viewName = 'auth.forgot-password';
+        return view($viewName);
     }
 
     /**
@@ -69,7 +71,9 @@ class PasswordResetController extends Controller
     {
         $email = request()->query('email', '');
 
-        return view('auth.reset-password', [
+        /** @var view-string $viewName */
+        $viewName = 'auth.reset-password';
+        return view($viewName, [
             'token' => $token,
             'email' => $email,
         ]);
