@@ -9,29 +9,23 @@ trait CreatesApplication
 {
     /**
      * Creates the application.
+     *
+     * The .env.testing file is loaded in tests/bootstrap.php before the application is created.
      */
     public function createApplication(): Application
     {
-        // Set ALL environment variables before anything else
-        putenv('APP_ENV=testing');
-        putenv('DB_CONNECTION=sqlite');
-        putenv('DB_DATABASE=:memory:');
-
-        $_ENV['APP_ENV'] = 'testing';
-        $_ENV['DB_CONNECTION'] = 'sqlite';
-        $_ENV['DB_DATABASE'] = ':memory:';
-
-        $_SERVER['APP_ENV'] = 'testing';
-        $_SERVER['DB_CONNECTION'] = 'sqlite';
-        $_SERVER['DB_DATABASE'] = ':memory:';
-
         $app = require __DIR__.'/../bootstrap/app.php';
 
         $app->make(Kernel::class)->bootstrap();
 
-        // Force config after bootstrap to ensure it's set
+        // Override configuration with testing values AFTER bootstrap
+        // This ensures tests run with the correct configuration regardless of .env file
+        $app['config']->set('app.env', 'testing');
         $app['config']->set('database.default', 'sqlite');
         $app['config']->set('database.connections.sqlite.database', ':memory:');
+
+        // Also set the environment on the application instance itself
+        $app->detectEnvironment(fn () => 'testing');
 
         return $app;
     }

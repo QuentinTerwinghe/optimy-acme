@@ -24,8 +24,10 @@
 uses(Tests\TestCase::class)
     ->in('Feature', 'Unit');
 
+// Apply RefreshDatabase to both Feature and Unit tests
+// Unit tests that interact with the database need migrations to run
 uses(Illuminate\Foundation\Testing\RefreshDatabase::class)
-    ->in('Feature');
+    ->in('Feature', 'Unit');
 
 /*
 |--------------------------------------------------------------------------
