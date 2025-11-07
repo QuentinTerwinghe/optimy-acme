@@ -40,6 +40,23 @@ class AppServiceProvider extends ServiceProvider
             \App\Services\Campaign\CampaignWriteService::class
         );
 
+        // Bind Tag services interfaces to implementations
+        $this->app->bind(
+            \App\Contracts\Tag\TagQueryServiceInterface::class,
+            \App\Services\Tag\TagQueryService::class
+        );
+
+        $this->app->bind(
+            \App\Contracts\Tag\TagWriteServiceInterface::class,
+            \App\Services\Tag\TagWriteService::class
+        );
+
+        // Bind Category services interfaces to implementations
+        $this->app->bind(
+            \App\Contracts\Category\CategoryQueryServiceInterface::class,
+            \App\Services\Category\CategoryQueryService::class
+        );
+
         // Bind StatefulGuard for AuthService dependency injection
         $this->app->bind(
             \Illuminate\Contracts\Auth\StatefulGuard::class,

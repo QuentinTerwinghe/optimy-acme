@@ -37,6 +37,8 @@ class CampaignResource extends JsonResource
             'status_label' => $this->resource->status->label(),
             'progress_percentage' => $this->calculateProgressPercentage(),
             'days_remaining' => $this->calculateDaysRemaining(),
+            'category' => $this->whenLoaded('category', fn() => new CategoryResource($this->resource->category)),
+            'tags' => TagResource::collection($this->whenLoaded('tags')),
         ];
     }
 

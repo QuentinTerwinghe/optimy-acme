@@ -7,7 +7,10 @@ namespace App\Http\Controllers\Api;
 use App\Contracts\Campaign\CampaignQueryServiceInterface;
 use App\Contracts\Campaign\CampaignWriteServiceInterface;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreCampaignRequest;
+use App\Http\Requests\UpdateCampaignRequest;
 use App\Http\Resources\CampaignResource;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 /**
@@ -45,12 +48,93 @@ class CampaignController extends Controller
      *
      * Returns the count of campaigns that are currently active and not yet ended
      */
-    public function getActiveCampaignsCount(): \Illuminate\Http\JsonResponse
+    public function getActiveCampaignsCount(): JsonResponse
     {
         $count = $this->campaignQueryService->getActiveCampaignsCount();
 
         return response()->json([
             'count' => $count,
         ]);
+    }
+
+    /**
+     * Get all campaigns
+     */
+    public function index(): AnonymousResourceCollection
+    {
+        $campaigns = $this->campaignQueryService->getAllCampaigns();
+
+        return CampaignResource::collection($campaigns);
+    }
+
+    /**
+     * Store a new campaign
+     */
+    public function store(StoreCampaignRequest $request): JsonResponse
+    {
+        $campaign = $this->campaignWriteService->createCampaign($request->validated());
+
+        return response()->json([
+            'message' => 'Campaign created successfully',
+            'data' => new CampaignResource($campaign),
+        ], 201);
+    }
+
+    /**
+     * Display the specified campaign
+     */
+    public function show(string $id): JsonResponse
+    {
+        $campaign = $this->campaignQueryService->findById($id);
+
+        if (!$campaign) {
+            return response()->json([
+                'message' => 'Campaign not found',
+            ], 404);
+        }
+
+        // Load relationships for detailed view
+        $campaign->load(['category', 'tags']);
+
+        return response()->json([
+            'data' => new CampaignResource($campaign),
+        ]);
+    }
+
+    /**
+     * Update the specified campaign
+     */
+    public function update(UpdateCampaignRequest $request, string $id): JsonResponse
+    {
+        try {
+            $campaign = $this->campaignWriteService->updateCampaign($id, $request->validated());
+
+            return response()->json([
+                'message' => 'Campaign updated successfully',
+                'data' => new CampaignResource($campaign),
+            ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'message' => 'Campaign not found',
+            ], 404);
+        }
+    }
+
+    /**
+     * Remove the specified campaign
+     */
+    public function destroy(string $id): JsonResponse
+    {
+        try {
+            $this->campaignWriteService->deleteCampaign($id);
+
+            return response()->json([
+                'message' => 'Campaign deleted successfully',
+            ], 200);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'message' => 'Campaign not found',
+            ], 404);
+        }
     }
 }

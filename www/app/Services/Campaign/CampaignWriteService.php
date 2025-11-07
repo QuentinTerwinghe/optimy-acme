@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services\Campaign;
 
 use App\Contracts\Campaign\CampaignWriteServiceInterface;
+use App\Contracts\Tag\TagWriteServiceInterface;
 use App\Models\Campaign;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -18,6 +19,14 @@ use Illuminate\Support\Facades\Log;
 class CampaignWriteService implements CampaignWriteServiceInterface
 {
     /**
+     * Constructor
+     *
+     * @param TagWriteServiceInterface $tagWriteService
+     */
+    public function __construct(
+        private TagWriteServiceInterface $tagWriteService
+    ) {}
+    /**
      * Create a new campaign
      *
      * @param array<string, mixed> $data
@@ -29,9 +38,28 @@ class CampaignWriteService implements CampaignWriteServiceInterface
         try {
             DB::beginTransaction();
 
+            // Extract tags from data (if present)
+            $tagNames = $data['tags'] ?? [];
+            unset($data['tags']);
+
+            // Create campaign
             $campaign = Campaign::create($data);
 
+            // Handle tags if provided
+            if (!empty($tagNames) && is_array($tagNames)) {
+                $tags = $this->tagWriteService->findOrCreateTags($tagNames);
+                $campaign->tags()->sync($tags->pluck('id'));
+
+                Log::info('Campaign tags synced', [
+                    'campaign_id' => $campaign->id,
+                    'tag_count' => $tags->count(),
+                ]);
+            }
+
             DB::commit();
+
+            // Reload campaign with relationships
+            $campaign->load(['category', 'tags']);
 
             Log::info('Campaign created successfully', [
                 'campaign_id' => $campaign->id,
@@ -65,9 +93,39 @@ class CampaignWriteService implements CampaignWriteServiceInterface
             DB::beginTransaction();
 
             $campaign = Campaign::findOrFail($id);
+
+            // Extract tags from data (if present)
+            $tagNames = $data['tags'] ?? null;
+            unset($data['tags']);
+
+            // Update campaign
             $campaign->update($data);
 
+            // Handle tags if provided (null means don't update tags, empty array means remove all tags)
+            if ($tagNames !== null && is_array($tagNames)) {
+                if (empty($tagNames)) {
+                    // Remove all tags
+                    $campaign->tags()->detach();
+
+                    Log::info('Campaign tags removed', [
+                        'campaign_id' => $campaign->id,
+                    ]);
+                } else {
+                    // Sync tags
+                    $tags = $this->tagWriteService->findOrCreateTags($tagNames);
+                    $campaign->tags()->sync($tags->pluck('id'));
+
+                    Log::info('Campaign tags synced', [
+                        'campaign_id' => $campaign->id,
+                        'tag_count' => $tags->count(),
+                    ]);
+                }
+            }
+
             DB::commit();
+
+            // Reload campaign with relationships
+            $campaign->load(['category', 'tags']);
 
             Log::info('Campaign updated successfully', [
                 'campaign_id' => $campaign->id,

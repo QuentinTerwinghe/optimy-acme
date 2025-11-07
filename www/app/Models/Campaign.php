@@ -12,6 +12,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Str;
 
 /**
@@ -26,12 +28,15 @@ use Illuminate\Support\Str;
  * @property \Illuminate\Support\Carbon $start_date
  * @property \Illuminate\Support\Carbon $end_date
  * @property CampaignStatus $status
+ * @property int|null $category_id
  * @property \Illuminate\Support\Carbon|null $creation_date
  * @property \Illuminate\Support\Carbon|null $update_date
  * @property int|null $created_by
  * @property int|null $updated_by
  * @property-read User|null $creator
  * @property-read User|null $updater
+ * @property-read Category|null $category
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Tag> $tags
  *
  * @use HasFactory<\Database\Factories\CampaignFactory>
  */
@@ -62,6 +67,7 @@ class Campaign extends Model
         'start_date',
         'end_date',
         'status',
+        'category_id',
     ];
 
     /**
@@ -197,5 +203,25 @@ class Campaign extends Model
     {
         $binary = hex2bin(str_replace('-', '', $uuid));
         return $query->where('id', $binary);
+    }
+
+    /**
+     * Get the category that the campaign belongs to
+     *
+     * @return BelongsTo<Category, $this>
+     */
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(Category::class);
+    }
+
+    /**
+     * Get all tags for this campaign
+     *
+     * @return BelongsToMany<Tag, $this>
+     */
+    public function tags(): BelongsToMany
+    {
+        return $this->belongsToMany(Tag::class, 'campaign_tag');
     }
 }

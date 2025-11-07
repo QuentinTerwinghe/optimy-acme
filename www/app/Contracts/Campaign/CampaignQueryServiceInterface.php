@@ -60,4 +60,28 @@ interface CampaignQueryServiceInterface
      * @return Collection<int, Campaign>
      */
     public function getCampaignsByStatus(\App\Enums\CampaignStatus $status): Collection;
+
+    /**
+     * Get campaigns by category
+     *
+     * @param int $categoryId
+     * @return Collection<int, Campaign>
+     */
+    public function getCampaignsByCategory(int $categoryId): Collection;
+
+    /**
+     * Get campaigns by tags (campaigns that have ANY of the specified tags)
+     *
+     * @param array<int, int> $tagIds
+     * @return Collection<int, Campaign>
+     */
+    public function getCampaignsByTags(array $tagIds): Collection;
+
+    /**
+     * Get campaigns by tags (campaigns that have ALL of the specified tags)
+     *
+     * @param array<int, int> $tagIds
+     * @return Collection<int, Campaign>
+     */
+    public function getCampaignsByAllTags(array $tagIds): Collection;
 }

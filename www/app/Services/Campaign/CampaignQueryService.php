@@ -136,4 +136,82 @@ class CampaignQueryService implements CampaignQueryServiceInterface
             return new Collection();
         }
     }
+
+    /**
+     * Get campaigns by category
+     *
+     * @param int $categoryId
+     * @return Collection<int, Campaign>
+     */
+    public function getCampaignsByCategory(int $categoryId): Collection
+    {
+        try {
+            return Campaign::query()
+                ->where('category_id', $categoryId)
+                ->with(['category', 'tags'])
+                ->orderBy('created_at', 'desc')
+                ->get();
+        } catch (\Exception $e) {
+            Log::error('Failed to fetch campaigns by category', [
+                'category_id' => $categoryId,
+                'error' => $e->getMessage(),
+            ]);
+
+            return new Collection();
+        }
+    }
+
+    /**
+     * Get campaigns by tags (campaigns that have ANY of the specified tags)
+     *
+     * @param array<int, int> $tagIds
+     * @return Collection<int, Campaign>
+     */
+    public function getCampaignsByTags(array $tagIds): Collection
+    {
+        try {
+            return Campaign::query()
+                ->whereHas('tags', function ($query) use ($tagIds) {
+                    $query->whereIn('tags.id', $tagIds);
+                })
+                ->with(['category', 'tags'])
+                ->orderBy('created_at', 'desc')
+                ->get();
+        } catch (\Exception $e) {
+            Log::error('Failed to fetch campaigns by tags', [
+                'tag_ids' => $tagIds,
+                'error' => $e->getMessage(),
+            ]);
+
+            return new Collection();
+        }
+    }
+
+    /**
+     * Get campaigns by tags (campaigns that have ALL of the specified tags)
+     *
+     * @param array<int, int> $tagIds
+     * @return Collection<int, Campaign>
+     */
+    public function getCampaignsByAllTags(array $tagIds): Collection
+    {
+        try {
+            $tagCount = count($tagIds);
+
+            return Campaign::query()
+                ->whereHas('tags', function ($query) use ($tagIds) {
+                    $query->whereIn('tags.id', $tagIds);
+                }, '=', $tagCount)
+                ->with(['category', 'tags'])
+                ->orderBy('created_at', 'desc')
+                ->get();
+        } catch (\Exception $e) {
+            Log::error('Failed to fetch campaigns by all tags', [
+                'tag_ids' => $tagIds,
+                'error' => $e->getMessage(),
+            ]);
+
+            return new Collection();
+        }
+    }
 }
