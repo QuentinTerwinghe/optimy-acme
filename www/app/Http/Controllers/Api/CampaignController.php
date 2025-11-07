@@ -39,4 +39,18 @@ class CampaignController extends Controller
 
         return CampaignResource::collection($campaigns);
     }
+
+    /**
+     * Get count of active campaigns
+     *
+     * Returns the count of campaigns that are currently active and not yet ended
+     */
+    public function getActiveCampaignsCount(): \Illuminate\Http\JsonResponse
+    {
+        $count = $this->campaignQueryService->getActiveCampaignsCount();
+
+        return response()->json([
+            'count' => $count,
+        ]);
+    }
 }

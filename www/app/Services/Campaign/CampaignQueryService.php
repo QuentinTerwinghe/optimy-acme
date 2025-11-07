@@ -48,6 +48,33 @@ class CampaignQueryService implements CampaignQueryServiceInterface
     }
 
     /**
+     * Get count of active campaigns
+     *
+     * Returns the count of campaigns that are:
+     * - Status is ACTIVE
+     * - End date is in the future
+     *
+     * @return int
+     */
+    public function getActiveCampaignsCount(): int
+    {
+        try {
+            return Campaign::query()
+                ->where('status', CampaignStatus::ACTIVE)
+                ->where('end_date', '>', now())
+                ->count();
+        } catch (\Exception $e) {
+            Log::error('Failed to count active campaigns', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            // Return 0 on error
+            return 0;
+        }
+    }
+
+    /**
      * Find a campaign by ID
      *
      * @param string $id

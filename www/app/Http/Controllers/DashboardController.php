@@ -11,7 +11,6 @@ class DashboardController extends Controller
      */
     public function index(): View
     {
-        /** @phpstan-ignore argument.type */
         return view('dashboard');
     }
 }

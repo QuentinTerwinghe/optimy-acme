@@ -28,6 +28,17 @@ interface CampaignQueryServiceInterface
     public function getActiveCampaigns(): Collection;
 
     /**
+     * Get count of active campaigns
+     *
+     * Returns the count of campaigns that are:
+     * - Status is ACTIVE
+     * - End date is in the future
+     *
+     * @return int
+     */
+    public function getActiveCampaignsCount(): int;
+
+    /**
      * Find a campaign by ID
      *
      * @param string $id

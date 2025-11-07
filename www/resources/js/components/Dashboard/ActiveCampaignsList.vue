@@ -145,11 +145,16 @@ const fetchCampaigns = async () => {
     }
 };
 
+// Define emits
+const emit = defineEmits(['refresh']);
+
 /**
  * Refresh campaigns list
  */
 const refreshCampaigns = () => {
     fetchCampaigns();
+    // Emit refresh event to parent so it can refresh other components
+    emit('refresh');
 };
 
 /**
