@@ -122,6 +122,9 @@ define do_setup
 	$(call do_docker)
 	$(call exec, "composer install --no-interaction --no-progress --prefer-dist --optimize-autoloader")
 	$(call exec, "php artisan key:generate")
+	echo -e 'Setting up testing environment...'
+	$(call exec, "cp -n .env.testing.example .env.testing || true")
+	$(call exec, "php artisan key:generate --env=testing")
 	$(call do_build_front)
 	$(call do_db_migrate_fresh)
 	$(call do_db_seed)
