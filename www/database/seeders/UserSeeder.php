@@ -10,39 +10,52 @@ class UserSeeder extends Seeder
 {
     /**
      * Run the database seeds.
+     *
+     * Creates dedicated test users with specific roles:
+     * - admin@acme.corp with 'admin' role
+     * - campaign@acme.corp with 'campaign_manager' role
+     * - user@acme.corp with 'user' role
      */
     public function run(): void
     {
         $users = [
             [
-                'name' => 'User 1',
-                'email' => 'user1@acme.corp',
-                'password' => 'user1',
+                'name' => 'Admin User',
+                'email' => 'admin@acme.corp',
+                'password' => 'admin',
+                'role' => 'admin',
             ],
             [
-                'name' => 'User 2',
-                'email' => 'user2@acme.corp',
-                'password' => 'user2',
+                'name' => 'Campaign Manager',
+                'email' => 'campaign@acme.corp',
+                'password' => 'campaign',
+                'role' => 'campaign_manager',
             ],
             [
-                'name' => 'User 3',
-                'email' => 'user3@acme.corp',
-                'password' => 'user3',
+                'name' => 'Regular User',
+                'email' => 'user@acme.corp',
+                'password' => 'user',
+                'role' => 'user',
             ],
         ];
 
         $this->command->info('');
-        $this->command->info('Creating test users...');
+        $this->command->info('Creating test users with roles...');
         $this->command->info('');
 
         foreach ($users as $userData) {
-            User::firstOrCreate(
+            $user = User::firstOrCreate(
                 ['email' => $userData['email']],
                 [
                     'name' => $userData['name'],
                     'password' => Hash::make($userData['password']),
                 ]
             );
+
+            // Assign role to user
+            if (!$user->hasRole($userData['role'])) {
+                $user->assignRole($userData['role']);
+            }
         }
 
         // Display created users with their credentials
@@ -52,11 +65,11 @@ class UserSeeder extends Seeder
         $this->command->info('');
 
         $this->command->table(
-            ['Email', 'Password', 'Name'],
+            ['Email', 'Password', 'Name', 'Role'],
             [
-                ['user1@acme.corp', 'user1', 'User 1'],
-                ['user2@acme.corp', 'user2', 'User 2'],
-                ['user3@acme.corp', 'user3', 'User 3'],
+                ['admin@acme.corp', 'admin', 'Admin User', 'admin'],
+                ['campaign@acme.corp', 'campaign', 'Campaign Manager', 'campaign_manager'],
+                ['user@acme.corp', 'user', 'Regular User', 'user'],
             ]
         );
 
