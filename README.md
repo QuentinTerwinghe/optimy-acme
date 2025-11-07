@@ -55,7 +55,7 @@ root/
    ```
 
    This single command will:
-   - Build and start all Docker containers (Laravel app, MySQL, RabbitMQ, MeiliSearch, MailCatcher)
+   - Build and start all Docker containers (Laravel app, MySQL, RabbitMQ, MailCatcher)
    - Install Composer dependencies
    - Generate Laravel application key
    - Run database migrations
@@ -70,7 +70,6 @@ root/
    - **Application**: <http://localhost:9481>
    - **MailCatcher**: <http://localhost:1786>
    - **RabbitMQ Management**: <http://localhost:15672>
-   - **MeiliSearch**: <http://localhost:7855>
 
 ### Local Development Setup (Without Docker)
 
@@ -94,7 +93,6 @@ The Docker setup includes:
 - **app**: Laravel application with PHP 8.3 and Apache
 - **mysql**: MySQL 9.1 database server
 - **rabbitmq**: RabbitMQ 4.0 message broker with management UI
-- **meilisearch**: MeiliSearch 1.11 search engine
 - **mailcatcher**: Email testing tool
 
 ## Make Commands
@@ -320,7 +318,6 @@ This project includes the following implemented features:
 - Docker-based development environment
 - MySQL 9.1 database
 - RabbitMQ 4.0 message broker
-- MeiliSearch 1.11 search engine
 - MailCatcher for email testing
 - Queue worker for background job processing
 

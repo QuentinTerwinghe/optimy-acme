@@ -287,7 +287,6 @@ define do_display_app_info
 	echo -e 'Database port: \e[36m${DATABASE_PORT}\e[0m'
 	echo -e 'MailCatcher: \e[36mhttp://localhost:${MAILCATCHER_PORT}\e[0m'
 	echo -e 'RabbitMQ Management: \e[36mhttp://localhost:15672\e[0m'
-	echo -e 'MeiliSearch: \e[36mhttp://localhost:${MEILISEARCH_PORT}\e[0m'
 endef
 
 define do_display_commands

@@ -34,15 +34,11 @@ services:
       - RABBITMQ_PORT=5672
       - RABBITMQ_USER=${RABBITMQ_DEFAULT_USER:-acme_corp}
       - RABBITMQ_PASSWORD=${RABBITMQ_DEFAULT_PASS}
-      - MEILISEARCH_HOST=http://meilisearch:7700
-      - MEILISEARCH_KEY=${MEILISEARCH_MASTER_KEY}
     depends_on:
       mysql:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
-      meilisearch:
-        condition: service_started
       mailcatcher:
         condition: service_started
     networks:
@@ -100,24 +96,6 @@ services:
     networks:
       - acme_corp_network
 
-  # MeiliSearch Search Engine
-  meilisearch:
-    env_file:
-      - .env
-    image: getmeili/meilisearch:v1.11
-    container_name: ${APP_NAME:-acme_corp}_meilisearch
-    restart: unless-stopped
-    ports:
-      - "${MEILISEARCH_PORT:-7855}:7700"
-    environment:
-      MEILI_MASTER_KEY: ${MEILISEARCH_MASTER_KEY}
-      MEILI_ENV: development
-      MEILI_NO_ANALYTICS: true
-    volumes:
-      - meilisearch_data:/meili_data
-    networks:
-      - acme_corp_network
-
   # MailCatcher Email Testing
   mailcatcher:
     env_file:
@@ -168,8 +146,6 @@ networks:
 
 volumes:
   mysql_data:
-    driver: local
-  meilisearch_data:
     driver: local
   rabbitmq_data:
     driver: local
