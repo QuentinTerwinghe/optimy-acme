@@ -1,27 +1,29 @@
 import './bootstrap';
 import { createApp } from 'vue';
-import { createPinia } from 'pinia';
-import router from './router';
-import App from './App.vue';
 
-// Import global components
+// Import components
 import StatsCard from './components/Dashboard/StatsCard.vue';
+import LoginForm from './components/Auth/LoginForm.vue';
 import ActiveCampaignsList from './components/Dashboard/ActiveCampaignsList.vue';
 import ActiveCampaignsCount from './components/Dashboard/ActiveCampaignsCount.vue';
 import DashboardWrapper from './components/Dashboard/DashboardWrapper.vue';
 
-// Create Pinia store
-const pinia = createPinia();
-
 // Create Vue app
-const app = createApp(App);
+const app = createApp({
+    methods: {
+        handleLogout(event) {
+            // Get the form element
+            const form = event.target;
 
-// Use plugins
-app.use(pinia);
-app.use(router);
+            // Submit the form natively (without Vue interfering)
+            form.submit();
+        }
+    }
+});
 
 // Register global components
 app.component('stats-card', StatsCard);
+app.component('login-form', LoginForm);
 app.component('active-campaigns-list', ActiveCampaignsList);
 app.component('active-campaigns-count', ActiveCampaignsCount);
 app.component('dashboard-wrapper', DashboardWrapper);

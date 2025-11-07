@@ -136,15 +136,34 @@
 
 <script setup>
 import { ref, computed } from 'vue';
-import { useRouter } from 'vue-router';
-import { useAuthStore } from '../../stores/auth';
 
-const router = useRouter();
-const authStore = useAuthStore();
+// Props
+const props = defineProps({
+    loginUrl: {
+        type: String,
+        required: true
+    },
+    csrfToken: {
+        type: String,
+        required: true
+    },
+    forgotPasswordUrl: {
+        type: String,
+        default: '/forgot-password'
+    },
+    oldUsername: {
+        type: String,
+        default: ''
+    },
+    serverErrors: {
+        type: Object,
+        default: () => ({})
+    }
+});
 
 // Form state
 const form = ref({
-    username: '',
+    username: props.oldUsername,
     password: '',
     remember: false
 });
@@ -153,8 +172,8 @@ const form = ref({
 const showPassword = ref(false);
 const isSubmitting = ref(false);
 const errors = ref({
-    username: '',
-    password: '',
+    username: props.serverErrors.username || '',
+    password: props.serverErrors.password || '',
     general: ''
 });
 
@@ -162,8 +181,6 @@ const errors = ref({
 const isFormValid = computed(() => {
     return form.value.username.trim() !== '' && form.value.password.trim() !== '';
 });
-
-const forgotPasswordUrl = '/forgot-password';
 
 // Methods
 const clearError = (field) => {
@@ -197,23 +214,37 @@ const handleSubmit = async () => {
     isSubmitting.value = true;
 
     try {
-        const result = await authStore.login({
-            username: form.value.username,
-            password: form.value.password,
-            remember: form.value.remember
+        // Create form data
+        const formData = new FormData();
+        formData.append('_token', props.csrfToken);
+        formData.append('username', form.value.username);
+        formData.append('password', form.value.password);
+        if (form.value.remember) {
+            formData.append('remember', 'on');
+        }
+
+        // Submit to Laravel
+        const response = await fetch(props.loginUrl, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+            }
         });
 
-        if (result.success) {
-            // Success - navigate to dashboard
-            router.push('/dashboard');
+        const data = await response.json();
+
+        if (response.ok) {
+            // Success - redirect to dashboard or intended page
+            window.location.href = data.redirect || '/dashboard';
         } else {
             // Handle validation errors
-            if (result.errors) {
-                errors.value.username = result.errors.username?.[0] || '';
-                errors.value.password = result.errors.password?.[0] || '';
-                if (!errors.value.username && !errors.value.password) {
-                    errors.value.general = result.errors.email?.[0] || 'Invalid credentials. Please try again.';
-                }
+            if (data.errors) {
+                errors.value.username = data.errors.username?.[0] || '';
+                errors.value.password = data.errors.password?.[0] || '';
+            } else if (data.message) {
+                errors.value.general = data.message;
             } else {
                 errors.value.general = 'Invalid credentials. Please try again.';
             }

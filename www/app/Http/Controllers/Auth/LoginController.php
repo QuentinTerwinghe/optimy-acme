@@ -66,11 +66,11 @@ class LoginController extends Controller
             return response()->json([
                 'message' => 'Login successful',
                 'user' => $this->authService->getAuthenticatedUser(),
-                'redirect' => '/dashboard',
+                'redirect' => route('dashboard'),
             ]);
         }
 
-        return redirect()->intended('/dashboard');
+        return redirect()->intended(route('dashboard'));
     }
 
     /**
@@ -90,7 +90,7 @@ class LoginController extends Controller
             ]);
         }
 
-        return redirect('/login');
+        return redirect()->route('login.form');
     }
 
     /**
