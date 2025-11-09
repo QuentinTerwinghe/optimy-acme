@@ -27,9 +27,13 @@ This project uses **Pest PHP**, a modern testing framework built on top of PHPUn
 
 ### Current Test Statistics
 
-- **Total Tests**: 55 passing tests
-- **Test Coverage**: Enums, Models, Factories
-- **PHPStan Status**: ✅ 0 errors
+- **Total Tests**: 193 passing tests
+- **Total Assertions**: 510
+- **Test Coverage**: Comprehensive coverage across all layers
+  - Unit Tests: Models, Services, Enums, DTOs, Resources
+  - Feature Tests: API endpoints, Campaign flows, Authentication
+- **Test Organization**: Organized by domain following Pseudo-DDD structure
+- **PHPStan Status**: ✅ 0 errors (Level 9)
 
 ## Testing Framework
 
@@ -120,18 +124,37 @@ php artisan test --filter=CampaignTest
 
 ### Directory Organization
 
+Following the **Pseudo-DDD** pattern, tests are organized by domain:
+
 ```text
 www/tests/
-├── Feature/              # Integration and HTTP tests
-├── Unit/                 # Unit tests for individual components
-│   ├── Enums/           # Enum tests
+├── Feature/                        # Integration and HTTP tests
+│   ├── Api/                        # API endpoint tests
+│   │   └── CampaignControllerTest.php
+│   └── Campaign/                   # Campaign domain feature tests
+│       └── CampaignStoreTest.php
+├── Unit/                           # Unit tests for individual components
+│   ├── ConfigTest.php              # Configuration tests
+│   ├── DataTransferObjects/       # DTO tests
+│   │   └── NotificationPayloadTest.php
+│   ├── Enums/                      # Enum tests
 │   │   ├── CampaignStatusTest.php
 │   │   └── CurrencyTest.php
-│   └── Models/          # Model tests
-│       ├── CampaignTest.php
-│       └── UserTest.php
-├── Pest.php             # Pest configuration
-└── TestCase.php         # Base test case
+│   ├── Models/                     # Model tests
+│   │   ├── CampaignTest.php
+│   │   └── UserTest.php
+│   ├── Resources/                  # API resource tests
+│   │   └── CampaignResourceTest.php
+│   └── Services/                   # Service tests
+│       ├── CampaignServiceTest.php
+│       └── Notifications/          # Notification service tests
+│           ├── AbstractNotificationHandlerTest.php
+│           ├── NotificationRegistryTest.php
+│           ├── NotificationServiceTest.php
+│           └── Handlers/
+│               └── ForgotPasswordHandlerTest.php
+├── Pest.php                        # Pest configuration
+└── TestCase.php                    # Base test case
 ```
 
 ### Test Categories
@@ -140,21 +163,25 @@ www/tests/
 
 Test individual classes, methods, and components in isolation.
 
-**Current Unit Tests**:
-- ✅ `UserTest.php` - 18 tests
-- ✅ `CampaignTest.php` - 38 tests
-- ✅ `CampaignStatusTest.php` - 17 tests
-- ✅ `CurrencyTest.php` - 27 tests
+**Current Unit Tests** (180 tests):
+- Config: 3 tests
+- Data Transfer Objects: 12 tests
+- Enums: 44 tests (CampaignStatus, Currency)
+- Models: 51 tests (Campaign, User)
+- Resources: 15 tests (CampaignResource)
+- Services: 23 tests (Campaign services, Notification system)
+  - AbstractNotificationHandler: 6 tests
+  - NotificationRegistry: 6 tests
+  - NotificationService: 5 tests
+  - ForgotPasswordHandler: 10 tests
 
 #### Feature Tests (`tests/Feature/`)
 
-Test complete features, HTTP endpoints, and user workflows.
+Test complete features, HTTP endpoints, and user workflows (32 tests).
 
-**Examples**:
-- API endpoint testing
-- Authentication flows
-- Form submissions
-- Database interactions
+**Current Feature Tests**:
+- API Endpoints: 22 tests (Campaign API, authentication, edge cases)
+- Campaign Management: 10 tests (Create campaigns, validation, tags/categories)
 
 ## Writing Tests
 
@@ -694,20 +721,38 @@ describe('Campaign API', function () {
 
 ## Summary
 
-This project uses Pest PHP for testing, providing:
+This project uses Pest PHP for comprehensive testing, providing:
 
-- ✅ 55 passing tests covering Enums, Models, and core functionality
-- ✅ Comprehensive factory support for test data generation
-- ✅ Easy-to-use Make commands for running tests
-- ✅ PHPStan integration for static analysis
-- ✅ Code coverage support
+- ✅ **193 passing tests** with **510 assertions**
+- ✅ **Organized by domain** following Pseudo-DDD structure
+- ✅ **Comprehensive coverage**: Models, Services, Enums, DTOs, Resources, APIs
+- ✅ **Factory support** for efficient test data generation
+- ✅ **Easy-to-use Make commands** for running tests
+- ✅ **PHPStan Level 9** for static analysis
+- ✅ **Code coverage support** to measure test effectiveness
+
+**Test Breakdown**:
+- Unit Tests: 180 tests (Config, DTOs, Enums, Models, Services, Resources)
+- Feature Tests: 32 tests (API endpoints, Campaign flows)
+- Zero errors in static analysis
 
 **Quick Commands**:
 ```bash
-make test              # Run all tests
-make test-unit         # Run unit tests
-make test-coverage     # Run with coverage
-make phpstan           # Static analysis
+make test              # Run all tests (193 tests)
+make test-unit         # Run unit tests only
+make test-feature      # Run feature tests only
+make test-coverage     # Run with coverage analysis
+make phpstan           # Run static analysis (Level 9)
 ```
 
-For more information, see the [main README](../README.md) or explore the existing test files in `www/tests/`.
+**Testing Philosophy**:
+- Write tests before code (TDD)
+- All new features must have tests
+- Never commit with failing tests
+- Maintain high test coverage
+- Follow SOLID principles in tests
+
+For more information, see:
+- [Main README](../README.md) - Project overview
+- [Architecture Guide](ARCHITECTURE.md) - Project structure and patterns
+- Explore existing test files in `www/tests/` for examples

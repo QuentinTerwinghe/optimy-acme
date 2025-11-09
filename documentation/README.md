@@ -1,61 +1,111 @@
 # Project Documentation
 
-This directory contains detailed documentation for various features and services implemented in the ACME Corp application.
+This directory contains detailed documentation for the ACME Corp Laravel application, including architecture, features, testing, and implementation guides.
 
 ## Available Documentation
 
+### Architecture & Development
+
+- **[Architecture Guide](ARCHITECTURE.md)** - Project structure and design principles:
+  - Pseudo-DDD organization
+  - SOLID principles implementation
+  - Domain organization patterns
+  - Folder structure conventions
+  - Code organization best practices
+
 ### Testing & Quality Assurance
 
-- **[Testing Guide](TESTING.md)** - Comprehensive guide to testing with Pest PHP:
-  - Running tests with Make commands
-  - Writing unit and feature tests
+- **[Testing Guide](TESTING.md)** - Comprehensive testing documentation:
+  - Running tests with Make commands (193 passing tests)
+  - Writing unit and feature tests with Pest PHP
   - Using factories for test data
   - Code coverage and best practices
-  - Pest PHP syntax and expectations
+  - Test organization by domain
   - CI/CD integration
 
-### Notification System
+### Feature Documentation
 
-- **[Notification Service](NOTIFICATION.md)** - Complete guide to the notification system architecture, including:
+#### Notification System
+
+- **[Notification Service](NOTIFICATION.md)** - Notification system architecture:
   - SOLID-compliant design using Strategy and Registry patterns
-  - How to create and register new notification handlers
-  - Integration with RabbitMQ for asynchronous processing
-  - Testing and best practices
+  - Creating and registering new notification handlers
+  - RabbitMQ integration for asynchronous processing
+  - Testing notification handlers
   - Error handling and troubleshooting
 
-### Authentication & Password Management
+#### Authentication & Password Management
 
-- **[Forgot Password Flow](FORGOT_PASSWORD_USAGE.md)** - Implementation guide for the password reset feature:
-  - Using the ForgotPasswordHandler notification
-  - Synchronous and asynchronous (RabbitMQ) implementations
+- **[Forgot Password Flow](FORGOT_PASSWORD_USAGE.md)** - Password reset implementation:
+  - Using the ForgotPasswordHandler
+  - Synchronous and asynchronous implementations
   - Token generation and security
   - Email templates and configuration
-  - Testing examples
+  - Testing password reset flows
 
 ## Quick Links
 
-### Notification System Overview
-
-The notification system is designed to be:
-- **Extensible**: Easy to add new notification types
-- **Maintainable**: Each notification type has its own handler
-- **Testable**: Built with SOLID principles and dependency injection
-- **Scalable**: Integrates with RabbitMQ for async processing
-
 ### Getting Started
 
-1. **To run tests**: See [TESTING.md](TESTING.md#running-tests)
-2. **To write new tests**: See [TESTING.md](TESTING.md#writing-tests)
-3. **To send a notification**: See [NOTIFICATION.md](NOTIFICATION.md#usage)
-4. **To create a new notification type**: See [NOTIFICATION.md](NOTIFICATION.md#step-2-create-a-notification-handler)
-5. **To implement forgot password**: See [FORGOT_PASSWORD_USAGE.md](FORGOT_PASSWORD_USAGE.md#usage-example)
+1. **Understanding the architecture**: See [ARCHITECTURE.md](ARCHITECTURE.md)
+2. **Running tests**: See [TESTING.md](TESTING.md#running-tests)
+3. **Writing new tests**: See [TESTING.md](TESTING.md#writing-tests)
+4. **Sending notifications**: See [NOTIFICATION.md](NOTIFICATION.md#usage)
+5. **Creating notification types**: See [NOTIFICATION.md](NOTIFICATION.md#step-2-create-a-notification-handler)
+6. **Password reset implementation**: See [FORGOT_PASSWORD_USAGE.md](FORGOT_PASSWORD_USAGE.md#usage-example)
+
+### Common Tasks
+
+#### Adding a New Feature Domain
+
+1. Create domain folder structure within each technical layer
+2. Follow the Pseudo-DDD pattern (see [ARCHITECTURE.md](ARCHITECTURE.md))
+3. Write corresponding tests (unit + feature)
+4. Ensure all tests pass before committing
+
+#### Testing Your Code
+
+```bash
+# Run all tests (193 tests should pass)
+make test
+
+# Run specific test suite
+make test-unit      # Unit tests only
+make test-feature   # Feature tests only
+
+# Run with coverage
+make test-coverage
+
+# Run static analysis
+make phpstan
+```
+
+## Project Statistics
+
+- **Total Tests**: 193 passing
+- **Total Assertions**: 510
+- **PHPStan Level**: 9
+- **Code Coverage**: Comprehensive coverage of models, services, and features
+- **Laravel Version**: 12.x LTS
+- **PHP Version**: 8.3
 
 ## Architecture Principles
 
-All features in this project follow SOLID principles:
+All features in this project follow **SOLID principles** and **Pseudo-DDD** organization:
+
+### SOLID Principles
 
 - **Single Responsibility**: Each class has one reason to change
 - **Open/Closed**: Open for extension, closed for modification
 - **Liskov Substitution**: Implementations are substitutable for their interfaces
 - **Interface Segregation**: Specific interfaces over general-purpose ones
 - **Dependency Inversion**: Depend on abstractions, not concretions
+
+### Pseudo-DDD Organization
+
+- Technical layers first (Controllers, Services, Models, etc.)
+- Domain folders within each layer (Campaign, Auth, Notifications, etc.)
+- Clear separation of concerns
+- Scalable and maintainable structure
+
+See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed information.

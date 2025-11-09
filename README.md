@@ -1,26 +1,56 @@
 # ACME Corp - Laravel 12.x LTS Project
 
-This is a Laravel 12.x LTS project running on PHP 8.3 with Docker support.
+A modern Laravel 12.x LTS application following SOLID principles, Domain-Driven Design organization, and comprehensive testing practices.
 
 ## Project Structure
 
+This project follows a **Pseudo-DDD (Domain-Driven Design)** architecture, organizing code by domain within each technical layer:
+
 ```text
 root/
-├── .docker/              # Docker configuration files
-├── www/                  # Laravel application root
-│   ├── app/             # Application code
-│   ├── bootstrap/       # Framework bootstrap
-│   ├── config/          # Configuration files
-│   ├── database/        # Migrations, seeders, factories
-│   ├── public/          # Public web root
-│   ├── resources/       # Views, assets
-│   ├── routes/          # Route definitions
-│   ├── storage/         # Logs, cache, uploads
-│   ├── tests/           # Test files
-│   └── vendor/          # Composer dependencies
-├── docker-compose.yml   # Docker services configuration
-├── Makefile            # Make commands for easy Docker management
-└── README.md           # This file
+├── .docker/                     # Docker configuration files
+├── www/                         # Laravel application root
+│   ├── app/
+│   │   ├── Http/
+│   │   │   ├── Controllers/
+│   │   │   │   └── {Domain}/   # Domain-specific controllers
+│   │   │   ├── Requests/
+│   │   │   │   └── {Domain}/   # Domain-specific form requests
+│   │   │   └── Resources/
+│   │   │       └── {Domain}/   # Domain-specific API resources
+│   │   ├── Models/
+│   │   │   └── {Domain}/       # Domain-specific models
+│   │   ├── Services/
+│   │   │   └── {Domain}/       # Domain-specific business logic
+│   │   ├── Repositories/
+│   │   │   └── {Domain}/       # Domain-specific data access
+│   │   ├── Contracts/
+│   │   │   └── {Domain}/       # Domain-specific interfaces
+│   │   ├── Enums/              # Application enums
+│   │   └── Providers/          # Service providers
+│   ├── database/
+│   │   ├── factories/
+│   │   │   └── {Domain}/       # Domain-specific factories
+│   │   ├── migrations/         # Database migrations
+│   │   └── seeders/            # Database seeders
+│   ├── resources/
+│   │   ├── js/
+│   │   │   └── components/
+│   │   │       └── {Domain}/   # Vue.js components by domain
+│   │   └── views/              # Blade templates
+│   ├── tests/
+│   │   ├── Feature/
+│   │   │   └── {Domain}/       # Feature tests by domain
+│   │   └── Unit/
+│   │       ├── Models/         # Model unit tests
+│   │       ├── Services/       # Service unit tests
+│   │       └── Enums/          # Enum unit tests
+│   └── vendor/                 # Composer dependencies
+├── documentation/              # Project documentation
+├── docker-compose.yml          # Docker services configuration
+├── Makefile                    # Make commands for Docker management
+├── CLAUDE.md                   # Development guidelines (internal)
+└── README.md                   # This file
 ```
 
 ## Requirements
@@ -264,11 +294,20 @@ make test-coverage
 
 ### Current Test Coverage
 
-- ✅ **55 passing tests** for Enums, Models, and core functionality
-- User Model: 18 tests
-- Campaign Model: 38 tests
-- CampaignStatus Enum: 17 tests
-- Currency Enum: 27 tests
+- ✅ **193 passing tests** with **510 assertions**
+- **Unit Tests**: Models, Services, Enums, DTOs, Resources
+- **Feature Tests**: API endpoints, Campaign management, Authentication flows
+- **Test Organization**: Organized by domain following Pseudo-DDD structure
+
+**Test Breakdown**:
+- Config Tests: 3 tests
+- Data Transfer Objects: 12 tests
+- Enums: 44 tests (CampaignStatus, Currency)
+- Models: 51 tests (Campaign, User)
+- Services: 23 tests (Campaign, Notifications)
+- Resources: 15 tests
+- Feature/API: 22 tests
+- Feature/Campaign: 10 tests
 
 For detailed testing documentation, see [Testing Guide](documentation/TESTING.md)
 
@@ -288,38 +327,76 @@ make phpstan-baseline
 
 **Current Status**: ✅ 0 errors - All code passes static analysis
 
+## Architecture & Design Principles
+
+This project follows industry best practices and SOLID principles:
+
+### SOLID Principles
+
+- **Single Responsibility**: Each class has one clear purpose
+- **Open/Closed**: Open for extension, closed for modification
+- **Liskov Substitution**: Implementations are interchangeable
+- **Interface Segregation**: Specific, focused interfaces
+- **Dependency Inversion**: Depend on abstractions, not concretions
+
+### Pseudo-DDD Organization
+
+The project uses a **Pseudo-DDD** approach:
+- Technical layers first (Controllers, Services, Models)
+- Domain folders within each layer (Campaign, Auth, Notifications)
+- Clear separation of concerns
+- Easy navigation and scalability
+
+Benefits:
+- ✅ Maintains Laravel's familiar structure
+- ✅ All Campaign files grouped by domain
+- ✅ Easy to find and modify related code
+- ✅ Scales well as the project grows
+
 ## Project Features
 
 This project includes the following implemented features:
 
+### Campaign Management
+
+- **Campaign Entity**: Full CRUD with UUID support
+- **Categories & Tags**: Organize campaigns with categories and tags
+- **Multi-Currency**: Support for USD, EUR, GBP, CHF, CAD
+- **Status Tracking**: Draft, Waiting for Validation, Active, Completed, Cancelled
+- **Progress Tracking**: Goal amounts, current amounts, progress percentages
+- **RESTful API**: Complete API for campaign operations
+- **Vue.js Frontend**: Modern Vue 3 components for campaign creation/management
+
 ### Notification System
 
-- Flexible, SOLID-compliant notification service using Strategy and Registry patterns
-- Support for multiple notification types (email, SMS, etc.)
-- RabbitMQ integration for asynchronous processing
+- **SOLID Architecture**: Strategy and Registry patterns
+- **Multiple Types**: Email, SMS, and custom notification handlers
+- **RabbitMQ Integration**: Asynchronous processing
+- **Extensible**: Easy to add new notification types
 - See [Notification Documentation](documentation/NOTIFICATION.md)
 
 ### Authentication Features
 
-- Forgot password flow with email notifications
-- Secure token generation and validation
-- Customizable email templates
-- See [Forgot Password Documentation](documentation/FORGOT_PASSWORD_USAGE.md)
-
-### Campaign Management
-
-- Campaign entity with UUID support
-- Multiple currency support (USD, EUR, GBP, CHF, CAD)
-- Campaign status tracking (Draft, Active, Completed, Cancelled)
-- Comprehensive test coverage with Pest PHP
+- **Password Reset**: Complete forgot password flow
+- **Email Notifications**: Secure token-based reset links
+- **Token Management**: Automatic expiration and validation
+- See [Password Reset Documentation](documentation/FORGOT_PASSWORD_USAGE.md)
 
 ### Infrastructure
 
-- Docker-based development environment
-- MySQL 9.1 database
-- RabbitMQ 4.0 message broker
-- MailCatcher for email testing
-- Queue worker for background job processing
+- **Docker Environment**: Consistent development setup
+- **MySQL 9.1**: Robust database with UUID support
+- **RabbitMQ 4.0**: Message broker for async jobs
+- **MailCatcher**: Email testing during development
+- **Vite**: Modern frontend build tool
+- **Pest PHP**: Elegant testing framework
+
+### Code Quality Tools
+
+- **PHPStan**: Static analysis (Level 9)
+- **Laravel Pint**: Code style enforcement
+- **Pest PHP**: Modern testing framework
+- **193 Tests**: Comprehensive test coverage
 
 For detailed implementation guides and examples, see the [documentation](documentation/) directory.
 
@@ -327,12 +404,48 @@ For detailed implementation guides and examples, see the [documentation](documen
 
 ### Project Documentation
 
-- [Project Features & Implementation Guides](documentation/) - Detailed guides for implemented features
+- **[Documentation Index](documentation/README.md)** - Overview of all available documentation
+- **[Testing Guide](documentation/TESTING.md)** - Comprehensive testing documentation
+- **[Notification System](documentation/NOTIFICATION.md)** - Notification architecture and usage
+- **[Password Reset](documentation/FORGOT_PASSWORD_USAGE.md)** - Forgot password implementation
 
 ### Laravel Documentation
 
-- [Laravel Documentation](https://laravel.com/docs/12.x)
+- [Laravel 12.x Documentation](https://laravel.com/docs/12.x)
 - [Laravel API Documentation](https://laravel.com/api/12.x)
+- [Pest PHP Documentation](https://pestphp.com)
+
+## Contributing
+
+### Development Guidelines
+
+1. **Follow SOLID Principles** - Write clean, maintainable code
+2. **Use Pseudo-DDD Structure** - Organize files by domain within technical layers
+3. **Write Tests First** - TDD approach with Pest PHP
+4. **Run Quality Checks** - PHPStan and tests before committing
+5. **Use Make Commands** - Always use Makefile for consistency
+
+### Before Committing
+
+```bash
+# Run all tests
+make test
+
+# Run static analysis
+make phpstan
+
+# Format code
+make artisan C="pint"
+```
+
+### Code Review Checklist
+
+- ✅ All tests passing (193 tests)
+- ✅ PHPStan passing (0 errors)
+- ✅ Code follows Pseudo-DDD structure
+- ✅ SOLID principles applied
+- ✅ Proper type hints on all methods
+- ✅ Comprehensive test coverage for new code
 
 ## License
 

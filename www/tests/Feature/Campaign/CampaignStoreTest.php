@@ -43,7 +43,7 @@ class CampaignStoreTest extends TestCase
             'currency' => Currency::EUR->value,
             'start_date' => now()->addDay()->format('Y-m-d'),
             'end_date' => now()->addDays(30)->format('Y-m-d'),
-            'status' => 'draft',
+            'status' => CampaignStatus::DRAFT->value,
             'category_id' => $this->category->id,
             'tags' => ['Education', 'Technology'],
         ];
@@ -84,7 +84,7 @@ class CampaignStoreTest extends TestCase
             'currency' => Currency::USD->value,
             'start_date' => now()->addDay()->format('Y-m-d'),
             'end_date' => now()->addDays(60)->format('Y-m-d'),
-            'status' => 'waiting_for_validation',
+            'status' => CampaignStatus::WAITING_FOR_VALIDATION->value,
             'category_id' => $this->category->id,
             'tags' => [],
         ];
@@ -117,7 +117,7 @@ class CampaignStoreTest extends TestCase
             'currency' => Currency::EUR->value,
             'start_date' => now()->addDay()->format('Y-m-d'),
             'end_date' => now()->addDays(45)->format('Y-m-d'),
-            'status' => 'draft',
+            'status' => CampaignStatus::DRAFT->value,
             'category_id' => $this->category->id,
             'tags' => ['Health', 'Community'],
         ];
@@ -146,7 +146,7 @@ class CampaignStoreTest extends TestCase
             'currency' => Currency::GBP->value,
             'start_date' => now()->addDay()->format('Y-m-d'),
             'end_date' => now()->addDays(30)->format('Y-m-d'),
-            'status' => 'draft',
+            'status' => CampaignStatus::DRAFT->value,
             'category_id' => $this->category->id,
             'tags' => ['Science', 'Innovation', 'Research'], // Mix of existing and new
         ];
@@ -173,7 +173,7 @@ class CampaignStoreTest extends TestCase
             'currency' => Currency::EUR->value,
             'start_date' => now()->addDay()->format('Y-m-d'),
             'end_date' => now()->addDays(20)->format('Y-m-d'),
-            'status' => 'draft',
+            'status' => CampaignStatus::DRAFT->value,
             'category_id' => null,
             'tags' => [],
         ];
@@ -207,7 +207,7 @@ class CampaignStoreTest extends TestCase
             'currency' => 'INVALID',
             'start_date' => now()->addDay()->format('Y-m-d'),
             'end_date' => now()->addDays(30)->format('Y-m-d'),
-            'status' => 'draft',
+            'status' => CampaignStatus::DRAFT->value,
         ];
 
         $response = $this->actingAs($this->user)
@@ -226,7 +226,7 @@ class CampaignStoreTest extends TestCase
             'currency' => Currency::EUR->value,
             'start_date' => now()->addDays(30)->format('Y-m-d'),
             'end_date' => now()->addDay()->format('Y-m-d'), // Before start date
-            'status' => 'draft',
+            'status' => CampaignStatus::DRAFT->value,
         ];
 
         $response = $this->actingAs($this->user)
@@ -245,7 +245,7 @@ class CampaignStoreTest extends TestCase
             'currency' => Currency::EUR->value,
             'start_date' => now()->addDay()->format('Y-m-d'),
             'end_date' => now()->addDays(30)->format('Y-m-d'),
-            'status' => 'draft',
+            'status' => CampaignStatus::DRAFT->value,
         ];
 
         $response = $this->postJson('/campaigns', $campaignData);
@@ -262,7 +262,7 @@ class CampaignStoreTest extends TestCase
             'currency' => Currency::EUR->value,
             'start_date' => now()->addDay()->format('Y-m-d'),
             'end_date' => now()->addDays(30)->format('Y-m-d'),
-            'status' => 'draft',
+            'status' => CampaignStatus::DRAFT->value,
         ];
 
         $response = $this->actingAs($this->user)
