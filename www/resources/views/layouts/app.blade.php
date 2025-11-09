@@ -22,9 +22,16 @@
                 <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div class="flex h-16 justify-between items-center">
                         <!-- Logo -->
-                        <div class="flex items-center">
+                        <div class="flex items-center gap-4">
                             <a href="{{ route('dashboard') }}" class="text-xl font-bold text-gray-900">
                                 {{ config('app.name', 'ACME Corp') }}
+                            </a>
+                            <a href="{{ route('campaigns.create') }}"
+                               class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition-colors duration-200 shadow-sm hover:shadow-md"
+                               title="Create new campaign">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                </svg>
                             </a>
                         </div>
 

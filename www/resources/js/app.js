@@ -7,6 +7,8 @@ import LoginForm from './components/Auth/LoginForm.vue';
 import ActiveCampaignsList from './components/Dashboard/ActiveCampaignsList.vue';
 import ActiveCampaignsCount from './components/Dashboard/ActiveCampaignsCount.vue';
 import DashboardWrapper from './components/Dashboard/DashboardWrapper.vue';
+import CampaignCreateForm from './components/Campaign/CampaignCreateForm.vue';
+import TagInput from './components/Common/TagInput.vue';
 
 // Create Vue app
 const app = createApp({
@@ -27,6 +29,8 @@ app.component('login-form', LoginForm);
 app.component('active-campaigns-list', ActiveCampaignsList);
 app.component('active-campaigns-count', ActiveCampaignsCount);
 app.component('dashboard-wrapper', DashboardWrapper);
+app.component('campaign-create-form', CampaignCreateForm);
+app.component('tag-input', TagInput);
 
 // Mount the app
 app.mount('#app');

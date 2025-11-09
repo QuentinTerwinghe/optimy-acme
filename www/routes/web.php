@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\PasswordResetController;
+use App\Http\Controllers\CampaignController;
 use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 
@@ -41,4 +42,8 @@ Route::middleware(['auth'])->group(function () {
 
     Route::delete('/logout', [LoginController::class, 'logout'])
         ->name('logout');
+
+    // Campaign Routes
+    Route::get('/campaigns/create', [CampaignController::class, 'create'])
+        ->name('campaigns.create');
 });
