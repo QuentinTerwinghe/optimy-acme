@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Contracts\Tag;
 
-use App\Models\Tag;
+use App\Models\Campaign\Tag;
 use Illuminate\Database\Eloquent\Collection;
 
 /**

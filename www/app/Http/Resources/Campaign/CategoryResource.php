@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Resources;
+namespace App\Http\Resources\Campaign;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -10,7 +10,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 /**
  * Category Resource
  *
- * @property \App\Models\Category $resource
+ * @property \App\Models\Campaign\Category $resource
  */
 class CategoryResource extends JsonResource
 {

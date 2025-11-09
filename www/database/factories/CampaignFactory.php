@@ -6,8 +6,8 @@ namespace Database\Factories;
 
 use App\Enums\CampaignStatus;
 use App\Enums\Currency;
-use App\Models\Campaign;
-use App\Models\User;
+use App\Models\Campaign\Campaign;
+use App\Models\Auth\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**

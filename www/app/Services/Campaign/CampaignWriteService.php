@@ -6,7 +6,7 @@ namespace App\Services\Campaign;
 
 use App\Contracts\Campaign\CampaignWriteServiceInterface;
 use App\Contracts\Tag\TagWriteServiceInterface;
-use App\Models\Campaign;
+use App\Models\Campaign\Campaign;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 

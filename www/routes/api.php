@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Http\Controllers\Api\CampaignController;
+use App\Http\Controllers\Api\Campaign\CampaignController;
 use Illuminate\Support\Facades\Route;
 
 // Protected API Routes - using web middleware for session-based auth

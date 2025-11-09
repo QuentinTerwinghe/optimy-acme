@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Resources;
+namespace App\Http\Resources\Campaign;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -12,7 +12,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *
  * Transforms Campaign model data for API responses
  *
- * @property \App\Models\Campaign $resource
+ * @property \App\Models\Campaign\Campaign $resource
  */
 class CampaignResource extends JsonResource
 {

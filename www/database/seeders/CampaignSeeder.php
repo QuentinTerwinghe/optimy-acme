@@ -3,9 +3,9 @@
 namespace Database\Seeders;
 
 use App\Enums\CampaignStatus;
-use App\Models\Campaign;
-use App\Models\Category;
-use App\Models\Tag;
+use App\Models\Campaign\Campaign;
+use App\Models\Campaign\Category;
+use App\Models\Campaign\Tag;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
@@ -19,7 +19,7 @@ class CampaignSeeder extends Seeder
         $currencies = ['USD', 'EUR', 'GBP', 'CAD', 'CHF'];
 
         // Get all user UUIDs for foreign key references
-        $userIds = \App\Models\User::pluck('id')->toArray();
+        $userIds = \App\Models\Auth\User::pluck('id')->toArray();
 
         // Create categories
         $categories = [

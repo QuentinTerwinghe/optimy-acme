@@ -2,11 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Campaign;
 
 use App\Enums\Currency;
-use App\Models\Category;
-use App\Models\Tag;
+use App\Http\Controllers\Controller;
+use App\Models\Campaign\Campaign;
+use App\Models\Campaign\Category;
+use App\Models\Campaign\Tag;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 

@@ -2,10 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Models;
+namespace App\Models\Campaign;
 
 use App\Enums\CampaignStatus;
 use App\Enums\Currency;
+use App\Models\Auth\User;
 use App\Models\Concerns\HasTimestamps;
 use App\Models\Concerns\HasUserTracking;
 use Illuminate\Database\Eloquent\Builder;

@@ -6,7 +6,7 @@ namespace App\Services\Notifications\Handlers;
 
 use App\Enums\NotificationType;
 use App\Mail\Auth\ForgotPasswordMail;
-use App\Models\User;
+use App\Models\Auth\User;
 use App\Services\Notifications\AbstractNotificationHandler;
 use Illuminate\Support\Facades\Mail;
 

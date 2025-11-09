@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Api\Campaign;
 
 use App\Contracts\Campaign\CampaignQueryServiceInterface;
 use App\Contracts\Campaign\CampaignWriteServiceInterface;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreCampaignRequest;
-use App\Http\Requests\UpdateCampaignRequest;
-use App\Http\Resources\CampaignResource;
+use App\Http\Requests\Campaign\StoreCampaignRequest;
+use App\Http\Requests\Campaign\UpdateCampaignRequest;
+use App\Http\Resources\Campaign\CampaignResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 

@@ -6,7 +6,7 @@ namespace App\Services\Auth;
 
 use App\Contracts\Auth\PasswordResetServiceInterface;
 use App\Jobs\SendForgotPasswordNotificationJob;
-use App\Models\User;
+use App\Models\Auth\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;

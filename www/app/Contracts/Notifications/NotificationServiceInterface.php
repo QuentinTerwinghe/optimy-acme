@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Contracts\Notifications;
 
 use App\Enums\NotificationType;
-use App\Models\User;
+use App\Models\Auth\User;
 
 /**
  * Main notification service interface.

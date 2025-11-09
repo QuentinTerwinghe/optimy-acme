@@ -6,7 +6,7 @@ namespace App\Services\Campaign;
 
 use App\Contracts\Campaign\CampaignQueryServiceInterface;
 use App\Enums\CampaignStatus;
-use App\Models\Campaign;
+use App\Models\Campaign\Campaign;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Log;
 

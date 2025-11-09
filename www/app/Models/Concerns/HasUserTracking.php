@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models\Concerns;
 
-use App\Models\User;
+use App\Models\Auth\User;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Auth;
 

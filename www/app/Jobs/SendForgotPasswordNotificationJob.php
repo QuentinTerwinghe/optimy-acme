@@ -6,7 +6,7 @@ namespace App\Jobs;
 
 use App\Contracts\Notifications\NotificationServiceInterface;
 use App\Enums\NotificationType;
-use App\Models\User;
+use App\Models\Auth\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;

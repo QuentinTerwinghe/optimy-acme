@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Services\Tag;
 
 use App\Contracts\Tag\TagQueryServiceInterface;
-use App\Models\Tag;
+use App\Models\Campaign\Tag;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Log;
 

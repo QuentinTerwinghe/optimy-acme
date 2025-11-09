@@ -2,8 +2,8 @@
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\PasswordResetController;
-use App\Http\Controllers\CampaignController;
-use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Campaign\CampaignController;
+use App\Http\Controllers\Dashboard\DashboardController;
 use Illuminate\Support\Facades\Route;
 
 // Redirect root to login

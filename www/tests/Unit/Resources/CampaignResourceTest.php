@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 use App\Enums\CampaignStatus;
 use App\Enums\Currency;
-use App\Http\Resources\CampaignResource;
-use App\Models\Campaign;
+use App\Http\Resources\Campaign\CampaignResource;
+use App\Models\Campaign\Campaign;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Resources;
+namespace App\Http\Resources\Campaign;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -10,7 +10,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 /**
  * Tag Resource
  *
- * @property \App\Models\Tag $resource
+ * @property \App\Models\Campaign\Tag $resource
  */
 class TagResource extends JsonResource
 {

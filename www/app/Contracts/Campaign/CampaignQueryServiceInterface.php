@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Contracts\Campaign;
 
-use App\Models\Campaign;
+use App\Models\Campaign\Campaign;
 use Illuminate\Database\Eloquent\Collection;
 
 /**
