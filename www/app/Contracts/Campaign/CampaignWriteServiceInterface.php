@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Contracts\Campaign;
 
+use App\DTOs\Campaign\CampaignDTO;
 use App\Models\Campaign\Campaign;
 
 /**
@@ -17,11 +18,11 @@ interface CampaignWriteServiceInterface
     /**
      * Create a new campaign
      *
-     * @param array<string, mixed> $data
+     * @param CampaignDTO $dto
      * @return Campaign
      * @throws \Exception
      */
-    public function createCampaign(array $data): Campaign;
+    public function createCampaign(CampaignDTO $dto): Campaign;
 
     /**
      * Update an existing campaign

@@ -6,6 +6,7 @@ namespace App\Services\Campaign;
 
 use App\Contracts\Campaign\CampaignWriteServiceInterface;
 use App\Contracts\Tag\TagWriteServiceInterface;
+use App\DTOs\Campaign\CampaignDTO;
 use App\Models\Campaign\Campaign;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -29,25 +30,24 @@ class CampaignWriteService implements CampaignWriteServiceInterface
     /**
      * Create a new campaign
      *
-     * @param array<string, mixed> $data
+     * @param CampaignDTO $dto
      * @return Campaign
      * @throws \Exception
      */
-    public function createCampaign(array $data): Campaign
+    public function createCampaign(CampaignDTO $dto): Campaign
     {
         try {
             DB::beginTransaction();
 
-            // Extract tags from data (if present)
-            $tagNames = $data['tags'] ?? [];
-            unset($data['tags']);
+            // Convert DTO to array for database operations
+            $data = $dto->toArray();
 
             // Create campaign
             $campaign = Campaign::create($data);
 
             // Handle tags if provided
-            if (!empty($tagNames) && is_array($tagNames)) {
-                $tags = $this->tagWriteService->findOrCreateTags($tagNames);
+            if (!empty($dto->tags)) {
+                $tags = $this->tagWriteService->findOrCreateTags($dto->tags);
                 $campaign->tags()->sync($tags->pluck('id'));
 
                 Log::info('Campaign tags synced', [
@@ -72,7 +72,7 @@ class CampaignWriteService implements CampaignWriteServiceInterface
 
             Log::error('Failed to create campaign', [
                 'error' => $e->getMessage(),
-                'data' => $data,
+                'dto' => $dto->toArray(),
             ]);
 
             throw $e;

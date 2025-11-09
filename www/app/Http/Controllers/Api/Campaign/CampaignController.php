@@ -10,6 +10,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Campaign\StoreCampaignRequest;
 use App\Http\Requests\Campaign\UpdateCampaignRequest;
 use App\Http\Resources\Campaign\CampaignResource;
+use App\Mappers\Campaign\CampaignMapper;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
@@ -72,7 +73,8 @@ class CampaignController extends Controller
      */
     public function store(StoreCampaignRequest $request): JsonResponse
     {
-        $campaign = $this->campaignWriteService->createCampaign($request->validated());
+        $dto = CampaignMapper::fromStoreRequest($request);
+        $campaign = $this->campaignWriteService->createCampaign($dto);
 
         return response()->json([
             'message' => 'Campaign created successfully',

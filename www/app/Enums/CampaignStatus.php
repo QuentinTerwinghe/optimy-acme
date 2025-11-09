@@ -35,4 +35,20 @@ enum CampaignStatus: string
             self::CANCELLED => 'Cancelled',
         };
     }
+
+    /**
+     * Create from request status value
+     * Maps user-friendly status names to enum cases
+     */
+    public static function fromRequest(string $status): self
+    {
+        return match ($status) {
+            'draft' => self::DRAFT,
+            'waiting_for_validation' => self::WAITING_FOR_VALIDATION,
+            'active' => self::ACTIVE,
+            'completed' => self::COMPLETED,
+            'cancelled' => self::CANCELLED,
+            default => throw new \InvalidArgumentException("Invalid status: {$status}"),
+        };
+    }
 }

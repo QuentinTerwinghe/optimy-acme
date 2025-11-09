@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Campaign;
 
 use App\Contracts\Campaign\CampaignWriteServiceInterface;
-use App\Enums\CampaignStatus;
 use App\Enums\Currency;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Campaign\StoreCampaignRequest;
+use App\Mappers\Campaign\CampaignMapper;
 use App\Models\Campaign\Campaign;
 use App\Models\Campaign\Category;
 use App\Models\Campaign\Tag;
@@ -61,25 +61,11 @@ class CampaignController extends Controller
     public function store(StoreCampaignRequest $request): JsonResponse
     {
         try {
-            $data = $request->validated();
-
-            // Map frontend status values to CampaignStatus enum values
-            $statusMapping = [
-                'draft' => CampaignStatus::DRAFT->value,
-                'waiting_for_validation' => CampaignStatus::WAITING_FOR_VALIDATION->value,
-            ];
-
-            // Get status from request or default to DRAFT
-            $requestedStatus = $data['status'] ?? 'draft';
-            $data['status'] = $statusMapping[$requestedStatus] ?? CampaignStatus::DRAFT->value;
-
-            // Set current_amount to 0 if not provided
-            if (!isset($data['current_amount'])) {
-                $data['current_amount'] = 0;
-            }
+            // Convert request to DTO using mapper
+            $dto = CampaignMapper::fromStoreRequest($request);
 
             // Create campaign using the service
-            $campaign = $this->campaignWriteService->createCampaign($data);
+            $campaign = $this->campaignWriteService->createCampaign($dto);
 
             // Refresh to ensure all attributes are properly loaded
             $campaign->refresh();
