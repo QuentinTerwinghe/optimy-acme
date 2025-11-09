@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Tests\Unit\DataTransferObjects;
+namespace Tests\Unit\DTOs\Notification;
 
-use App\DataTransferObjects\NotificationPayload;
+use App\DTOs\Notification\NotificationPayloadDTO;
 use App\Enums\NotificationType;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Unit tests for NotificationPayload DTO.
+ * Unit tests for NotificationPayloadDTO DTO.
  */
-class NotificationPayloadTest extends TestCase
+class NotificationPayloadDTOTest extends TestCase
 {
     public function test_constructor_sets_properties_correctly(): void
     {
@@ -21,7 +21,7 @@ class NotificationPayloadTest extends TestCase
         $parameters = ['token' => 'test-token-123'];
 
         // Act
-        $payload = new NotificationPayload($userId, $type, $parameters);
+        $payload = new NotificationPayloadDTO($userId, $type, $parameters);
 
         // Assert
         $this->assertSame($userId, $payload->userId);
@@ -36,7 +36,7 @@ class NotificationPayloadTest extends TestCase
         $type = NotificationType::FORGOT_PASSWORD;
         $parameters = ['token' => 'test-token-123', 'expiration_minutes' => 60];
 
-        $payload = new NotificationPayload($userId, $type, $parameters);
+        $payload = new NotificationPayloadDTO($userId, $type, $parameters);
 
         // Act
         $array = $payload->toArray();
@@ -58,10 +58,10 @@ class NotificationPayloadTest extends TestCase
         ];
 
         // Act
-        $payload = NotificationPayload::fromArray($data);
+        $payload = NotificationPayloadDTO::fromArray($data);
 
         // Assert
-        $this->assertInstanceOf(NotificationPayload::class, $payload);
+        $this->assertInstanceOf(NotificationPayloadDTO::class, $payload);
         $this->assertSame(1, $payload->userId);
         $this->assertSame(NotificationType::FORGOT_PASSWORD, $payload->type);
         $this->assertSame(['token' => 'test-token-123'], $payload->parameters);
@@ -76,7 +76,7 @@ class NotificationPayloadTest extends TestCase
         ];
 
         // Act
-        $payload = NotificationPayload::fromArray($data);
+        $payload = NotificationPayloadDTO::fromArray($data);
 
         // Assert
         $this->assertSame([], $payload->parameters);
@@ -89,7 +89,7 @@ class NotificationPayloadTest extends TestCase
         $type = NotificationType::FORGOT_PASSWORD;
         $parameters = ['token' => 'test-token-123'];
 
-        $payload = new NotificationPayload($userId, $type, $parameters);
+        $payload = new NotificationPayloadDTO($userId, $type, $parameters);
 
         // Act
         $json = $payload->toJson();
@@ -113,10 +113,10 @@ class NotificationPayloadTest extends TestCase
         ]);
 
         // Act
-        $payload = NotificationPayload::fromJson($json);
+        $payload = NotificationPayloadDTO::fromJson($json);
 
         // Assert
-        $this->assertInstanceOf(NotificationPayload::class, $payload);
+        $this->assertInstanceOf(NotificationPayloadDTO::class, $payload);
         $this->assertSame(1, $payload->userId);
         $this->assertSame(NotificationType::FORGOT_PASSWORD, $payload->type);
         $this->assertSame(['token' => 'test-token-123'], $payload->parameters);
@@ -131,13 +131,13 @@ class NotificationPayloadTest extends TestCase
         $this->expectException(\JsonException::class);
 
         // Act
-        NotificationPayload::fromJson($invalidJson);
+        NotificationPayloadDTO::fromJson($invalidJson);
     }
 
     public function test_to_json_and_from_json_are_reversible(): void
     {
         // Arrange
-        $original = new NotificationPayload(
+        $original = new NotificationPayloadDTO(
             userId: 42,
             type: NotificationType::FORGOT_PASSWORD,
             parameters: [
@@ -149,7 +149,7 @@ class NotificationPayloadTest extends TestCase
 
         // Act
         $json = $original->toJson();
-        $restored = NotificationPayload::fromJson($json);
+        $restored = NotificationPayloadDTO::fromJson($json);
 
         // Assert
         $this->assertSame($original->userId, $restored->userId);
@@ -160,7 +160,7 @@ class NotificationPayloadTest extends TestCase
     public function test_to_array_and_from_array_are_reversible(): void
     {
         // Arrange
-        $original = new NotificationPayload(
+        $original = new NotificationPayloadDTO(
             userId: 42,
             type: NotificationType::FORGOT_PASSWORD,
             parameters: [
@@ -171,7 +171,7 @@ class NotificationPayloadTest extends TestCase
 
         // Act
         $array = $original->toArray();
-        $restored = NotificationPayload::fromArray($array);
+        $restored = NotificationPayloadDTO::fromArray($array);
 
         // Assert
         $this->assertSame($original->userId, $restored->userId);
@@ -182,7 +182,7 @@ class NotificationPayloadTest extends TestCase
     public function test_handles_empty_parameters(): void
     {
         // Arrange & Act
-        $payload = new NotificationPayload(
+        $payload = new NotificationPayloadDTO(
             userId: 1,
             type: NotificationType::FORGOT_PASSWORD,
             parameters: []
@@ -210,9 +210,9 @@ class NotificationPayloadTest extends TestCase
         ];
 
         // Act
-        $payload = new NotificationPayload(1, NotificationType::FORGOT_PASSWORD, $complexParameters);
+        $payload = new NotificationPayloadDTO(1, NotificationType::FORGOT_PASSWORD, $complexParameters);
         $json = $payload->toJson();
-        $restored = NotificationPayload::fromJson($json);
+        $restored = NotificationPayloadDTO::fromJson($json);
 
         // Assert
         $this->assertSame($complexParameters, $restored->parameters);
@@ -224,7 +224,7 @@ class NotificationPayloadTest extends TestCase
         // If PHP runtime allows modification, this would fail
 
         // Arrange
-        $payload = new NotificationPayload(
+        $payload = new NotificationPayloadDTO(
             userId: 1,
             type: NotificationType::FORGOT_PASSWORD,
             parameters: ['token' => 'test']

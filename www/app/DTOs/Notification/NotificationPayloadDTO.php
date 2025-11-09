@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\DataTransferObjects;
+namespace App\DTOs\Notification;
 
 use App\Enums\NotificationType;
 
@@ -10,7 +10,7 @@ use App\Enums\NotificationType;
  * Data Transfer Object for notification payloads.
  * Useful for serialization/deserialization when working with queues like RabbitMQ.
  */
-final readonly class NotificationPayload
+final readonly class NotificationPayloadDTO
 {
     /**
      * @param int $userId User ID who will receive the notification
