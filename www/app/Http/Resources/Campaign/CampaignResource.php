@@ -27,12 +27,14 @@ class CampaignResource extends JsonResource
             'id' => $this->resource->id,
             'title' => $this->resource->title,
             'description' => $this->resource->description,
-            'goal_amount' => number_format((float) $this->resource->goal_amount, 2, '.', ''),
+            'goal_amount' => $this->resource->goal_amount !== null
+                ? number_format((float) $this->resource->goal_amount, 2, '.', '')
+                : null,
             'current_amount' => number_format((float) $this->resource->current_amount, 2, '.', ''),
-            'currency' => $this->resource->currency->value,
-            'start_date' => $this->resource->start_date->toIso8601String(),
-            'end_date' => $this->resource->end_date->toIso8601String(),
-            'end_date_formatted' => $this->resource->end_date->format('M d, Y'),
+            'currency' => $this->resource->currency?->value,
+            'start_date' => $this->resource->start_date?->toIso8601String(),
+            'end_date' => $this->resource->end_date?->toIso8601String(),
+            'end_date_formatted' => $this->resource->end_date?->format('M d, Y'),
             'status' => $this->resource->status->value,
             'status_label' => $this->resource->status->label(),
             'progress_percentage' => $this->calculateProgressPercentage(),
@@ -45,8 +47,12 @@ class CampaignResource extends JsonResource
     /**
      * Calculate the progress percentage
      */
-    private function calculateProgressPercentage(): float
+    private function calculateProgressPercentage(): ?float
     {
+        if ($this->resource->goal_amount === null) {
+            return null;
+        }
+
         $goal = (float) $this->resource->goal_amount;
         $current = (float) $this->resource->current_amount;
 
@@ -62,8 +68,12 @@ class CampaignResource extends JsonResource
     /**
      * Calculate days remaining until campaign end
      */
-    private function calculateDaysRemaining(): int
+    private function calculateDaysRemaining(): ?int
     {
+        if ($this->resource->end_date === null) {
+            return null;
+        }
+
         return (int) max(0, now()->diffInDays($this->resource->end_date, false));
     }
 }

@@ -26,10 +26,10 @@ final class CampaignMapper
 
         return new CampaignDTO(
             title: $validated['title'],
-            goalAmount: (float) $validated['goal_amount'],
-            currency: Currency::from($validated['currency']),
-            startDate: Carbon::parse($validated['start_date']),
-            endDate: Carbon::parse($validated['end_date']),
+            goalAmount: isset($validated['goal_amount']) ? (float) $validated['goal_amount'] : null,
+            currency: isset($validated['currency']) ? Currency::from($validated['currency']) : null,
+            startDate: isset($validated['start_date']) ? Carbon::parse($validated['start_date']) : null,
+            endDate: isset($validated['end_date']) ? Carbon::parse($validated['end_date']) : null,
             status: CampaignStatus::fromRequest($validated['status'] ?? 'draft'),
             description: $validated['description'] ?? null,
             categoryId: $validated['category_id'] ?? null,

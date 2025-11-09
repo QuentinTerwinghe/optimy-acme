@@ -32,14 +32,16 @@ class StoreCampaignRequest extends FormRequest
      */
     public function rules(): array
     {
+        $isDraft = $this->input('status') === CampaignStatus::DRAFT->value || $this->input('status') === null;
+
         return [
             'title' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
-            'goal_amount' => ['required', 'numeric', 'min:0.01'],
+            'goal_amount' => [$isDraft ? 'nullable' : 'required', 'numeric', 'min:0.01'],
             'current_amount' => ['nullable', 'numeric', 'min:0'],
-            'currency' => ['required', 'string', Rule::enum(Currency::class)],
-            'start_date' => ['required', 'date', 'after_or_equal:today'],
-            'end_date' => ['required', 'date', 'after:start_date'],
+            'currency' => [$isDraft ? 'nullable' : 'required', 'string', Rule::enum(Currency::class)],
+            'start_date' => [$isDraft ? 'nullable' : 'required', 'date', $isDraft ? '' : 'after_or_equal:today'],
+            'end_date' => [$isDraft ? 'nullable' : 'required', 'date', 'after:start_date'],
             'status' => ['nullable', 'string', Rule::enum(CampaignStatus::class)],
             'category_id' => ['nullable', 'integer', 'exists:categories,id'],
             'tags' => ['nullable', 'array'],

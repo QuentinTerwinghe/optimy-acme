@@ -23,11 +23,11 @@ use Illuminate\Support\Str;
  * @property string $id
  * @property string $title
  * @property string|null $description
- * @property string $goal_amount
+ * @property string|null $goal_amount
  * @property string $current_amount
- * @property Currency $currency
- * @property \Illuminate\Support\Carbon $start_date
- * @property \Illuminate\Support\Carbon $end_date
+ * @property Currency|null $currency
+ * @property \Illuminate\Support\Carbon|null $start_date
+ * @property \Illuminate\Support\Carbon|null $end_date
  * @property CampaignStatus $status
  * @property int|null $category_id
  * @property \Illuminate\Support\Carbon|null $creation_date

@@ -22,14 +22,14 @@ return new class extends Migration
             $table->string('title');
             $table->text('description')->nullable();
 
-            // Financial information
-            $table->decimal('goal_amount', 10, 2)->unsigned();
+            // Financial information - nullable for draft campaigns
+            $table->decimal('goal_amount', 10, 2)->unsigned()->nullable();
             $table->decimal('current_amount', 10, 2)->unsigned()->default(0);
-            $table->string('currency', 3); // ISO 4217 currency code
+            $table->string('currency', 3)->nullable(); // ISO 4217 currency code
 
-            // Campaign timeline
-            $table->dateTime('start_date');
-            $table->dateTime('end_date');
+            // Campaign timeline - nullable for draft campaigns
+            $table->dateTime('start_date')->nullable();
+            $table->dateTime('end_date')->nullable();
 
             // Campaign status
             $table->string('status', 20)->default('draft');

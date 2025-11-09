@@ -189,13 +189,51 @@ class CampaignStoreTest extends TestCase
         ]);
     }
 
-    public function test_validation_fails_without_required_fields(): void
+    public function test_can_create_draft_campaign_with_only_title(): void
+    {
+        $campaignData = [
+            'title' => 'Draft Campaign',
+            'status' => CampaignStatus::DRAFT->value,
+        ];
+
+        $response = $this->actingAs($this->user)
+            ->postJson('/campaigns', $campaignData);
+
+        $response->assertStatus(201)
+            ->assertJson([
+                'success' => true,
+                'message' => 'Campaign created successfully',
+            ]);
+
+        $this->assertDatabaseHas('campaigns', [
+            'title' => 'Draft Campaign',
+            'status' => CampaignStatus::DRAFT->value,
+            'goal_amount' => null,
+            'currency' => null,
+            'start_date' => null,
+            'end_date' => null,
+        ]);
+    }
+
+    public function test_validation_fails_without_required_fields_for_non_draft(): void
+    {
+        $response = $this->actingAs($this->user)
+            ->postJson('/campaigns', [
+                'title' => 'Active Campaign',
+                'status' => CampaignStatus::ACTIVE->value,
+            ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['goal_amount', 'currency', 'start_date', 'end_date']);
+    }
+
+    public function test_validation_fails_without_title(): void
     {
         $response = $this->actingAs($this->user)
             ->postJson('/campaigns', []);
 
         $response->assertStatus(422)
-            ->assertJsonValidationErrors(['title', 'goal_amount', 'currency', 'start_date', 'end_date']);
+            ->assertJsonValidationErrors(['title']);
     }
 
     public function test_validation_fails_with_invalid_currency(): void
@@ -207,7 +245,7 @@ class CampaignStoreTest extends TestCase
             'currency' => 'INVALID',
             'start_date' => now()->addDay()->format('Y-m-d'),
             'end_date' => now()->addDays(30)->format('Y-m-d'),
-            'status' => CampaignStatus::DRAFT->value,
+            'status' => CampaignStatus::ACTIVE->value, // Use ACTIVE status to require currency
         ];
 
         $response = $this->actingAs($this->user)

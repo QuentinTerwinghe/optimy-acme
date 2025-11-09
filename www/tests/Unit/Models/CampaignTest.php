@@ -77,24 +77,40 @@ describe('Campaign Model', function () {
             ->toThrow(\Illuminate\Database\QueryException::class);
     });
 
-    test('goal_amount is required', function () {
-        expect(fn () => Campaign::factory()->create(['goal_amount' => null]))
-            ->toThrow(\Illuminate\Database\QueryException::class);
+    test('goal_amount can be nullable for draft campaigns', function () {
+        $campaign = Campaign::factory()->create([
+            'goal_amount' => null,
+            'status' => \App\Enums\CampaignStatus::DRAFT,
+        ]);
+
+        expect($campaign->goal_amount)->toBeNull();
     });
 
-    test('currency is required', function () {
-        expect(fn () => Campaign::factory()->create(['currency' => null]))
-            ->toThrow(\Illuminate\Database\QueryException::class);
+    test('currency can be nullable for draft campaigns', function () {
+        $campaign = Campaign::factory()->create([
+            'currency' => null,
+            'status' => \App\Enums\CampaignStatus::DRAFT,
+        ]);
+
+        expect($campaign->currency)->toBeNull();
     });
 
-    test('start_date is required', function () {
-        expect(fn () => Campaign::factory()->create(['start_date' => null]))
-            ->toThrow(\Illuminate\Database\QueryException::class);
+    test('start_date can be nullable for draft campaigns', function () {
+        $campaign = Campaign::factory()->create([
+            'start_date' => null,
+            'status' => \App\Enums\CampaignStatus::DRAFT,
+        ]);
+
+        expect($campaign->start_date)->toBeNull();
     });
 
-    test('end_date is required', function () {
-        expect(fn () => Campaign::factory()->create(['end_date' => null]))
-            ->toThrow(\Illuminate\Database\QueryException::class);
+    test('end_date can be nullable for draft campaigns', function () {
+        $campaign = Campaign::factory()->create([
+            'end_date' => null,
+            'status' => \App\Enums\CampaignStatus::DRAFT,
+        ]);
+
+        expect($campaign->end_date)->toBeNull();
     });
 
     test('description can be nullable', function () {

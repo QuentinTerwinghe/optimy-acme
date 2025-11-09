@@ -126,13 +126,12 @@
                         <!-- Goal Amount -->
                         <div>
                             <label for="goal_amount" class="block text-sm font-medium text-gray-700 mb-2">
-                                Goal Amount <span class="text-red-500">*</span>
+                                Goal Amount <span class="text-gray-500 text-xs">(required for submission)</span>
                             </label>
                             <input
                                 type="number"
                                 id="goal_amount"
                                 v-model="form.goal_amount"
-                                required
                                 step="0.01"
                                 min="0"
                                 :disabled="isSubmitting"
@@ -152,12 +151,11 @@
                         <!-- Currency -->
                         <div>
                             <label for="currency" class="block text-sm font-medium text-gray-700 mb-2">
-                                Currency <span class="text-red-500">*</span>
+                                Currency <span class="text-gray-500 text-xs">(required for submission)</span>
                             </label>
                             <select
                                 id="currency"
                                 v-model="form.currency"
-                                required
                                 :disabled="isSubmitting"
                                 :class="[
                                     'appearance-none block w-full px-3 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition-colors',
@@ -166,6 +164,7 @@
                                 ]"
                                 @change="clearError('currency')"
                             >
+                                <option value="">Select currency</option>
                                 <option
                                     v-for="currency in currencies"
                                     :key="currency.value"
@@ -189,14 +188,13 @@
                         <!-- Start Date -->
                         <div>
                             <label for="start_date" class="block text-sm font-medium text-gray-700 mb-2">
-                                Start Date <span class="text-red-500">*</span>
+                                Start Date <span class="text-gray-500 text-xs">(required for submission)</span>
                             </label>
                             <input
                                 ref="startDateInput"
                                 type="date"
                                 id="start_date"
                                 v-model="form.start_date"
-                                required
                                 :disabled="isSubmitting"
                                 :class="[
                                     'appearance-none block w-full px-3 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition-colors cursor-pointer',
@@ -214,14 +212,13 @@
                         <!-- End Date -->
                         <div>
                             <label for="end_date" class="block text-sm font-medium text-gray-700 mb-2">
-                                End Date <span class="text-red-500">*</span>
+                                End Date <span class="text-gray-500 text-xs">(required for submission)</span>
                             </label>
                             <input
                                 ref="endDateInput"
                                 type="date"
                                 id="end_date"
                                 v-model="form.end_date"
-                                required
                                 :min="minEndDate"
                                 :disabled="isSubmitting"
                                 :class="[
@@ -266,10 +263,10 @@
                     <button
                         type="button"
                         @click="handleSubmit('draft')"
-                        :disabled="isSubmitting || !isFormValid"
+                        :disabled="isSubmitting || !canSaveAsDraft"
                         :class="[
                             'px-6 py-2.5 rounded-lg text-sm font-medium transition-colors duration-200 shadow-sm',
-                            isSubmitting || !isFormValid
+                            isSubmitting || !canSaveAsDraft
                                 ? 'bg-gray-400 text-white cursor-not-allowed'
                                 : 'bg-gray-600 text-white hover:bg-gray-700 hover:shadow-md'
                         ]"
@@ -286,10 +283,10 @@
                     <button
                         type="button"
                         @click="handleSubmit('waiting_for_validation')"
-                        :disabled="isSubmitting || !isFormValid"
+                        :disabled="isSubmitting || !canSaveForValidation"
                         :class="[
                             'px-6 py-2.5 rounded-lg text-sm font-medium transition-colors duration-200 shadow-sm',
-                            isSubmitting || !isFormValid
+                            isSubmitting || !canSaveForValidation
                                 ? 'bg-indigo-400 text-white cursor-not-allowed'
                                 : 'bg-indigo-600 text-white hover:bg-indigo-700 hover:shadow-md'
                         ]"
@@ -344,7 +341,7 @@ const form = ref({
     category_id: '',
     tags: [],
     goal_amount: '',
-    currency: props.currencies.find(c => c.value === 'EUR')?.value || props.currencies[0]?.value || '',
+    currency: '',
     start_date: '',
     end_date: ''
 });
@@ -365,7 +362,13 @@ const errors = ref({
 });
 
 // Computed
-const isFormValid = computed(() => {
+const canSaveAsDraft = computed(() => {
+    // For draft, only title is required
+    return form.value.title.trim() !== '';
+});
+
+const canSaveForValidation = computed(() => {
+    // For validation, all fields are required
     return (
         form.value.title.trim() !== '' &&
         form.value.goal_amount !== '' &&
