@@ -21,15 +21,15 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  */
 class Tag extends Model
 {
-    /** @use HasFactory<\Database\Factories\TagFactory> */
+    /** @use HasFactory<\Database\Factories\Campaign\TagFactory> */
     use HasFactory;
 
     /**
      * Create a new factory instance for the model.
      */
-    protected static function newFactory(): \Database\Factories\TagFactory
+    protected static function newFactory(): \Database\Factories\Campaign\TagFactory
     {
-        return \Database\Factories\TagFactory::new();
+        return \Database\Factories\Campaign\TagFactory::new();
     }
 
     /**

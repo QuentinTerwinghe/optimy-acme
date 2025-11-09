@@ -8,8 +8,9 @@ describe('CampaignStatus Enum', function () {
     test('has all expected cases', function () {
         $cases = CampaignStatus::cases();
 
-        expect($cases)->toHaveCount(4)
+        expect($cases)->toHaveCount(5)
             ->and($cases)->toContain(CampaignStatus::DRAFT)
+            ->and($cases)->toContain(CampaignStatus::WAITING_FOR_VALIDATION)
             ->and($cases)->toContain(CampaignStatus::ACTIVE)
             ->and($cases)->toContain(CampaignStatus::COMPLETED)
             ->and($cases)->toContain(CampaignStatus::CANCELLED);
@@ -34,8 +35,8 @@ describe('CampaignStatus Enum', function () {
     test('values() returns all values', function () {
         $values = CampaignStatus::values();
 
-        expect($values)->toBe(['draft', 'active', 'completed', 'cancelled'])
-            ->and($values)->toHaveCount(4);
+        expect($values)->toBe(['draft', 'waiting_for_validation', 'active', 'completed', 'cancelled'])
+            ->and($values)->toHaveCount(5);
     });
 
     test('draft label returns correct text', function () {

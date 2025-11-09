@@ -39,15 +39,23 @@ use Illuminate\Support\Str;
  * @property-read Category|null $category
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Tag> $tags
  *
- * @use HasFactory<\Database\Factories\CampaignFactory>
+ * @use HasFactory<\Database\Factories\Campaign\CampaignFactory>
  */
 class Campaign extends Model
 {
-    /** @use HasFactory<\Database\Factories\CampaignFactory> */
+    /** @use HasFactory<\Database\Factories\Campaign\CampaignFactory> */
     use HasFactory;
     use HasUuids;
     use HasTimestamps;
     use HasUserTracking;
+
+    /**
+     * Create a new factory instance for the model.
+     */
+    protected static function newFactory(): \Database\Factories\Campaign\CampaignFactory
+    {
+        return \Database\Factories\Campaign\CampaignFactory::new();
+    }
 
     /**
      * Indicates if the model should be timestamped.

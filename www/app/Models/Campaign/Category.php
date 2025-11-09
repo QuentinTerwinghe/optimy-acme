@@ -22,15 +22,15 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class Category extends Model
 {
-    /** @use HasFactory<\Database\Factories\CategoryFactory> */
+    /** @use HasFactory<\Database\Factories\Campaign\CategoryFactory> */
     use HasFactory;
 
     /**
      * Create a new factory instance for the model.
      */
-    protected static function newFactory(): \Database\Factories\CategoryFactory
+    protected static function newFactory(): \Database\Factories\Campaign\CategoryFactory
     {
-        return \Database\Factories\CategoryFactory::new();
+        return \Database\Factories\Campaign\CategoryFactory::new();
     }
 
     /**

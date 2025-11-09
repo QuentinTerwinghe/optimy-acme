@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Database\Factories;
+namespace Database\Factories\Campaign;
 
 use App\Models\Campaign\Tag;
 use Illuminate\Database\Eloquent\Factories\Factory;
