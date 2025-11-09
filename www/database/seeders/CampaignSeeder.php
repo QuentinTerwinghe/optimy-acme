@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Enums\CampaignStatus;
+use App\Enums\Campaign\CampaignStatus;
 use App\Models\Campaign\Campaign;
 use App\Models\Campaign\Category;
 use App\Models\Campaign\Tag;

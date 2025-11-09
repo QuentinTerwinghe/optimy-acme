@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Jobs;
 
 use App\Contracts\Notifications\NotificationServiceInterface;
-use App\Enums\NotificationType;
+use App\Enums\Notification\NotificationType;
 use App\Models\Auth\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;

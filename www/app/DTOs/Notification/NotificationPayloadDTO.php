@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\DTOs\Notification;
 
-use App\Enums\NotificationType;
+use App\Enums\Notification\NotificationType;
 
 /**
  * Data Transfer Object for notification payloads.

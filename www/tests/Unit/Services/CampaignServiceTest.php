@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use App\Contracts\Campaign\CampaignQueryServiceInterface;
-use App\Enums\CampaignStatus;
+use App\Enums\Campaign\CampaignStatus;
 use App\Models\Campaign\Campaign;
 use App\Services\Campaign\CampaignQueryService;
 use Illuminate\Foundation\Testing\RefreshDatabase;

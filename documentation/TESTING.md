@@ -324,7 +324,7 @@ The Campaign factory includes multiple states and helper methods:
 
 ```php
 use App\Models\Campaign;
-use App\Enums\Currency;
+use App\Enums\Common\Currency;
 
 // Basic campaign creation
 $campaign = Campaign::factory()->create();
@@ -628,7 +628,7 @@ make pest ARGS="--processes=1"
 ```php
 <?php
 
-use App\Enums\Currency;
+use App\Enums\Common\Currency;
 
 describe('Currency Enum', function () {
     test('has all expected cases', function () {
@@ -658,7 +658,7 @@ describe('Currency Enum', function () {
 <?php
 
 use App\Models\Campaign;
-use App\Enums\CampaignStatus;
+use App\Enums\Campaign\CampaignStatus;
 
 describe('Campaign Model', function () {
     test('uses UUID for primary key', function () {

@@ -6,7 +6,7 @@ namespace App\Services\Notifications;
 
 use App\Contracts\Notifications\NotificationRegistryInterface;
 use App\Contracts\Notifications\NotificationServiceInterface;
-use App\Enums\NotificationType;
+use App\Enums\Notification\NotificationType;
 use App\Models\Auth\User;
 use Illuminate\Support\Facades\Log;
 

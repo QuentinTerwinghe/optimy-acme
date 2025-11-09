@@ -56,10 +56,10 @@ interface CampaignQueryServiceInterface
     /**
      * Get campaigns by status
      *
-     * @param \App\Enums\CampaignStatus $status
+     * @param \App\Enums\Campaign\CampaignStatus $status
      * @return Collection<int, Campaign>
      */
-    public function getCampaignsByStatus(\App\Enums\CampaignStatus $status): Collection;
+    public function getCampaignsByStatus(\App\Enums\Campaign\CampaignStatus $status): Collection;
 
     /**
      * Get campaigns by category
@@ -84,4 +84,16 @@ interface CampaignQueryServiceInterface
      * @return Collection<int, Campaign>
      */
     public function getCampaignsByAllTags(array $tagIds): Collection;
+
+    /**
+     * Get campaigns for management view
+     *
+     * Returns campaigns based on user role:
+     * - Campaign managers and admins: all campaigns
+     * - Regular users: only their own campaigns
+     *
+     * @param \App\Models\Auth\User $user
+     * @return Collection<int, Campaign>
+     */
+    public function getCampaignsForManagement(\App\Models\Auth\User $user): Collection;
 }

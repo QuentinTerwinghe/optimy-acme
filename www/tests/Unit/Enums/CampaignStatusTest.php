@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Enums\CampaignStatus;
+use App\Enums\Campaign\CampaignStatus;
 
 describe('CampaignStatus Enum', function () {
     test('has all expected cases', function () {

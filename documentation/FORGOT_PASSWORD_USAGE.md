@@ -22,7 +22,7 @@ This handler sends password reset emails with token links to users who have requ
 
 ```php
 use App\Contracts\Notifications\NotificationServiceInterface;
-use App\Enums\NotificationType;
+use App\Enums\Notification\NotificationType;
 use App\Models\User;
 
 class ForgotPasswordController
@@ -75,7 +75,7 @@ declare(strict_types=1);
 namespace App\Jobs;
 
 use App\Contracts\Notifications\NotificationServiceInterface;
-use App\Enums\NotificationType;
+use App\Enums\Notification\NotificationType;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -201,7 +201,7 @@ The template receives:
 namespace Tests\Unit\Services\Notifications;
 
 use App\Contracts\Notifications\NotificationRegistryInterface;
-use App\Enums\NotificationType;
+use App\Enums\Notification\NotificationType;
 use App\Models\User;
 use App\Services\Notifications\Handlers\ForgotPasswordHandler;
 use App\Services\Notifications\NotificationService;

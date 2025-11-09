@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace App\Services\Notifications\Handlers;
 
-use App\Enums\NotificationType;
+use App\Enums\Notification\NotificationType;
 use App\Models\User;
 use App\Services\Notifications\AbstractNotificationHandler;
 use Illuminate\Support\Facades\Mail;
@@ -53,7 +53,7 @@ class ExampleNotificationHandler extends AbstractNotificationHandler
 
 ## Usage
 
-1. Create your notification type in `App\Enums\NotificationType`
+1. Create your notification type in `App\Enums\Notification\NotificationType`
 2. Create your handler class extending `AbstractNotificationHandler`
 3. Implement `getNotificationType()` and `send()` methods
 4. Register the handler in `NotificationServiceProvider::boot()`

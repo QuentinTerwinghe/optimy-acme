@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Services\Notifications;
 
 use App\Contracts\Notifications\NotificationHandlerInterface;
-use App\Enums\NotificationType;
+use App\Enums\Notification\NotificationType;
 use App\Models\Auth\User;
 use Illuminate\Support\Facades\Log;
 

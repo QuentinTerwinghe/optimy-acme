@@ -44,6 +44,8 @@ Route::middleware(['auth'])->group(function () {
         ->name('logout');
 
     // Campaign Routes
+    Route::get('/campaigns', [CampaignController::class, 'index'])
+        ->name('campaigns.index');
     Route::get('/campaigns/create', [CampaignController::class, 'create'])
         ->name('campaigns.create');
     Route::post('/campaigns', [CampaignController::class, 'store'])

@@ -80,7 +80,7 @@ declare(strict_types=1);
 
 namespace App\Services\Notifications\Handlers;
 
-use App\Enums\NotificationType;
+use App\Enums\Notification\NotificationType;
 use App\Models\User;
 use App\Services\Notifications\AbstractNotificationHandler;
 use Illuminate\Support\Facades\Mail;
@@ -151,7 +151,7 @@ Use the service to send notifications:
 
 ```php
 use App\Contracts\Notifications\NotificationServiceInterface;
-use App\Enums\NotificationType;
+use App\Enums\Notification\NotificationType;
 use App\Models\User;
 
 class IncentiveController extends Controller
@@ -196,7 +196,7 @@ declare(strict_types=1);
 namespace App\Jobs;
 
 use App\Contracts\Notifications\NotificationServiceInterface;
-use App\Enums\NotificationType;
+use App\Enums\Notification\NotificationType;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -247,7 +247,7 @@ class SendNotificationJob implements ShouldQueue
 
 ```php
 use App\Jobs\SendNotificationJob;
-use App\Enums\NotificationType;
+use App\Enums\Notification\NotificationType;
 
 // Dispatch to RabbitMQ
 SendNotificationJob::dispatch(
@@ -294,7 +294,7 @@ The service includes comprehensive error handling:
 namespace Tests\Unit\Services\Notifications;
 
 use App\Contracts\Notifications\NotificationRegistryInterface;
-use App\Enums\NotificationType;
+use App\Enums\Notification\NotificationType;
 use App\Models\User;
 use App\Services\Notifications\Handlers\IncentiveConfirmationHandler;
 use App\Services\Notifications\NotificationService;

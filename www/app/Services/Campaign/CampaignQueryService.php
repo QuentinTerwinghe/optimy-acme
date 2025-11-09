@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace App\Services\Campaign;
 
 use App\Contracts\Campaign\CampaignQueryServiceInterface;
-use App\Enums\CampaignStatus;
+use App\Enums\Campaign\CampaignPermissions;
+use App\Enums\Campaign\CampaignStatus;
 use App\Models\Campaign\Campaign;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Log;
@@ -208,6 +209,43 @@ class CampaignQueryService implements CampaignQueryServiceInterface
         } catch (\Exception $e) {
             Log::error('Failed to fetch campaigns by all tags', [
                 'tag_ids' => $tagIds,
+                'error' => $e->getMessage(),
+            ]);
+
+            return new Collection();
+        }
+    }
+
+    /**
+     * Get campaigns for management view
+     *
+     * Returns campaigns based on user permissions:
+     * - Users with 'manageAllCampaigns' permission: all campaigns
+     * - Regular users: only their own campaigns
+     *
+     * This follows the Open/Closed Principle - new roles can be granted
+     * the 'manageAllCampaigns' permission without modifying this code.
+     *
+     * @param \App\Models\Auth\User $user
+     * @return Collection<int, Campaign>
+     */
+    public function getCampaignsForManagement(\App\Models\Auth\User $user): Collection
+    {
+        try {
+            $query = Campaign::query();
+
+            // If user doesn't have permission to manage all campaigns, filter by created_by
+            if (!$user->can(CampaignPermissions::MANAGE_ALL_CAMPAIGNS->value)) {
+                $query->where('created_by', $user->id);
+            }
+
+            return $query
+                ->with(['category', 'tags'])
+                ->orderBy('creation_date', 'desc')
+                ->get();
+        } catch (\Exception $e) {
+            Log::error('Failed to fetch campaigns for management', [
+                'user_id' => $user->id,
                 'error' => $e->getMessage(),
             ]);
 

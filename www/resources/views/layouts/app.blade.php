@@ -41,7 +41,10 @@
                                class="inline-flex items-center px-1 pt-1 text-sm font-medium {{ request()->routeIs('dashboard') ? 'text-gray-900 border-b-2 border-indigo-500' : 'text-gray-500 hover:text-gray-700 hover:border-gray-300' }}">
                                 Dashboard
                             </a>
-                            <!-- Add more navigation items here -->
+                            <a href="{{ route('campaigns.index') }}"
+                               class="inline-flex items-center px-1 pt-1 text-sm font-medium {{ request()->routeIs('campaigns.index') ? 'text-gray-900 border-b-2 border-indigo-500' : 'text-gray-500 hover:text-gray-700 hover:border-gray-300' }}">
+                                Manage Campaigns
+                            </a>
                         </div>
 
                         <!-- User Dropdown -->

@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Mappers\Campaign;
 
 use App\DTOs\Campaign\CampaignDTO;
-use App\Enums\CampaignStatus;
-use App\Enums\Currency;
+use App\Enums\Campaign\CampaignStatus;
+use App\Enums\Common\Currency;
 use App\Http\Requests\Campaign\StoreCampaignRequest;
 use Carbon\Carbon;
 

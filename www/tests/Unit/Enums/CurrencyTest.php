@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Enums\Currency;
+use App\Enums\Common\Currency;
 
 describe('Currency Enum', function () {
     test('has all expected cases', function () {

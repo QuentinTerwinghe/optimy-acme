@@ -6,7 +6,7 @@ namespace Tests\Unit\Services\Notifications;
 
 use App\Contracts\Notifications\NotificationHandlerInterface;
 use App\Contracts\Notifications\NotificationRegistryInterface;
-use App\Enums\NotificationType;
+use App\Enums\Notification\NotificationType;
 use App\Models\Auth\User;
 use App\Services\Notifications\NotificationService;
 use Illuminate\Foundation\Testing\RefreshDatabase;

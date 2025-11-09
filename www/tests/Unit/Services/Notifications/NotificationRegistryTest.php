@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tests\Unit\Services\Notifications;
 
 use App\Contracts\Notifications\NotificationHandlerInterface;
-use App\Enums\NotificationType;
+use App\Enums\Notification\NotificationType;
 use App\Services\Notifications\NotificationRegistry;
 use PHPUnit\Framework\TestCase;
 

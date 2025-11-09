@@ -208,9 +208,9 @@ describe('Campaign API - getActiveCampaigns', function () {
     test('returns all currency types correctly', function () {
         $user = User::factory()->create();
 
-        Campaign::factory()->active()->create(['currency' => \App\Enums\Currency::USD]);
-        Campaign::factory()->active()->create(['currency' => \App\Enums\Currency::EUR]);
-        Campaign::factory()->active()->create(['currency' => \App\Enums\Currency::GBP]);
+        Campaign::factory()->active()->create(['currency' => \App\Enums\Common\Currency::USD]);
+        Campaign::factory()->active()->create(['currency' => \App\Enums\Common\Currency::EUR]);
+        Campaign::factory()->active()->create(['currency' => \App\Enums\Common\Currency::GBP]);
 
         $response = $this->actingAs($user)->getJson('/api/campaigns/active');
 

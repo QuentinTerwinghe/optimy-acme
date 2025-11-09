@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use App\Enums\CampaignStatus;
-use App\Enums\Currency;
+use App\Enums\Campaign\CampaignStatus;
+use App\Enums\Common\Currency;
 use App\Models\Campaign\Campaign;
 use App\Models\Auth\User;
 
@@ -80,7 +80,7 @@ describe('Campaign Model', function () {
     test('goal_amount can be nullable for draft campaigns', function () {
         $campaign = Campaign::factory()->create([
             'goal_amount' => null,
-            'status' => \App\Enums\CampaignStatus::DRAFT,
+            'status' => \App\Enums\Campaign\CampaignStatus::DRAFT,
         ]);
 
         expect($campaign->goal_amount)->toBeNull();
@@ -89,7 +89,7 @@ describe('Campaign Model', function () {
     test('currency can be nullable for draft campaigns', function () {
         $campaign = Campaign::factory()->create([
             'currency' => null,
-            'status' => \App\Enums\CampaignStatus::DRAFT,
+            'status' => \App\Enums\Campaign\CampaignStatus::DRAFT,
         ]);
 
         expect($campaign->currency)->toBeNull();
@@ -98,7 +98,7 @@ describe('Campaign Model', function () {
     test('start_date can be nullable for draft campaigns', function () {
         $campaign = Campaign::factory()->create([
             'start_date' => null,
-            'status' => \App\Enums\CampaignStatus::DRAFT,
+            'status' => \App\Enums\Campaign\CampaignStatus::DRAFT,
         ]);
 
         expect($campaign->start_date)->toBeNull();
@@ -107,7 +107,7 @@ describe('Campaign Model', function () {
     test('end_date can be nullable for draft campaigns', function () {
         $campaign = Campaign::factory()->create([
             'end_date' => null,
-            'status' => \App\Enums\CampaignStatus::DRAFT,
+            'status' => \App\Enums\Campaign\CampaignStatus::DRAFT,
         ]);
 
         expect($campaign->end_date)->toBeNull();

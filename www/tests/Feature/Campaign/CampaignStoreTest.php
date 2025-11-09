@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Campaign;
 
-use App\Enums\CampaignStatus;
-use App\Enums\Currency;
+use App\Enums\Campaign\CampaignStatus;
+use App\Enums\Common\Currency;
 use App\Models\Auth\User;
 use App\Models\Campaign\Campaign;
 use App\Models\Campaign\Category;

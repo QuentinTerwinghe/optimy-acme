@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Database\Factories\Campaign;
 
-use App\Enums\CampaignStatus;
-use App\Enums\Currency;
+use App\Enums\Campaign\CampaignStatus;
+use App\Enums\Common\Currency;
 use App\Models\Campaign\Campaign;
 use App\Models\Auth\User;
 use Illuminate\Database\Eloquent\Factories\Factory;

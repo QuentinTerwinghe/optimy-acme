@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Campaign;
 
-use App\Enums\CampaignStatus;
-use App\Enums\Currency;
+use App\Enums\Campaign\CampaignStatus;
+use App\Enums\Common\Currency;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 

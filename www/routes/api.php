@@ -12,4 +12,6 @@ Route::middleware(['web', 'auth'])->group(function () {
         ->name('api.campaigns.active');
     Route::get('/campaigns/active/count', [CampaignController::class, 'getActiveCampaignsCount'])
         ->name('api.campaigns.active.count');
+    Route::get('/campaigns/manage', [CampaignController::class, 'getCampaignsForManagement'])
+        ->name('api.campaigns.manage');
 });

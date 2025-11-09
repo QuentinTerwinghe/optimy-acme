@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Campaign;
 
 use App\Contracts\Campaign\CampaignWriteServiceInterface;
-use App\Enums\Currency;
+use App\Enums\Common\Currency;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Campaign\StoreCampaignRequest;
 use App\Mappers\Campaign\CampaignMapper;
@@ -31,8 +31,7 @@ class CampaignController extends Controller
      */
     public function index(): View
     {
-        // TODO: Implement index method
-        abort(404);
+        return view('campaigns.manage');
     }
 
     /**

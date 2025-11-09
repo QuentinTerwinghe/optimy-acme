@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Services\Notifications;
 
-use App\Enums\NotificationType;
+use App\Enums\Notification\NotificationType;
 use App\Models\Auth\User;
 use App\Services\Notifications\AbstractNotificationHandler;
 use Illuminate\Foundation\Testing\RefreshDatabase;

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tests\Unit\DTOs\Notification;
 
 use App\DTOs\Notification\NotificationPayloadDTO;
-use App\Enums\NotificationType;
+use App\Enums\Notification\NotificationType;
 use PHPUnit\Framework\TestCase;
 
 /**

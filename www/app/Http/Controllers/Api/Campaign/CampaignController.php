@@ -59,6 +59,22 @@ class CampaignController extends Controller
     }
 
     /**
+     * Get campaigns for management
+     *
+     * Returns campaigns based on user role:
+     * - Campaign managers and admins: all campaigns
+     * - Regular users: only their own campaigns
+     */
+    public function getCampaignsForManagement(): AnonymousResourceCollection
+    {
+        /** @var \App\Models\Auth\User $user */
+        $user = auth()->user();
+        $campaigns = $this->campaignQueryService->getCampaignsForManagement($user);
+
+        return CampaignResource::collection($campaigns);
+    }
+
+    /**
      * Get all campaigns
      */
     public function index(): AnonymousResourceCollection

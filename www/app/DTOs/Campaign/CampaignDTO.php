@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\DTOs\Campaign;
 
-use App\Enums\CampaignStatus;
-use App\Enums\Currency;
+use App\Enums\Campaign\CampaignStatus;
+use App\Enums\Common\Currency;
 use Carbon\Carbon;
 
 /**

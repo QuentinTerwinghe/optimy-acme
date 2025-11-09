@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\Notifications\Handlers;
 
-use App\Enums\NotificationType;
+use App\Enums\Notification\NotificationType;
 use App\Mail\Auth\ForgotPasswordMail;
 use App\Models\Auth\User;
 use App\Services\Notifications\AbstractNotificationHandler;

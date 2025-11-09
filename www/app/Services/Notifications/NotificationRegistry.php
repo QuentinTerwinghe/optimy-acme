@@ -6,7 +6,7 @@ namespace App\Services\Notifications;
 
 use App\Contracts\Notifications\NotificationHandlerInterface;
 use App\Contracts\Notifications\NotificationRegistryInterface;
-use App\Enums\NotificationType;
+use App\Enums\Notification\NotificationType;
 
 /**
  * Registry for managing notification handlers.
