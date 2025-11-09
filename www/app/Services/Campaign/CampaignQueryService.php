@@ -34,6 +34,7 @@ class CampaignQueryService implements CampaignQueryServiceInterface
         try {
             return Campaign::query()
                 ->where('status', CampaignStatus::ACTIVE)
+                ->where('start_date', '<=', now())
                 ->where('end_date', '>', now())
                 ->orderBy('end_date', 'asc')
                 ->get();
@@ -62,6 +63,7 @@ class CampaignQueryService implements CampaignQueryServiceInterface
         try {
             return Campaign::query()
                 ->where('status', CampaignStatus::ACTIVE)
+                ->where('start_date', '<=', now())
                 ->where('end_date', '>', now())
                 ->count();
         } catch (\Exception $e) {
