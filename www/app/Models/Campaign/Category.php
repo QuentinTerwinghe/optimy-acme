@@ -26,6 +26,14 @@ class Category extends Model
     use HasFactory;
 
     /**
+     * Create a new factory instance for the model.
+     */
+    protected static function newFactory(): \Database\Factories\CategoryFactory
+    {
+        return \Database\Factories\CategoryFactory::new();
+    }
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var list<string>

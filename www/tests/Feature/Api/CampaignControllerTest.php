@@ -2,9 +2,8 @@
 
 declare(strict_types=1);
 
-use App\Enums\CampaignStatus;
-use App\Models\Campaign;
-use App\Models\User;
+use App\Models\Campaign\Campaign;
+use App\Models\Auth\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);

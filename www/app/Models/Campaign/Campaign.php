@@ -93,6 +93,7 @@ class Campaign extends Model
     protected function casts(): array
     {
         return [
+            'id' => 'string',
             'goal_amount' => 'decimal:2',
             'current_amount' => 'decimal:2',
             'currency' => Currency::class,
@@ -108,6 +109,23 @@ class Campaign extends Model
     public function getRouteKeyName(): string
     {
         return 'id';
+    }
+
+    /**
+     * Convert the model instance to an array.
+     *
+     * @return array<string, mixed>
+     */
+    public function toArray(): array
+    {
+        $array = parent::toArray();
+
+        // Ensure ID is properly converted to UUID string
+        if (isset($array['id'])) {
+            $array['id'] = $this->getAttribute('id');
+        }
+
+        return $array;
     }
 
     /**

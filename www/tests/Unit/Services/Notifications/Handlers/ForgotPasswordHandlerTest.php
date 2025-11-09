@@ -6,7 +6,7 @@ namespace Tests\Unit\Services\Notifications\Handlers;
 
 use App\Enums\NotificationType;
 use App\Mail\Auth\ForgotPasswordMail;
-use App\Models\User;
+use App\Models\Auth\User;
 use App\Services\Notifications\Handlers\ForgotPasswordHandler;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;

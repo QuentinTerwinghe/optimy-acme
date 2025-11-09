@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Models\User;
+use App\Models\Auth\User;
 use Illuminate\Support\Facades\Hash;
 
 describe('User Model', function () {

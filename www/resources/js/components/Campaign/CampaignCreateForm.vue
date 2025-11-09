@@ -285,7 +285,7 @@
                     </button>
                     <button
                         type="button"
-                        @click="handleSubmit('active')"
+                        @click="handleSubmit('waiting_for_validation')"
                         :disabled="isSubmitting || !isFormValid"
                         :class="[
                             'px-6 py-2.5 rounded-lg text-sm font-medium transition-colors duration-200 shadow-sm',
@@ -294,7 +294,7 @@
                                 : 'bg-indigo-600 text-white hover:bg-indigo-700 hover:shadow-md'
                         ]"
                     >
-                        <span v-if="!isSubmitting || submitType !== 'active'">Save</span>
+                        <span v-if="!isSubmitting || submitType !== 'waiting_for_validation'">Save</span>
                         <span v-else class="flex items-center">
                             <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -428,16 +428,50 @@ const handleSubmit = async (status) => {
         // Prepare form data with status
         const formData = {
             ...form.value,
-            status: status
+            status: status,
+            // Ensure empty category_id is sent as null
+            category_id: form.value.category_id || null,
+            // Convert tags from objects to array of strings (tag names)
+            tags: form.value.tags.map(tag => tag.name)
         };
 
-        // For now, this is just a placeholder
-        // The actual submission will be implemented later
-        console.log('Form submitted with status:', status, formData);
-        errors.value.general = 'Form submission is not yet implemented. This will be added in the next step.';
+        // Submit to the server
+        const response = await fetch('/campaigns', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': props.csrfToken,
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            // Handle validation errors
+            if (response.status === 422 && data.errors) {
+                // Laravel validation errors
+                Object.keys(data.errors).forEach(key => {
+                    if (errors.value.hasOwnProperty(key)) {
+                        errors.value[key] = data.errors[key][0];
+                    }
+                });
+            } else {
+                // General error
+                errors.value.general = data.message || 'An error occurred while saving the campaign.';
+            }
+            return;
+        }
+
+        // Success! Redirect to dashboard or show success message
+        console.log('Campaign created successfully:', data);
+
+        // Redirect to dashboard
+        window.location.href = props.dashboardUrl;
     } catch (error) {
         console.error('Submission error:', error);
-        errors.value.general = 'An error occurred while saving the campaign.';
+        errors.value.general = 'An error occurred while saving the campaign. Please try again.';
     } finally {
         isSubmitting.value = false;
         submitType.value = null;

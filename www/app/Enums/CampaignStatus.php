@@ -7,6 +7,7 @@ namespace App\Enums;
 enum CampaignStatus: string
 {
     case DRAFT = 'draft';
+    case WAITING_FOR_VALIDATION = 'waiting_for_validation';
     case ACTIVE = 'active';
     case COMPLETED = 'completed';
     case CANCELLED = 'cancelled';
@@ -28,6 +29,7 @@ enum CampaignStatus: string
     {
         return match ($this) {
             self::DRAFT => 'Draft',
+            self::WAITING_FOR_VALIDATION => 'Waiting for Validation',
             self::ACTIVE => 'Active',
             self::COMPLETED => 'Completed',
             self::CANCELLED => 'Cancelled',

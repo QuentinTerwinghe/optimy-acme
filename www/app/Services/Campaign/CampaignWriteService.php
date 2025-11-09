@@ -51,7 +51,7 @@ class CampaignWriteService implements CampaignWriteServiceInterface
                 $campaign->tags()->sync($tags->pluck('id'));
 
                 Log::info('Campaign tags synced', [
-                    'campaign_id' => $campaign->id,
+                    'campaign_id' => (string) $campaign->id,
                     'tag_count' => $tags->count(),
                 ]);
             }
@@ -62,7 +62,7 @@ class CampaignWriteService implements CampaignWriteServiceInterface
             $campaign->load(['category', 'tags']);
 
             Log::info('Campaign created successfully', [
-                'campaign_id' => $campaign->id,
+                'campaign_id' => (string) $campaign->id,
                 'title' => $campaign->title,
             ]);
 

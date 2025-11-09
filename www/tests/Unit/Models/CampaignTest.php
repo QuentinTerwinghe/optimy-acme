@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 use App\Enums\CampaignStatus;
 use App\Enums\Currency;
-use App\Models\Campaign;
-use App\Models\User;
+use App\Models\Campaign\Campaign;
+use App\Models\Auth\User;
 
 describe('Campaign Model', function () {
     test('can create a campaign', function () {

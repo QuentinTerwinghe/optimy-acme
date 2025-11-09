@@ -12,6 +12,13 @@ use Illuminate\Support\Str;
 class UserFactory extends Factory
 {
     /**
+     * The name of the factory's corresponding model.
+     *
+     * @var class-string<\App\Models\Auth\User>
+     */
+    protected $model = \App\Models\Auth\User::class;
+
+    /**
      * The current password being used by the factory.
      */
     protected static ?string $password;
