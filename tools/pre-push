@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+echo "Running pre-push checks..."
+
+# Run tests
+if ! make test; then
+  echo "❌ Tests failed. Aborting push."
+  exit 1
+fi
+
+# Run PHPStan
+if ! make phpstan; then
+  echo "❌ PHPStan failed. Aborting push."
+  exit 1
+fi
+
+echo "✅ All checks passed. Pushing..."
+exit 0

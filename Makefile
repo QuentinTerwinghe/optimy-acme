@@ -129,6 +129,7 @@ define do_setup
 	$(call do_db_migrate_fresh)
 	$(call do_cc)
 	$(call do_db_seed)
+	cp tools/pre-push .git/hooks
 
 	@printf "\n"
 	@printf "\e[42m%s setup completed\e[0m\n" "${APP_NAME}"
