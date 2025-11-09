@@ -50,4 +50,6 @@ Route::middleware(['auth'])->group(function () {
         ->name('campaigns.create');
     Route::post('/campaigns', [CampaignController::class, 'store'])
         ->name('campaigns.store');
+    Route::get('/campaigns/{id}/edit', [CampaignController::class, 'edit'])
+        ->name('campaigns.edit');
 });

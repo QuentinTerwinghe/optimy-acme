@@ -219,13 +219,21 @@
                                 </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <button
-                                    @click="editCampaign(campaign.id)"
+                                <a
+                                    v-if="canEditCampaign(campaign)"
+                                    :href="`/campaigns/${campaign.id}/edit`"
                                     class="text-indigo-600 hover:text-indigo-900 mr-4"
                                     title="Edit campaign"
                                 >
                                     Edit
-                                </button>
+                                </a>
+                                <span
+                                    v-else
+                                    class="text-gray-400 mr-4 cursor-not-allowed"
+                                    title="Cannot edit this campaign"
+                                >
+                                    Edit
+                                </span>
                                 <button
                                     @click="cancelCampaign(campaign.id)"
                                     class="text-red-600 hover:text-red-900"
@@ -454,12 +462,12 @@ const getStatusBadgeClass = (status) => {
     return classes[status] || 'bg-gray-100 text-gray-800';
 };
 
-// Action handlers (placeholders - not implemented yet)
-const editCampaign = (id) => {
-    console.log('Edit campaign:', id);
-    // TODO: Implement edit functionality
+// Check if campaign can be edited (only draft and waiting_for_validation)
+const canEditCampaign = (campaign) => {
+    return campaign.status === 'draft' || campaign.status === 'waiting_for_validation';
 };
 
+// Action handlers
 const cancelCampaign = (id) => {
     console.log('Cancel campaign:', id);
     // TODO: Implement cancel functionality

@@ -278,8 +278,32 @@ class CampaignSeeder extends Seeder
             $campaignIndex++;
         }
 
-        // Create 3 draft campaigns
-        for ($i = 0; $i < 3; $i++) {
+        // Create 2 waiting for validation campaigns
+        for ($i = 0; $i < 2; $i++) {
+            $campaignData = $campaigns[$campaignIndex];
+            $campaign = Campaign::create([
+                'title' => $campaignData['title'],
+                'description' => $campaignData['description'],
+                'goal_amount' => fake()->numberBetween(5000, 40000),
+                'current_amount' => 0, // Waiting campaigns should have 0
+                'currency' => fake()->randomElement($currencies),
+                'start_date' => now()->addDays(fake()->numberBetween(1, 15)), // Future start date
+                'end_date' => now()->addDays(fake()->numberBetween(60, 120)), // Future end date
+                'status' => CampaignStatus::WAITING_FOR_VALIDATION,
+                'category_id' => $createdCategories[$campaignData['category']]->id,
+                'created_by' => fake()->randomElement($userIds),
+                'updated_by' => fake()->randomElement($userIds),
+            ]);
+
+            // Attach tags
+            $tagIds = collect($campaignData['tags'])->map(fn($tagSlug) => $createdTags[$tagSlug]->id)->toArray();
+            $campaign->tags()->sync($tagIds);
+
+            $campaignIndex++;
+        }
+
+        // Create 2 draft campaigns
+        for ($i = 0; $i < 2; $i++) {
             $campaignData = $campaigns[$campaignIndex];
             $campaign = Campaign::create([
                 'title' => $campaignData['title'],

@@ -14,6 +14,7 @@ use App\Models\Campaign\Category;
 use App\Models\Campaign\Tag;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class CampaignController extends Controller
@@ -94,10 +95,37 @@ class CampaignController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id): never
+    public function edit(string $id): View|RedirectResponse
     {
-        // TODO: Implement edit method
-        abort(404);
+        // Find the campaign by ID and load tags relationship
+        $campaign = Campaign::with('tags')->findByUuid($id)->firstOrFail();
+
+        // Get current authenticated user
+        $user = auth()->user();
+
+        // Check authorization using the policy
+        if ($user === null || !$user->can('update', $campaign)) {
+            // Redirect to campaigns list if unauthorized
+            return redirect()
+                ->route('campaigns.index')
+                ->with('error', 'You are not authorized to edit this campaign or the campaign cannot be edited in its current status.');
+        }
+
+        // Load necessary data for the form
+        $categories = Category::where('is_active', true)
+            ->orderBy('name')
+            ->get();
+
+        $tags = Tag::orderBy('name')->get();
+
+        $currencies = Currency::cases();
+
+        return view('campaigns.edit', [
+            'campaign' => $campaign,
+            'categories' => $categories,
+            'tags' => $tags,
+            'currencies' => $currencies,
+        ]);
     }
 
     /**

@@ -36,15 +36,21 @@ class RoleSeeder extends Seeder
             'guard_name' => 'web',
         ]);
 
-        // Create the admin role and assign the wildcard permission
+        // Create the admin role and assign permissions
         $adminRole = Role::firstOrCreate([
             'name' => 'admin',
             'guard_name' => 'web',
         ]);
 
-        // Assign the wildcard permission to admin role
+        // Assign the wildcard permission to admin role for full access
         if (!$adminRole->hasPermissionTo('*')) {
             $adminRole->givePermissionTo($adminPermission);
+        }
+
+        // Also explicitly give manageAllCampaigns permission for clarity
+        // (even though wildcard '*' should grant all permissions)
+        if (!$adminRole->hasPermissionTo(CampaignPermissions::MANAGE_ALL_CAMPAIGNS->value)) {
+            $adminRole->givePermissionTo(CampaignPermissions::MANAGE_ALL_CAMPAIGNS->value);
         }
 
         // Create the campaign_manager role and assign permissions

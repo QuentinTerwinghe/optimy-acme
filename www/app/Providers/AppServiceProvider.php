@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+use App\Models\Campaign\Campaign;
+use App\Policies\Campaign\CampaignPolicy;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -71,6 +74,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Register Campaign Policy
+        Gate::policy(Campaign::class, CampaignPolicy::class);
     }
 }

@@ -32,7 +32,7 @@ class CampaignQueryServiceTest extends TestCase
         $this->service = new CampaignQueryService();
 
         // Create permissions
-        $manageAllCampaignsPermission = Permission::create([
+        $manageAllCampaignsPermission = Permission::firstOrCreate([
             'name' => CampaignPermissions::MANAGE_ALL_CAMPAIGNS->value
         ]);
 

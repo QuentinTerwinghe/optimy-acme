@@ -8,6 +8,7 @@ import ActiveCampaignsList from './components/Dashboard/ActiveCampaignsList.vue'
 import ActiveCampaignsCount from './components/Dashboard/ActiveCampaignsCount.vue';
 import DashboardWrapper from './components/Dashboard/DashboardWrapper.vue';
 import CampaignCreateForm from './components/Campaign/CampaignCreateForm.vue';
+import CampaignEditForm from './components/Campaign/CampaignEditForm.vue';
 import CampaignManageList from './components/Campaign/CampaignManageList.vue';
 import TagInput from './components/Common/TagInput.vue';
 
@@ -31,6 +32,7 @@ app.component('active-campaigns-list', ActiveCampaignsList);
 app.component('active-campaigns-count', ActiveCampaignsCount);
 app.component('dashboard-wrapper', DashboardWrapper);
 app.component('campaign-create-form', CampaignCreateForm);
+app.component('campaign-edit-form', CampaignEditForm);
 app.component('campaign-manage-list', CampaignManageList);
 app.component('tag-input', TagInput);
 

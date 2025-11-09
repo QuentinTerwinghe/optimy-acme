@@ -29,7 +29,7 @@ class CampaignManageTest extends TestCase
         parent::setUp();
 
         // Create permissions
-        $manageAllCampaignsPermission = Permission::create([
+        $manageAllCampaignsPermission = Permission::firstOrCreate([
             'name' => CampaignPermissions::MANAGE_ALL_CAMPAIGNS->value
         ]);
 
