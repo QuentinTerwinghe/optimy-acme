@@ -237,7 +237,8 @@ class CampaignQueryService implements CampaignQueryServiceInterface
             $query = Campaign::query();
 
             // If user doesn't have permission to manage all campaigns, filter by created_by
-            if (!$user->can(CampaignPermissions::MANAGE_ALL_CAMPAIGNS->value)) {
+            // Use hasPermissionTo() instead of can() to properly support wildcard permissions
+            if (!$user->hasPermissionTo(CampaignPermissions::MANAGE_ALL_CAMPAIGNS->value)) {
                 $query->where('created_by', $user->id);
             }
 
