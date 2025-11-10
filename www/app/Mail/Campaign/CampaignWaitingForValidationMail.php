@@ -25,12 +25,12 @@ class CampaignWaitingForValidationMail extends Mailable implements ShouldQueue
      * Create a new message instance.
      *
      * @param User $receiver The campaign manager receiving the notification
-     * @param Campaign $campaign The campaign waiting for validation
+     * @param array $campaign The campaign waiting for validation
      * @param User $creator The user who created/submitted the campaign
      */
     public function __construct(
         public readonly User $receiver,
-        public readonly Campaign $campaign,
+        public readonly array $campaign,
         public readonly User $creator
     ) {
     }
@@ -41,7 +41,7 @@ class CampaignWaitingForValidationMail extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'New Campaign Awaiting Validation: ' . $this->campaign->title,
+            subject: 'New Campaign Awaiting Validation: ' . $this->campaign['title'],
         );
     }
 

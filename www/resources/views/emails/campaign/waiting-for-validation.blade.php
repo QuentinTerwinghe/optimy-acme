@@ -6,16 +6,16 @@ Hello {{ $receiver->name }},
 A new campaign has been submitted and is waiting for validation.
 
 **Campaign Details:**
-- **Title:** {{ $campaign->title }}
+- **Title:** {{ $campaign['title'] }}
 - **Created by:** {{ $creator->name }} ({{ $creator->email }})
-@if($campaign->description)
-- **Description:** {{ Str::limit($campaign->description, 150) }}
+@if($campaign['description'])
+- **Description:** {{ Str::limit($campaign['description'], 150) }}
 @endif
-@if($campaign->goal_amount)
-- **Goal Amount:** {{ $campaign->currency?->value ?? '' }} {{ number_format($campaign->goal_amount, 2) }}
+@if($campaign['goal_amount'])
+- **Goal Amount:** {{ $campaign['currency']->value ?? '' }} {{ number_format($campaign['goal_amount'], 2) }}
 @endif
 
-<x-mail::button :url="route('campaigns.show', $campaign->id)">
+<x-mail::button :url="route('campaigns.edit', $campaign['id'])">
 View Campaign
 </x-mail::button>
 

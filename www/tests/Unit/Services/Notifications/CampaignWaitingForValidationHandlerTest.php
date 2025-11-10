@@ -63,7 +63,7 @@ class CampaignWaitingForValidationHandlerTest extends TestCase
 
         Mail::assertQueued(CampaignWaitingForValidationMail::class, function ($mail) use ($receiver, $campaign, $creator) {
             return $mail->receiver->id === $receiver->id
-                && $mail->campaign->id === $campaign->id
+                && $mail->campaign['id'] === $campaign->id
                 && $mail->creator->id === $creator->id
                 && $mail->hasTo($receiver->email);
         });

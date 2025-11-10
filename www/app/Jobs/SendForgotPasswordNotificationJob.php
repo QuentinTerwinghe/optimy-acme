@@ -39,7 +39,7 @@ class SendForgotPasswordNotificationJob implements ShouldQueue
     /**
      * Create a new job instance.
      *
-     * @param int $userId User ID who will receive the notification
+     * @param string $userId User ID who will receive the notification
      * @param string $token Password reset token (plain, not hashed)
      * @param int $expirationMinutes Token expiration in minutes
      */

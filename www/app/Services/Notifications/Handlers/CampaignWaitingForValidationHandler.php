@@ -75,13 +75,13 @@ class CampaignWaitingForValidationHandler extends AbstractNotificationHandler
 
             Log::info('Notification being sent', [
                 'campaign_id' => $campaign->id,
-                'creator' => $creator->name,
+                'receiver' => $receiver->email,
             ]);
 
             Mail::to($receiver->email)->send(
                 new CampaignWaitingForValidationMail(
                     receiver: $receiver,
-                    campaign: $campaign,
+                    campaign: $campaign->toArray(),
                     creator: $creator
                 )
             );
