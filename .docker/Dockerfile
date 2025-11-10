@@ -34,6 +34,9 @@ RUN docker-php-ext-install \
 # Install AMQP extension for RabbitMQ
 RUN pecl install amqp && docker-php-ext-enable amqp
 
+# Install XDebug for debugging
+RUN pecl install xdebug && docker-php-ext-enable xdebug
+
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
@@ -62,6 +65,11 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction
 # Create entrypoint script
 COPY .docker/apache/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
+
+ARG XDEBUG_CLIENT_PORT
+ENV XDEBUG_MODE=debug
+ENV XDEBUG_CLIENT_PORT=${XDEBUG_CLIENT_PORT:-9013}
+RUN echo "xdebug.client_port=\${XDEBUG_CLIENT_PORT}" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 
 EXPOSE 80
 

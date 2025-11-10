@@ -11,6 +11,8 @@ services:
     build:
       context: .
       dockerfile: .docker/Dockerfile
+      args:
+        - XDEBUG_CLIENT_PORT=${XDEBUG_CLIENT_PORT:-9013}
     container_name: ${APP_NAME:-acme_corp}_app
     restart: unless-stopped
     ports:
@@ -34,6 +36,11 @@ services:
       - RABBITMQ_PORT=5672
       - RABBITMQ_USER=${RABBITMQ_DEFAULT_USER:-acme_corp}
       - RABBITMQ_PASSWORD=${RABBITMQ_DEFAULT_PASS}
+      # XDebug Configuration
+      - XDEBUG_MODE=${XDEBUG_MODE:-debug}
+      - XDEBUG_CLIENT_HOST=${XDEBUG_CLIENT_HOST:-host.docker.internal}
+      - XDEBUG_CLIENT_PORT=${XDEBUG_CLIENT_PORT:-9013}
+      - XDEBUG_IDEKEY=${XDEBUG_IDEKEY:-ACME_CORP}
     depends_on:
       mysql:
         condition: service_healthy
