@@ -59,10 +59,11 @@
 
             <!-- Campaigns List -->
             <div v-else class="space-y-4">
-                <div
+                <a
                     v-for="campaign in campaigns"
                     :key="campaign.id"
-                    class="border border-gray-200 rounded-lg p-4 hover:border-indigo-300 transition-colors"
+                    :href="`/campaigns/${campaign.id}`"
+                    class="block border border-gray-200 rounded-lg p-4 hover:border-indigo-300 hover:shadow-md transition-all cursor-pointer"
                 >
                     <!-- Campaign Header -->
                     <div class="flex items-start justify-between mb-3">
@@ -112,7 +113,7 @@
                             {{ campaign.days_remaining }} {{ campaign.days_remaining === 1 ? 'day' : 'days' }} left
                         </div>
                     </div>
-                </div>
+                </a>
             </div>
         </div>
     </div>

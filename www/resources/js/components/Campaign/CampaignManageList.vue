@@ -220,6 +220,13 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                 <a
+                                    :href="`/campaigns/${campaign.id}`"
+                                    class="text-blue-600 hover:text-blue-900 mr-4"
+                                    title="View campaign details"
+                                >
+                                    View
+                                </a>
+                                <a
                                     v-if="canEditCampaign(campaign)"
                                     :href="`/campaigns/${campaign.id}/edit`"
                                     class="text-indigo-600 hover:text-indigo-900 mr-4"

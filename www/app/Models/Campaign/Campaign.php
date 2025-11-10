@@ -120,6 +120,14 @@ class Campaign extends Model
     }
 
     /**
+     * Get the status label attribute.
+     */
+    public function getStatusLabelAttribute(): string
+    {
+        return $this->status->label();
+    }
+
+    /**
      * Convert the model instance to an array.
      *
      * @return array<string, mixed>
@@ -132,6 +140,9 @@ class Campaign extends Model
         if (isset($array['id'])) {
             $array['id'] = $this->getAttribute('id');
         }
+
+        // Add status label
+        $array['status_label'] = $this->status_label;
 
         return $array;
     }

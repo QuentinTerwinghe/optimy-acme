@@ -89,10 +89,27 @@ class CampaignController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id): never
+    public function show(string $id): View|RedirectResponse
     {
-        // TODO: Implement show method
-        abort(404);
+        try {
+            // Find the campaign by ID and load relationships
+            $campaign = Campaign::with(['category', 'tags', 'creator'])
+                ->findById($id)
+                ->firstOrFail();
+
+            return view('campaigns.show', [
+                'campaign' => $campaign,
+            ]);
+        } catch (ModelNotFoundException $e) {
+            return redirect()
+                ->route('dashboard')
+                ->with('error', 'Campaign not found.');
+        } catch (\Exception $e) {
+            // Handle invalid UUIDs or other errors
+            return redirect()
+                ->route('dashboard')
+                ->with('error', 'Campaign not found.');
+        }
     }
 
     /**

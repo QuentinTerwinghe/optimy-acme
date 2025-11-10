@@ -10,6 +10,7 @@ import DashboardWrapper from './components/Dashboard/DashboardWrapper.vue';
 import CampaignCreateForm from './components/Campaign/CampaignCreateForm.vue';
 import CampaignEditForm from './components/Campaign/CampaignEditForm.vue';
 import CampaignManageList from './components/Campaign/CampaignManageList.vue';
+import CampaignShow from './components/Campaign/CampaignShow.vue';
 import TagInput from './components/Common/TagInput.vue';
 
 // Create Vue app
@@ -34,6 +35,7 @@ app.component('dashboard-wrapper', DashboardWrapper);
 app.component('campaign-create-form', CampaignCreateForm);
 app.component('campaign-edit-form', CampaignEditForm);
 app.component('campaign-manage-list', CampaignManageList);
+app.component('campaign-show', CampaignShow);
 app.component('tag-input', TagInput);
 
 // Mount the app
