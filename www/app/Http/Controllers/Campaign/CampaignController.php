@@ -151,6 +151,10 @@ class CampaignController extends Controller
             // Convert request to DTO using mapper
             $dto = CampaignMapper::fromUpdateRequest($request);
 
+            if (!$dto->hasAnyField()) {
+                throw new \InvalidArgumentException('At least one data is required to perform an update');
+            }
+
             // Update campaign using the service
             $updatedCampaign = $this->campaignWriteService->updateCampaign((string) $campaign->id, $dto);
 
