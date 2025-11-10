@@ -219,9 +219,7 @@ const handleSubmit = async () => {
         formData.append('_token', props.csrfToken);
         formData.append('username', form.value.username);
         formData.append('password', form.value.password);
-        if (form.value.remember) {
-            formData.append('remember', 'on');
-        }
+        formData.append('remember', form.value.remember ? '1' : '0');
 
         // Submit to Laravel
         const response = await fetch(props.loginUrl, {
