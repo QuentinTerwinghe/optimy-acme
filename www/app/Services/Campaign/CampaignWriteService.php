@@ -7,6 +7,7 @@ namespace App\Services\Campaign;
 use App\Contracts\Campaign\CampaignWriteServiceInterface;
 use App\Contracts\Tag\TagWriteServiceInterface;
 use App\DTOs\Campaign\CampaignDTO;
+use App\Enums\Campaign\CampaignStatus;
 use App\Models\Campaign\Campaign;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -97,6 +98,30 @@ class CampaignWriteService implements CampaignWriteServiceInterface
             // Extract tags from data (if present)
             $tagNames = $data['tags'] ?? null;
             unset($data['tags']);
+
+            // Check if status is being changed to WAITING_FOR_VALIDATION or ACTIVE
+            $newStatus = $data['status'] ?? null;
+            if ($newStatus !== null &&
+                ($newStatus === CampaignStatus::WAITING_FOR_VALIDATION->value || $newStatus === CampaignStatus::ACTIVE->value) &&
+                $newStatus !== $campaign->status->value) {
+                // Validate that required fields are present (either in update data or already in campaign)
+                $requiredFields = ['goal_amount', 'currency', 'start_date', 'end_date'];
+                $missingFields = [];
+
+                foreach ($requiredFields as $field) {
+                    // Check if field will be set after update (either provided in data or already exists)
+                    $value = $data[$field] ?? $campaign->{$field};
+                    if (empty($value)) {
+                        $missingFields[] = $field;
+                    }
+                }
+
+                if (!empty($missingFields)) {
+                    throw new \InvalidArgumentException(
+                        'Cannot change status to ' . $newStatus . ' without required fields: ' . implode(', ', $missingFields)
+                    );
+                }
+            }
 
             // Update campaign
             $campaign->update($data);

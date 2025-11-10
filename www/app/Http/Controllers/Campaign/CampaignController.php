@@ -15,6 +15,7 @@ use App\Models\Campaign\Campaign;
 use App\Models\Campaign\Category;
 use App\Models\Campaign\Tag;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -161,6 +162,33 @@ class CampaignController extends Controller
                 'message' => 'Campaign updated successfully',
                 'data' => $updatedCampaign->toArray(),
             ], 200);
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Campaign not found.',
+            ], 404);
+        } catch (\InvalidArgumentException $e) {
+            // Parse the exception message to extract field names and return validation error format
+            $message = $e->getMessage();
+            $errors = [];
+
+            // Extract missing fields from the message
+            if (str_contains($message, 'without required fields:')) {
+                $fieldsString = substr($message, strpos($message, 'without required fields:') + 25);
+                $fields = array_map('trim', explode(',', $fieldsString));
+
+                foreach ($fields as $field) {
+                    $fieldName = str_replace('_', ' ', $field);
+                    $errors[$field] = [ucfirst($fieldName) . ' is required'];
+                }
+            }
+
+            return response()->json([
+                'message' => count($errors) > 1
+                    ? array_keys($errors)[0] . ' is required (and ' . (count($errors) - 1) . ' more errors)'
+                    : ($errors[array_key_first($errors)][0] ?? $message),
+                'errors' => $errors,
+            ], 422);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -201,6 +229,11 @@ class CampaignController extends Controller
                 'message' => 'Campaign validated successfully',
                 'data' => $updatedCampaign->toArray(),
             ], 200);
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Campaign not found.',
+            ], 404);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
