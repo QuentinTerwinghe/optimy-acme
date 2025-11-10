@@ -50,6 +50,7 @@ COPY .docker/apache/apache2.conf /etc/apache2/apache2.conf
 # Copy PHP configuration
 COPY .docker/php/php.ini /usr/local/etc/php/conf.d/custom.ini
 COPY .docker/php/opcache.ini /usr/local/etc/php/conf.d/opcache.ini
+COPY .docker/php/xdebug.ini /usr/local/etc/php/conf.d/xdebug.ini
 
 # Copy application files
 COPY ./www /var/www/html
@@ -65,11 +66,6 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction
 # Create entrypoint script
 COPY .docker/apache/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
-
-ARG XDEBUG_CLIENT_PORT
-ENV XDEBUG_MODE=debug
-ENV XDEBUG_CLIENT_PORT=${XDEBUG_CLIENT_PORT:-9013}
-RUN echo "xdebug.client_port=\${XDEBUG_CLIENT_PORT}" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 
 EXPOSE 80
 
