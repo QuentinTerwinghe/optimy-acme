@@ -356,7 +356,10 @@ const filteredCampaigns = computed(() => {
 
     // Apply status filter
     if (filters.value.status) {
-        result = result.filter(campaign => campaign.status === filters.value.status);
+        result = result.filter(campaign => {
+            const matches = campaign.status === filters.value.status;
+            return matches;
+        });
     }
 
     // Apply sorting
