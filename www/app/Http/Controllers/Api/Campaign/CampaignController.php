@@ -125,7 +125,10 @@ class CampaignController extends Controller
     public function update(UpdateCampaignRequest $request, string $id): JsonResponse
     {
         try {
-            $campaign = $this->campaignWriteService->updateCampaign($id, $request->validated());
+            // Convert request to DTO using mapper
+            $dto = \App\Mappers\Campaign\CampaignMapper::fromUpdateRequest($request);
+
+            $campaign = $this->campaignWriteService->updateCampaign($id, $dto);
 
             return response()->json([
                 'message' => 'Campaign updated successfully',

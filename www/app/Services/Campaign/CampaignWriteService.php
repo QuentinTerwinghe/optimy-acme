@@ -7,6 +7,7 @@ namespace App\Services\Campaign;
 use App\Contracts\Campaign\CampaignWriteServiceInterface;
 use App\Contracts\Tag\TagWriteServiceInterface;
 use App\DTOs\Campaign\CampaignDTO;
+use App\DTOs\Campaign\UpdateCampaignDTO;
 use App\Enums\Campaign\CampaignStatus;
 use App\Models\Campaign\Campaign;
 use Illuminate\Support\Facades\DB;
@@ -84,66 +85,71 @@ class CampaignWriteService implements CampaignWriteServiceInterface
      * Update an existing campaign
      *
      * @param string $id
-     * @param array<string, mixed> $data
+     * @param UpdateCampaignDTO $dto
      * @return Campaign
      * @throws \Exception
      */
-    public function updateCampaign(string $id, array $data): Campaign
+    public function updateCampaign(string $id, UpdateCampaignDTO $dto): Campaign
     {
         try {
             DB::beginTransaction();
 
             $campaign = Campaign::findById($id)->firstOrFail();
 
-            // Extract tags from data (if present)
-            $tagNames = $data['tags'] ?? null;
-            unset($data['tags']);
+            // Convert DTO to array for database operations
+            $data = $dto->toArray();
+
+            // Get tags from DTO (if present)
+            $tagNames = $dto->tags;
 
             // Check if status is being changed to WAITING_FOR_VALIDATION or ACTIVE
-            $newStatus = $data['status'] ?? null;
-            $oldStatus = $campaign->status->value;
+            $newStatus = $dto->status;
+            $oldStatus = $campaign->status;
 
             if ($newStatus !== null &&
-                ($newStatus === CampaignStatus::WAITING_FOR_VALIDATION->value || $newStatus === CampaignStatus::ACTIVE->value) &&
+                ($newStatus === CampaignStatus::WAITING_FOR_VALIDATION || $newStatus === CampaignStatus::ACTIVE) &&
                 $newStatus !== $oldStatus) {
-                $requiredFields = ['goal_amount', 'currency', 'start_date', 'end_date'];
+                $requiredFields = [
+                    'goal_amount' => $dto->goalAmount,
+                    'currency' => $dto->currency,
+                    'start_date' => $dto->startDate,
+                    'end_date' => $dto->endDate,
+                ];
                 $missingFields = [];
 
-                // When changing FROM draft TO waiting_for_validation, require fields in request
-                // When validating (draft/waiting -> active), check if fields exist in campaign or request
-                $requireInRequest = ($oldStatus === CampaignStatus::DRAFT->value &&
-                                    $newStatus === CampaignStatus::WAITING_FOR_VALIDATION->value);
+                // When changing FROM draft TO waiting_for_validation, require fields in DTO
+                // When validating (draft/waiting -> active), check if fields exist in campaign or DTO
+                $requireInDto = ($oldStatus === CampaignStatus::DRAFT &&
+                                 $newStatus === CampaignStatus::WAITING_FOR_VALIDATION);
 
-                foreach ($requiredFields as $field) {
-                    if ($requireInRequest) {
-                        // Must be in the request and not empty
-                        if (!isset($data[$field]) || $data[$field] === '') {
-                            $missingFields[] = $field;
+                foreach ($requiredFields as $fieldName => $dtoValue) {
+                    if ($requireInDto) {
+                        // Must be in the DTO and not null
+                        if ($dtoValue === null) {
+                            $missingFields[] = $fieldName;
                         }
                     } else {
-                        // Can be in request or already in campaign
-                        $valueInRequest = $data[$field] ?? null;
-                        $valueInCampaign = $campaign->{$field};
+                        // Can be in DTO or already in campaign
+                        $campaignValue = $campaign->{$fieldName};
 
-                        if (($valueInRequest === null || $valueInRequest === '') &&
-                            ($valueInCampaign === null || $valueInCampaign === '')) {
-                            $missingFields[] = $field;
+                        if ($dtoValue === null && ($campaignValue === null || $campaignValue === '')) {
+                            $missingFields[] = $fieldName;
                         }
                     }
                 }
 
                 if (!empty($missingFields)) {
                     throw new \InvalidArgumentException(
-                        'Cannot change status to ' . $newStatus . ' without required fields: ' . implode(', ', $missingFields)
+                        'Cannot change status to ' . $newStatus->value . ' without required fields: ' . implode(', ', $missingFields)
                     );
                 }
             }
 
-            // Update campaign
+            // Update campaign with data from DTO
             $campaign->update($data);
 
             // Handle tags if provided (null means don't update tags, empty array means remove all tags)
-            if ($tagNames !== null && is_array($tagNames)) {
+            if ($tagNames !== null) {
                 if (empty($tagNames)) {
                     // Remove all tags
                     $campaign->tags()->detach();
@@ -180,7 +186,7 @@ class CampaignWriteService implements CampaignWriteServiceInterface
             Log::error('Failed to update campaign', [
                 'id' => $id,
                 'error' => $e->getMessage(),
-                'data' => $data,
+                'dto' => $dto->toArray(),
             ]);
 
             throw $e;

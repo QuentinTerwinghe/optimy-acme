@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Contracts\Campaign;
 
 use App\DTOs\Campaign\CampaignDTO;
+use App\DTOs\Campaign\UpdateCampaignDTO;
 use App\Models\Campaign\Campaign;
 
 /**
@@ -28,11 +29,11 @@ interface CampaignWriteServiceInterface
      * Update an existing campaign
      *
      * @param string $id
-     * @param array<string, mixed> $data
+     * @param UpdateCampaignDTO $dto
      * @return Campaign
      * @throws \Exception
      */
-    public function updateCampaign(string $id, array $data): Campaign;
+    public function updateCampaign(string $id, UpdateCampaignDTO $dto): Campaign;
 
     /**
      * Delete a campaign

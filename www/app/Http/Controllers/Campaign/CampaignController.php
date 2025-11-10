@@ -148,11 +148,11 @@ class CampaignController extends Controller
                 ], 403);
             }
 
-            // Convert request to array using mapper
-            $data = CampaignMapper::fromUpdateRequest($request);
+            // Convert request to DTO using mapper
+            $dto = CampaignMapper::fromUpdateRequest($request);
 
             // Update campaign using the service
-            $updatedCampaign = $this->campaignWriteService->updateCampaign((string) $campaign->id, $data);
+            $updatedCampaign = $this->campaignWriteService->updateCampaign((string) $campaign->id, $dto);
 
             // Refresh to ensure all attributes are properly loaded
             $updatedCampaign->refresh();
@@ -215,10 +215,15 @@ class CampaignController extends Controller
                 ], 403);
             }
 
-            // Only update the status to active
+            // Create DTO with only status change
+            $dto = new \App\DTOs\Campaign\UpdateCampaignDTO(
+                status: CampaignStatus::ACTIVE
+            );
+
+            // Update campaign using the service
             $updatedCampaign = $this->campaignWriteService->updateCampaign(
                 (string) $campaign->id,
-                ['status' => CampaignStatus::ACTIVE->value]
+                $dto
             );
 
             // Refresh to ensure all attributes are properly loaded
