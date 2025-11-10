@@ -30,17 +30,9 @@
         </div>
 
         <!-- Additional Content Area -->
-        <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
-            <!-- Left Column - Active Campaigns -->
+        <div>
+            <!-- Active Campaigns - Full Width -->
             <active-campaigns-list @refresh="handleRefresh" />
-
-            <!-- Right Column -->
-            <div class="bg-white overflow-hidden shadow-sm rounded-lg">
-                <div class="p-6">
-                    <h2 class="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
-                    <p class="text-gray-600">Quick action buttons will go here...</p>
-                </div>
-            </div>
         </div>
     </div>
 </template>
