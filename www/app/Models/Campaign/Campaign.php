@@ -221,6 +221,19 @@ class Campaign extends Model
     }
 
     /**
+     * Resolve a route binding value by converting UUID string to binary.
+     */
+    public function resolveRouteBindingQuery($query, $value, $field = null): Builder
+    {
+        // If querying by ID and value is UUID string, convert to binary
+        if (($field ?? $this->getRouteKeyName()) === 'id' && is_string($value) && strlen($value) === 36) {
+            $value = hex2bin(str_replace('-', '', $value));
+        }
+
+        return parent::resolveRouteBindingQuery($query, $value, $field);
+    }
+
+    /**
      * Scope a query to find by UUID string
      *
      * @param Builder<Campaign> $query

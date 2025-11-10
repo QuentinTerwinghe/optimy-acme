@@ -224,7 +224,7 @@ class CampaignUpdateTest extends TestCase
         $response->assertStatus(200);
 
         // Verify tags are associated
-        $updatedCampaign = Campaign::find($this->draftCampaign->id);
+        $updatedCampaign = Campaign::findById($this->draftCampaign->id)->firstOrFail();
         $this->assertCount(3, $updatedCampaign->tags);
         $this->assertTrue($updatedCampaign->tags->contains('name', 'ExistingTag'));
         $this->assertTrue($updatedCampaign->tags->contains('name', 'NewTag1'));
@@ -326,11 +326,11 @@ class CampaignUpdateTest extends TestCase
         $response->assertStatus(200);
 
         // Verify only status changed
-        $updatedCampaign = Campaign::find($this->waitingCampaign->id);
+        $updatedCampaign = Campaign::findById($this->waitingCampaign->id)->firstOrFail();
         $this->assertEquals($originalTitle, $updatedCampaign->title);
         $this->assertEquals($originalDescription, $updatedCampaign->description);
         $this->assertEquals($originalGoalAmount, $updatedCampaign->goal_amount);
-        $this->assertEquals(CampaignStatus::ACTIVE->value, $updatedCampaign->status);
+        $this->assertEquals(CampaignStatus::ACTIVE, $updatedCampaign->status);
     }
 
     /** @test */
@@ -402,7 +402,7 @@ class CampaignUpdateTest extends TestCase
         $response->assertStatus(200);
 
         // Verify only description changed
-        $updatedCampaign = Campaign::find($this->draftCampaign->id);
+        $updatedCampaign = Campaign::findById($this->draftCampaign->id)->firstOrFail();
         $this->assertEquals($originalTitle, $updatedCampaign->title);
         $this->assertEquals($originalGoalAmount, $updatedCampaign->goal_amount);
         $this->assertEquals('Only updating description', $updatedCampaign->description);

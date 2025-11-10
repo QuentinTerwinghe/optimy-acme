@@ -92,7 +92,7 @@ class CampaignWriteService implements CampaignWriteServiceInterface
         try {
             DB::beginTransaction();
 
-            $campaign = Campaign::findOrFail($id);
+            $campaign = Campaign::findById($id)->firstOrFail();
 
             // Extract tags from data (if present)
             $tagNames = $data['tags'] ?? null;
@@ -158,7 +158,7 @@ class CampaignWriteService implements CampaignWriteServiceInterface
         try {
             DB::beginTransaction();
 
-            $campaign = Campaign::findOrFail($id);
+            $campaign = Campaign::findById($id)->firstOrFail();
             $deleted = (bool) $campaign->delete();
 
             DB::commit();
