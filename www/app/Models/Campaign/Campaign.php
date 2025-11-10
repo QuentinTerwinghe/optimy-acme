@@ -191,49 +191,6 @@ class Campaign extends Model
     }
 
     /**
-     * Get the value of the model's primary key.
-     */
-    public function getKey(): mixed
-    {
-        $key = $this->getAttribute($this->getKeyName());
-
-        if ($key && is_string($key) && strlen($key) === 16) {
-            // Convert binary to UUID string
-            return $this->getAttribute('id');
-        }
-
-        return $key;
-    }
-
-    /**
-     * Get the value indicating whether the IDs are incrementing.
-     */
-    protected function getKeyForSaveQuery(): mixed
-    {
-        $key = $this->getKey();
-
-        if (is_string($key) && strlen($key) === 36) {
-            // Convert UUID string to binary for query
-            return hex2bin(str_replace('-', '', $key));
-        }
-
-        return $key;
-    }
-
-    /**
-     * Resolve a route binding value by converting UUID string to binary.
-     */
-    public function resolveRouteBindingQuery($query, $value, $field = null): Builder
-    {
-        // If querying by ID and value is UUID string, convert to binary
-        if (($field ?? $this->getRouteKeyName()) === 'id' && is_string($value) && strlen($value) === 36) {
-            $value = hex2bin(str_replace('-', '', $value));
-        }
-
-        return parent::resolveRouteBindingQuery($query, $value, $field);
-    }
-
-    /**
      * Scope a query to find by UUID string
      *
      * @param Builder<Campaign> $query

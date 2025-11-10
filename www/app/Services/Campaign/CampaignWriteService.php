@@ -116,8 +116,8 @@ class CampaignWriteService implements CampaignWriteServiceInterface
 
                 foreach ($requiredFields as $field) {
                     if ($requireInRequest) {
-                        // Must be in the request
-                        if (!isset($data[$field]) || $data[$field] === null || $data[$field] === '') {
+                        // Must be in the request and not empty
+                        if (!isset($data[$field]) || $data[$field] === '') {
                             $missingFields[] = $field;
                         }
                     } else {
