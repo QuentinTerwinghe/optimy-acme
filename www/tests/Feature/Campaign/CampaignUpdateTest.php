@@ -26,6 +26,14 @@ class CampaignUpdateTest extends TestCase
     private Campaign $activeCampaign;
     private Category $category;
 
+    /**
+     * Convert UUID string to binary for database assertions
+     */
+    private function uuidToBinary(string $uuid): string
+    {
+        return hex2bin(str_replace('-', '', $uuid));
+    }
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -91,7 +99,7 @@ class CampaignUpdateTest extends TestCase
 
         // Verify database update
         $this->assertDatabaseHas('campaigns', [
-            'id' => $this->draftCampaign->id,
+            'id' => $this->uuidToBinary($this->draftCampaign->id),
             'title' => 'Updated Campaign Title',
             'description' => 'Updated description',
             'status' => CampaignStatus::DRAFT->value,
@@ -120,7 +128,7 @@ class CampaignUpdateTest extends TestCase
 
         // Verify status changed
         $this->assertDatabaseHas('campaigns', [
-            'id' => $this->draftCampaign->id,
+            'id' => $this->uuidToBinary($this->draftCampaign->id),
             'title' => 'Updated Campaign Title',
             'status' => CampaignStatus::WAITING_FOR_VALIDATION->value,
         ]);
@@ -142,7 +150,7 @@ class CampaignUpdateTest extends TestCase
         $response->assertJson(['success' => true]);
 
         $this->assertDatabaseHas('campaigns', [
-            'id' => $this->waitingCampaign->id,
+            'id' => $this->uuidToBinary($this->waitingCampaign->id),
             'title' => 'Updated Waiting Campaign',
         ]);
     }
@@ -201,7 +209,7 @@ class CampaignUpdateTest extends TestCase
         $response->assertJson(['success' => true]);
 
         $this->assertDatabaseHas('campaigns', [
-            'id' => $this->draftCampaign->id,
+            'id' => $this->uuidToBinary($this->draftCampaign->id),
             'title' => 'Manager Updated Title',
         ]);
     }
@@ -248,7 +256,7 @@ class CampaignUpdateTest extends TestCase
         $response->assertStatus(200);
 
         $this->assertDatabaseHas('campaigns', [
-            'id' => $this->draftCampaign->id,
+            'id' => $this->uuidToBinary($this->draftCampaign->id),
             'category_id' => $newCategory->id,
         ]);
     }
@@ -308,7 +316,7 @@ class CampaignUpdateTest extends TestCase
 
         // Verify status changed to active
         $this->assertDatabaseHas('campaigns', [
-            'id' => $this->waitingCampaign->id,
+            'id' => $this->uuidToBinary($this->waitingCampaign->id),
             'status' => CampaignStatus::ACTIVE->value,
         ]);
     }
@@ -347,7 +355,7 @@ class CampaignUpdateTest extends TestCase
 
         // Verify status did NOT change
         $this->assertDatabaseHas('campaigns', [
-            'id' => $this->waitingCampaign->id,
+            'id' => $this->uuidToBinary($this->waitingCampaign->id),
             'status' => CampaignStatus::WAITING_FOR_VALIDATION->value,
         ]);
     }
@@ -380,7 +388,7 @@ class CampaignUpdateTest extends TestCase
 
         // Verify status changed to active
         $this->assertDatabaseHas('campaigns', [
-            'id' => $this->draftCampaign->id,
+            'id' => $this->uuidToBinary($this->draftCampaign->id),
             'status' => CampaignStatus::ACTIVE->value,
         ]);
     }

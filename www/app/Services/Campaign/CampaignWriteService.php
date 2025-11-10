@@ -101,18 +101,34 @@ class CampaignWriteService implements CampaignWriteServiceInterface
 
             // Check if status is being changed to WAITING_FOR_VALIDATION or ACTIVE
             $newStatus = $data['status'] ?? null;
+            $oldStatus = $campaign->status->value;
+
             if ($newStatus !== null &&
                 ($newStatus === CampaignStatus::WAITING_FOR_VALIDATION->value || $newStatus === CampaignStatus::ACTIVE->value) &&
-                $newStatus !== $campaign->status->value) {
-                // Validate that required fields are present (either in update data or already in campaign)
+                $newStatus !== $oldStatus) {
                 $requiredFields = ['goal_amount', 'currency', 'start_date', 'end_date'];
                 $missingFields = [];
 
+                // When changing FROM draft TO waiting_for_validation, require fields in request
+                // When validating (draft/waiting -> active), check if fields exist in campaign or request
+                $requireInRequest = ($oldStatus === CampaignStatus::DRAFT->value &&
+                                    $newStatus === CampaignStatus::WAITING_FOR_VALIDATION->value);
+
                 foreach ($requiredFields as $field) {
-                    // Check if field will be set after update (either provided in data or already exists)
-                    $value = $data[$field] ?? $campaign->{$field};
-                    if (empty($value)) {
-                        $missingFields[] = $field;
+                    if ($requireInRequest) {
+                        // Must be in the request
+                        if (!isset($data[$field]) || $data[$field] === null || $data[$field] === '') {
+                            $missingFields[] = $field;
+                        }
+                    } else {
+                        // Can be in request or already in campaign
+                        $valueInRequest = $data[$field] ?? null;
+                        $valueInCampaign = $campaign->{$field};
+
+                        if (($valueInRequest === null || $valueInRequest === '') &&
+                            ($valueInCampaign === null || $valueInCampaign === '')) {
+                            $missingFields[] = $field;
+                        }
                     }
                 }
 

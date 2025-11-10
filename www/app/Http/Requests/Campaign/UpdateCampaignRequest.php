@@ -6,6 +6,7 @@ namespace App\Http\Requests\Campaign;
 
 use App\Enums\Campaign\CampaignStatus;
 use App\Enums\Common\Currency;
+use App\Models\Campaign\Campaign;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -21,7 +22,8 @@ class UpdateCampaignRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        // TODO: Implement authorization logic (e.g., check user permissions)
+        // Authorization logic is handled in the controller
+        // This allows proper 404 responses when campaigns don't exist
         return true;
     }
 

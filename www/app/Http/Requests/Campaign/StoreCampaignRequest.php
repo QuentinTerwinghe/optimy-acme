@@ -21,7 +21,6 @@ class StoreCampaignRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        // TODO: Implement authorization logic (e.g., check user permissions)
         return true;
     }
 
