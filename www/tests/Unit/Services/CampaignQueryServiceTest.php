@@ -36,12 +36,20 @@ class CampaignQueryServiceTest extends TestCase
             'name' => CampaignPermissions::MANAGE_ALL_CAMPAIGNS->value
         ]);
 
+        // Create wildcard permission for admin
+        $wildcardPermission = Permission::firstOrCreate([
+            'name' => '*'
+        ]);
+
         // Create roles
         $campaignManagerRole = Role::create(['name' => 'campaign_manager']);
         $adminRole = Role::create(['name' => 'admin']);
 
         // Assign permissions to roles
         $campaignManagerRole->givePermissionTo($manageAllCampaignsPermission);
+        // Admin gets wildcard permission (which should grant all permissions)
+        $adminRole->givePermissionTo($wildcardPermission);
+        // Also explicitly give manageAllCampaigns for clarity (as done in RoleSeeder)
         $adminRole->givePermissionTo($manageAllCampaignsPermission);
 
         // Create test users
@@ -227,6 +235,41 @@ class CampaignQueryServiceTest extends TestCase
 
         // The supervisor should see all campaigns without any code changes
         $result = $this->service->getCampaignsForManagement($supervisor);
+
+        $this->assertCount(5, $result);
+    }
+
+    public function test_user_with_wildcard_permission_sees_all_campaigns(): void
+    {
+        // Create a new role with ONLY wildcard permission (no explicit manageAllCampaigns)
+        $superAdminRole = Role::create(['name' => 'super_admin']);
+
+        // Get wildcard permission
+        $wildcardPermission = Permission::where('name', '*')->first();
+        $superAdminRole->givePermissionTo($wildcardPermission);
+
+        // Create a super admin user
+        $superAdmin = User::factory()->create();
+        $superAdmin->assignRole('super_admin');
+
+        // Create campaigns by different users
+        Campaign::factory()->count(3)->create([
+            'created_by' => $this->regularUser->id,
+            'category_id' => $this->category->id,
+        ]);
+
+        $otherUser = User::factory()->create();
+        Campaign::factory()->count(2)->create([
+            'created_by' => $otherUser->id,
+            'category_id' => $this->category->id,
+        ]);
+
+        // Verify that wildcard permission check works
+        $this->assertTrue($superAdmin->hasPermissionTo('*'));
+        $this->assertTrue($superAdmin->hasPermissionTo(CampaignPermissions::MANAGE_ALL_CAMPAIGNS->value));
+
+        // The super admin should see all campaigns thanks to wildcard permission
+        $result = $this->service->getCampaignsForManagement($superAdmin);
 
         $this->assertCount(5, $result);
     }

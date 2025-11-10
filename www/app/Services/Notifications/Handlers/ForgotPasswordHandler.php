@@ -9,6 +9,7 @@ use App\Mail\Auth\ForgotPasswordMail;
 use App\Models\Auth\User;
 use App\Services\Notifications\AbstractNotificationHandler;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Handler for forgot password notifications.
@@ -68,6 +69,10 @@ class ForgotPasswordHandler extends AbstractNotificationHandler
             // Build the password reset URL
             $resetUrl = $this->buildResetUrl($receiver->email, $token);
 
+            Log::info('Notification being sent', [
+                'resetUrl' => $resetUrl,
+            ]);
+
             // Send the email
             Mail::to($receiver->email)->send(
                 new ForgotPasswordMail(
@@ -76,6 +81,8 @@ class ForgotPasswordHandler extends AbstractNotificationHandler
                     expirationMinutes: $expirationMinutes
                 )
             );
+
+            Log::info('Notification sent');
 
             return true;
         } catch (\Exception $e) {

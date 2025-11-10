@@ -44,7 +44,7 @@ class SendForgotPasswordNotificationJob implements ShouldQueue
      * @param int $expirationMinutes Token expiration in minutes
      */
     public function __construct(
-        private readonly int $userId,
+        private readonly string $userId,
         private readonly string $token,
         private readonly int $expirationMinutes
     ) {
