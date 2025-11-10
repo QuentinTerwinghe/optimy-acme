@@ -52,4 +52,8 @@ Route::middleware(['auth'])->group(function () {
         ->name('campaigns.store');
     Route::get('/campaigns/{id}/edit', [CampaignController::class, 'edit'])
         ->name('campaigns.edit');
+    Route::put('/campaigns/{id}', [CampaignController::class, 'update'])
+        ->name('campaigns.update');
+    Route::post('/campaigns/{id}/validate', [CampaignController::class, 'validate'])
+        ->name('campaigns.validate');
 });

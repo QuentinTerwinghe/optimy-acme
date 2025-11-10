@@ -8,6 +8,7 @@
     :categories="{{ $categories->toJson() }}"
     :tags="{{ $tags->toJson() }}"
     :currencies="{{ json_encode(array_map(fn($c) => ['value' => $c->value, 'symbol' => $c->symbol(), 'label' => $c->label()], $currencies)) }}"
+    :user-permissions="{{ json_encode(auth()->user()->getAllPermissions()->pluck('name')->toArray()) }}"
     csrf-token="{{ csrf_token() }}"
     dashboard-url="{{ route('dashboard') }}"
     campaigns-url="{{ route('campaigns.index') }}"

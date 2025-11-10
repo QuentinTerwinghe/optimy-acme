@@ -262,7 +262,10 @@
                     >
                         Cancel
                     </a>
+
+                    <!-- Save as Draft Button - Only show if status is Draft -->
                     <button
+                        v-if="isDraftStatus"
                         type="button"
                         @click="handleSubmit('draft')"
                         :disabled="isSubmitting || !canSaveAsDraft"
@@ -282,6 +285,8 @@
                             Saving...
                         </span>
                     </button>
+
+                    <!-- Save Button - Always show -->
                     <button
                         type="button"
                         @click="handleSubmit('waiting_for_validation')"
@@ -300,6 +305,29 @@
                                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                             </svg>
                             Saving...
+                        </span>
+                    </button>
+
+                    <!-- Validate Button - Only show if user has manageAllCampaigns permission AND status is waiting_for_validation -->
+                    <button
+                        v-if="showValidateButton"
+                        type="button"
+                        @click="handleSubmit('active')"
+                        :disabled="isSubmitting || !canSaveForValidation"
+                        :class="[
+                            'px-6 py-2.5 rounded-lg text-sm font-medium transition-colors duration-200 shadow-sm',
+                            isSubmitting || !canSaveForValidation
+                                ? 'bg-green-400 text-white cursor-not-allowed'
+                                : 'bg-green-600 text-white hover:bg-green-700 hover:shadow-md'
+                        ]"
+                    >
+                        <span v-if="!isSubmitting || submitType !== 'active'">Validate</span>
+                        <span v-else class="flex items-center">
+                            <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Validating...
                         </span>
                     </button>
                 </div>
@@ -330,6 +358,10 @@ const props = defineProps({
         type: Array,
         required: true
     },
+    userPermissions: {
+        type: Array,
+        default: () => []
+    },
     csrfToken: {
         type: String,
         required: true
@@ -359,6 +391,14 @@ const initializeTags = (campaign) => {
     }));
 };
 
+// Helper function to get currency value (handles both string and enum object)
+const getCurrencyValue = (currency) => {
+    if (!currency) return 'EUR'; // Default to EUR if null
+    if (typeof currency === 'string') return currency;
+    if (typeof currency === 'object' && currency.value) return currency.value;
+    return 'EUR';
+};
+
 // Form state - Initialize with campaign data
 const form = ref({
     title: props.campaign.title || '',
@@ -366,7 +406,7 @@ const form = ref({
     category_id: props.campaign.category_id || '',
     tags: initializeTags(props.campaign),
     goal_amount: props.campaign.goal_amount || '',
-    currency: props.campaign.currency || '',
+    currency: getCurrencyValue(props.campaign.currency),
     start_date: formatDateForInput(props.campaign.start_date),
     end_date: formatDateForInput(props.campaign.end_date)
 });
@@ -416,6 +456,31 @@ const minEndDate = computed(() => {
     return startDate.toISOString().split('T')[0];
 });
 
+// Check if user has specific permission
+const hasPermission = (permission) => {
+    return props.userPermissions.includes(permission);
+};
+
+// Check if current campaign status is Draft
+const isDraftStatus = computed(() => {
+    return props.campaign.status === 'draft';
+});
+
+// Check if current campaign status is Waiting for Validation
+const isWaitingForValidationStatus = computed(() => {
+    return props.campaign.status === 'waiting_for_validation';
+});
+
+// Check if user can validate campaigns
+const canValidateCampaigns = computed(() => {
+    return hasPermission('manageAllCampaigns');
+});
+
+// Show validate button only if user has permission AND status is waiting_for_validation
+const showValidateButton = computed(() => {
+    return canValidateCampaigns.value && isWaitingForValidationStatus.value;
+});
+
 // Methods
 const clearError = (field) => {
     errors.value[field] = '';
@@ -435,12 +500,89 @@ const openDatePicker = (event) => {
 };
 
 const handleSubmit = async (status) => {
-    // Note: For now, this is a placeholder since we're not implementing the update endpoint yet
-    // This will be implemented when adding the update functionality
-    console.log('Edit form submitted with status:', status);
-    console.log('Form data:', form.value);
+    // Clear previous errors
+    errors.value = {
+        title: '',
+        description: '',
+        category_id: '',
+        tags: '',
+        goal_amount: '',
+        currency: '',
+        start_date: '',
+        end_date: '',
+        general: ''
+    };
 
-    // TODO: Implement actual update API call when update endpoint is ready
-    errors.value.general = 'Update functionality will be implemented when the update endpoint is ready.';
+    // Set submitting state
+    isSubmitting.value = true;
+    submitType.value = status;
+
+    try {
+        // Prepare form data based on action type
+        let endpoint = '';
+        let method = '';
+        let payload = {};
+
+        if (status === 'active') {
+            // Validate action - only change status, don't send form modifications
+            endpoint = `/campaigns/${props.campaign.id}/validate`;
+            method = 'POST';
+            payload = {}; // Empty payload - endpoint handles status change
+        } else {
+            // Update action (draft or waiting_for_validation)
+            endpoint = `/campaigns/${props.campaign.id}`;
+            method = 'PUT';
+
+            // Build payload with form data and status
+            payload = {
+                title: form.value.title,
+                description: form.value.description || null,
+                category_id: form.value.category_id || null,
+                tags: form.value.tags.map(tag => tag.name),
+                goal_amount: form.value.goal_amount || null,
+                currency: form.value.currency || null,
+                start_date: form.value.start_date || null,
+                end_date: form.value.end_date || null,
+                status: status
+            };
+        }
+
+        // Make API call
+        const response = await fetch(endpoint, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': props.csrfToken,
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result.success) {
+            // Success! Redirect to campaigns list
+            window.location.href = props.campaignsUrl;
+        } else {
+            // Handle validation errors
+            if (result.errors) {
+                Object.keys(result.errors).forEach(key => {
+                    if (errors.value.hasOwnProperty(key)) {
+                        errors.value[key] = Array.isArray(result.errors[key])
+                            ? result.errors[key][0]
+                            : result.errors[key];
+                    }
+                });
+            } else {
+                errors.value.general = result.message || 'An error occurred while saving the campaign.';
+            }
+        }
+    } catch (error) {
+        console.error('Error submitting form:', error);
+        errors.value.general = 'A network error occurred. Please try again.';
+    } finally {
+        isSubmitting.value = false;
+        submitType.value = null;
+    }
 };
 </script>

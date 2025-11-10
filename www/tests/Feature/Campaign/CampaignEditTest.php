@@ -248,4 +248,116 @@ class CampaignEditTest extends TestCase
         $response->assertRedirect(route('campaigns.index'));
         $response->assertSessionHas('error');
     }
+
+    /** @test */
+    public function edit_page_passes_user_permissions_for_regular_user(): void
+    {
+        $response = $this->actingAs($this->regularUser)
+            ->get(route('campaigns.edit', ['id' => $this->draftCampaign->id]));
+
+        $response->assertStatus(200);
+
+        // Check that the view contains user permissions
+        $content = $response->getContent();
+
+        // The component should receive userPermissions prop with editOwnCampaign permission
+        $this->assertStringContainsString('user-permissions', $content);
+        $this->assertStringContainsString(CampaignPermissions::EDIT_OWN_CAMPAIGN->value, $content);
+
+        // Regular user should NOT have manageAllCampaigns permission
+        $this->assertStringNotContainsString(CampaignPermissions::MANAGE_ALL_CAMPAIGNS->value, $content);
+    }
+
+    /** @test */
+    public function edit_page_passes_user_permissions_for_campaign_manager(): void
+    {
+        $response = $this->actingAs($this->campaignManager)
+            ->get(route('campaigns.edit', ['id' => $this->draftCampaign->id]));
+
+        $response->assertStatus(200);
+
+        // Check that the view contains user permissions
+        $content = $response->getContent();
+
+        // The component should receive userPermissions prop with manageAllCampaigns permission
+        $this->assertStringContainsString('user-permissions', $content);
+        $this->assertStringContainsString(CampaignPermissions::MANAGE_ALL_CAMPAIGNS->value, $content);
+    }
+
+    /** @test */
+    public function edit_page_passes_campaign_status_to_component(): void
+    {
+        // Test with draft campaign
+        $response = $this->actingAs($this->regularUser)
+            ->get(route('campaigns.edit', ['id' => $this->draftCampaign->id]));
+
+        $response->assertStatus(200);
+        $content = $response->getContent();
+
+        // Should contain campaign status
+        $this->assertStringContainsString(CampaignStatus::DRAFT->value, $content);
+
+        // Test with waiting_for_validation campaign
+        $response = $this->actingAs($this->regularUser)
+            ->get(route('campaigns.edit', ['id' => $this->waitingCampaign->id]));
+
+        $response->assertStatus(200);
+        $content = $response->getContent();
+
+        // Should contain campaign status
+        $this->assertStringContainsString(CampaignStatus::WAITING_FOR_VALIDATION->value, $content);
+    }
+
+    /** @test */
+    public function validate_button_logic_for_draft_campaign(): void
+    {
+        // Campaign manager editing a draft campaign should NOT see validate button
+        // because status is not "waiting_for_validation"
+        $response = $this->actingAs($this->campaignManager)
+            ->get(route('campaigns.edit', ['id' => $this->draftCampaign->id]));
+
+        $response->assertStatus(200);
+        $content = $response->getContent();
+
+        // Should have manageAllCampaigns permission
+        $this->assertStringContainsString(CampaignPermissions::MANAGE_ALL_CAMPAIGNS->value, $content);
+
+        // Should have draft status
+        $this->assertStringContainsString(CampaignStatus::DRAFT->value, $content);
+    }
+
+    /** @test */
+    public function validate_button_logic_for_waiting_for_validation_campaign(): void
+    {
+        // Campaign manager editing a waiting_for_validation campaign SHOULD see validate button
+        $response = $this->actingAs($this->campaignManager)
+            ->get(route('campaigns.edit', ['id' => $this->waitingCampaign->id]));
+
+        $response->assertStatus(200);
+        $content = $response->getContent();
+
+        // Should have manageAllCampaigns permission
+        $this->assertStringContainsString(CampaignPermissions::MANAGE_ALL_CAMPAIGNS->value, $content);
+
+        // Should have waiting_for_validation status
+        $this->assertStringContainsString(CampaignStatus::WAITING_FOR_VALIDATION->value, $content);
+    }
+
+    /** @test */
+    public function regular_user_does_not_see_validate_button_even_on_waiting_campaign(): void
+    {
+        // Regular user editing a waiting_for_validation campaign should NOT see validate button
+        // because they don't have manageAllCampaigns permission
+        $response = $this->actingAs($this->regularUser)
+            ->get(route('campaigns.edit', ['id' => $this->waitingCampaign->id]));
+
+        $response->assertStatus(200);
+        $content = $response->getContent();
+
+        // Should NOT have manageAllCampaigns permission
+        $this->assertStringNotContainsString(CampaignPermissions::MANAGE_ALL_CAMPAIGNS->value, $content);
+
+        // Should have waiting_for_validation status
+        $this->assertStringContainsString(CampaignStatus::WAITING_FOR_VALIDATION->value, $content);
+    }
 }

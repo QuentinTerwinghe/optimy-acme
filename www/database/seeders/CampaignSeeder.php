@@ -254,8 +254,8 @@ class CampaignSeeder extends Seeder
             $campaignIndex++;
         }
 
-        // Create 2 cancelled campaigns
-        for ($i = 0; $i < 2; $i++) {
+        // Create 1 cancelled campaigns
+        for ($i = 0; $i < 1; $i++) {
             $campaignData = $campaigns[$campaignIndex];
             $campaign = Campaign::create([
                 'title' => $campaignData['title'],

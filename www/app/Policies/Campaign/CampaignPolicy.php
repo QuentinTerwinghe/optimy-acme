@@ -44,6 +44,16 @@ class CampaignPolicy
     }
 
     /**
+     * Determine if the user can manage all campaigns.
+     *
+     * This is used for administrative actions like validating campaigns.
+     */
+    public function manageAllCampaigns(User $user): bool
+    {
+        return $user->can(CampaignPermissions::MANAGE_ALL_CAMPAIGNS->value);
+    }
+
+    /**
      * Determine if the campaign status allows editing.
      *
      * Only DRAFT and WAITING_FOR_VALIDATION campaigns can be edited.

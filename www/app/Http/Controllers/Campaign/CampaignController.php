@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Campaign;
 
 use App\Contracts\Campaign\CampaignWriteServiceInterface;
+use App\Enums\Campaign\CampaignStatus;
 use App\Enums\Common\Currency;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Campaign\StoreCampaignRequest;
+use App\Http\Requests\Campaign\UpdateCampaignRequest;
 use App\Mappers\Campaign\CampaignMapper;
 use App\Models\Campaign\Campaign;
 use App\Models\Campaign\Category;
@@ -98,7 +100,7 @@ class CampaignController extends Controller
     public function edit(string $id): View|RedirectResponse
     {
         // Find the campaign by ID and load tags relationship
-        $campaign = Campaign::with('tags')->findByUuid($id)->firstOrFail();
+        $campaign = Campaign::with('tags')->findById($id)->firstOrFail();
 
         // Get current authenticated user
         $user = auth()->user();
@@ -131,10 +133,80 @@ class CampaignController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id): never
+    public function update(UpdateCampaignRequest $request, string $id): JsonResponse
     {
-        // TODO: Implement update method
-        abort(404);
+        try {
+            // Find the campaign by UUID
+            $campaign = Campaign::findById($id)->firstOrFail();
+
+            // Check authorization using the policy
+            if (!$request->user()?->can('update', $campaign)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'You are not authorized to update this campaign.',
+                ], 403);
+            }
+
+            // Convert request to array using mapper
+            $data = CampaignMapper::fromUpdateRequest($request);
+
+            // Update campaign using the service
+            $updatedCampaign = $this->campaignWriteService->updateCampaign((string) $campaign->id, $data);
+
+            // Refresh to ensure all attributes are properly loaded
+            $updatedCampaign->refresh();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Campaign updated successfully',
+                'data' => $updatedCampaign->toArray(),
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update campaign: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Validate a campaign (set status to active)
+     * This endpoint ONLY changes the status, does not modify other fields
+     */
+    public function validate(Request $request, string $id): JsonResponse
+    {
+        try {
+            // Find the campaign by UUID
+            $campaign = Campaign::findById($id)->firstOrFail();
+
+            // Check if user has permission to validate campaigns
+            if (!$request->user()?->can('manageAllCampaigns', Campaign::class)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'You are not authorized to validate campaigns.',
+                ], 403);
+            }
+
+            // Only update the status to active
+            $updatedCampaign = $this->campaignWriteService->updateCampaign(
+                (string) $campaign->id,
+                ['status' => CampaignStatus::ACTIVE->value]
+            );
+
+            // Refresh to ensure all attributes are properly loaded
+            $updatedCampaign->refresh();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Campaign validated successfully',
+                'data' => $updatedCampaign->toArray(),
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to validate campaign: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 
     /**

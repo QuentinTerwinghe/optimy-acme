@@ -207,7 +207,7 @@ describe('Campaign Model', function () {
         $campaign = Campaign::factory()->create();
         $uuid = $campaign->id;
 
-        $found = Campaign::findByUuid($uuid)->first();
+        $found = Campaign::findById($uuid)->first();
 
         expect($found)->not->toBeNull()
             ->and($found->id)->toBe($uuid);

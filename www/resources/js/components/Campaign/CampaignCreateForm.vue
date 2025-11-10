@@ -341,7 +341,7 @@ const form = ref({
     category_id: '',
     tags: [],
     goal_amount: '',
-    currency: '',
+    currency: 'EUR', // Default to EUR
     start_date: '',
     end_date: ''
 });

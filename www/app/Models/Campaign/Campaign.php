@@ -226,7 +226,7 @@ class Campaign extends Model
      * @param Builder<Campaign> $query
      * @return Builder<Campaign>
      */
-    public function scopeFindByUuid(Builder $query, string $uuid): Builder
+    public function scopeFindById(Builder $query, string $uuid): Builder
     {
         $binary = hex2bin(str_replace('-', '', $uuid));
         return $query->where('id', $binary);
