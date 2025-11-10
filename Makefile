@@ -247,37 +247,31 @@ endef
 define do_test
 	@printf "Running all tests...\n"
 	docker exec -w /var/www/html ${APP_NAME}_app bash -c "php artisan test"
-	make cc
 endef
 
 define do_test_unit
 	@printf "Running unit tests...\n"
 	docker exec -w /var/www/html ${APP_NAME}_app bash -c "php artisan test --testsuite=Unit"
-	make cc
 endef
 
 define do_test_feature
 	@printf "Running feature tests...\n"
 	docker exec -w /var/www/html ${APP_NAME}_app bash -c "php artisan test --testsuite=Feature"
-	make cc
 endef
 
 define do_test_coverage
 	@printf "Running tests with coverage...\n"
 	docker exec -w /var/www/html ${APP_NAME}_app bash -c "./vendor/bin/pest --coverage --min=80"
-	make cc
 endef
 
 define do_test_filter
 	@printf "Running filtered tests: \e[36m%s\e[0m\n" "${F}"
 	docker exec -w /var/www/html ${APP_NAME}_app bash -c "php artisan test --filter='${F}'"
-	make cc
 endef
 
 define do_pest
 	@printf "Running Pest tests...\n"
 	docker exec -w /var/www/html ${APP_NAME}_app bash -c "./vendor/bin/pest ${ARGS}"
-	make cc
 endef
 
 define exec
