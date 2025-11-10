@@ -25,7 +25,7 @@ class CampaignWaitingForValidationMail extends Mailable implements ShouldQueue
      * Create a new message instance.
      *
      * @param User $receiver The campaign manager receiving the notification
-     * @param array $campaign The campaign waiting for validation
+     * @param array<string, mixed> $campaign The campaign waiting for validation
      * @param User $creator The user who created/submitted the campaign
      */
     public function __construct(

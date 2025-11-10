@@ -119,8 +119,8 @@ class CampaignObserver
 
             // Dispatch job to queue for async processing
             SendCampaignWaitingForValidationNotificationJob::dispatch(
-                $campaign->id,
-                $creator->id
+                (string) $campaign->id,
+                (string) $creator->id
             );
 
             Log::info('Campaign validation notification job dispatched', [

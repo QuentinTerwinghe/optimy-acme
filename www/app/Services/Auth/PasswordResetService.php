@@ -47,7 +47,7 @@ class PasswordResetService implements PasswordResetServiceInterface
 
         // Dispatch job to RabbitMQ for async notification sending
         SendForgotPasswordNotificationJob::dispatch(
-            $user->id,
+            (string) $user->id,
             $token,
             config('auth.passwords.users.expire', 60)
         );
