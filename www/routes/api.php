@@ -15,6 +15,14 @@ Route::middleware(['web', 'auth'])->group(function () {
     Route::get('/campaigns/manage', [CampaignController::class, 'getCampaignsForManagement'])
         ->name('api.campaigns.manage');
 
+    // Dashboard Statistics Routes
+    Route::get('/campaigns/stats/total-funds-raised', [CampaignController::class, 'getTotalFundsRaised'])
+        ->name('api.campaigns.stats.total-funds-raised');
+    Route::get('/campaigns/stats/completed-count', [CampaignController::class, 'getCompletedCampaignsCount'])
+        ->name('api.campaigns.stats.completed-count');
+    Route::get('/campaigns/stats/fundraising-progress', [CampaignController::class, 'getFundraisingProgress'])
+        ->name('api.campaigns.stats.fundraising-progress');
+
     // Category and Tag Routes
     Route::get('/categories', [CampaignController::class, 'getCategories'])
         ->name('api.categories.index');

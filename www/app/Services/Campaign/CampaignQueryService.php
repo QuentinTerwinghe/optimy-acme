@@ -292,4 +292,99 @@ class CampaignQueryService implements CampaignQueryServiceInterface
             return new Collection();
         }
     }
+
+    /**
+     * Get total funds raised from active and completed campaigns
+     *
+     * Returns the sum of current_amount from campaigns that are:
+     * - Status is ACTIVE or COMPLETED
+     *
+     * @return float
+     */
+    public function getTotalFundsRaised(): float
+    {
+        try {
+            $total = Campaign::query()
+                ->whereIn('status', [CampaignStatus::ACTIVE, CampaignStatus::COMPLETED])
+                ->sum('current_amount');
+
+            return (float) $total;
+        } catch (\Exception $e) {
+            Log::error('Failed to calculate total funds raised', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            // Return 0 on error
+            return 0.0;
+        }
+    }
+
+    /**
+     * Get count of completed campaigns
+     *
+     * Returns the count of campaigns that have status COMPLETED
+     *
+     * @return int
+     */
+    public function getCompletedCampaignsCount(): int
+    {
+        try {
+            return Campaign::query()
+                ->where('status', CampaignStatus::COMPLETED)
+                ->count();
+        } catch (\Exception $e) {
+            Log::error('Failed to count completed campaigns', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            // Return 0 on error
+            return 0;
+        }
+    }
+
+    /**
+     * Get fundraising progress statistics
+     *
+     * Returns an array with:
+     * - 'total_goal': sum of goal_amount from active/completed campaigns
+     * - 'total_raised': sum of current_amount from active/completed campaigns
+     * - 'percentage': percentage of goal achieved
+     *
+     * @return array{total_goal: float, total_raised: float, percentage: float}
+     */
+    public function getFundraisingProgress(): array
+    {
+        try {
+            $campaigns = Campaign::query()
+                ->whereIn('status', [CampaignStatus::ACTIVE, CampaignStatus::COMPLETED])
+                ->selectRaw('SUM(goal_amount) as total_goal, SUM(current_amount) as total_raised')
+                ->first();
+
+            $totalGoal = (float) ($campaigns->total_goal ?? 0);
+            $totalRaised = (float) ($campaigns->total_raised ?? 0);
+
+            // Calculate percentage
+            $percentage = $totalGoal > 0 ? ($totalRaised / $totalGoal) * 100 : 0;
+
+            return [
+                'total_goal' => $totalGoal,
+                'total_raised' => $totalRaised,
+                'percentage' => round($percentage, 2),
+            ];
+        } catch (\Exception $e) {
+            Log::error('Failed to calculate fundraising progress', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            // Return zeros on error
+            return [
+                'total_goal' => 0.0,
+                'total_raised' => 0.0,
+                'percentage' => 0.0,
+            ];
+        }
+    }
 }

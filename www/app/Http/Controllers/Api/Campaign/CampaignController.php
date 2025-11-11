@@ -94,6 +94,46 @@ class CampaignController extends Controller
     }
 
     /**
+     * Get total funds raised from active and completed campaigns
+     *
+     * Returns the sum of current_amount from campaigns with active or completed status
+     */
+    public function getTotalFundsRaised(): JsonResponse
+    {
+        $total = $this->campaignQueryService->getTotalFundsRaised();
+
+        return response()->json([
+            'total' => $total,
+        ]);
+    }
+
+    /**
+     * Get count of completed campaigns
+     *
+     * Returns the count of campaigns with completed status
+     */
+    public function getCompletedCampaignsCount(): JsonResponse
+    {
+        $count = $this->campaignQueryService->getCompletedCampaignsCount();
+
+        return response()->json([
+            'count' => $count,
+        ]);
+    }
+
+    /**
+     * Get fundraising progress statistics
+     *
+     * Returns total goal vs total raised amounts with percentage
+     */
+    public function getFundraisingProgress(): JsonResponse
+    {
+        $progress = $this->campaignQueryService->getFundraisingProgress();
+
+        return response()->json($progress);
+    }
+
+    /**
      * Get campaigns for management
      *
      * Returns campaigns based on user role:
