@@ -8,6 +8,7 @@ use App\Contracts\Campaign\CampaignQueryServiceInterface;
 use App\Contracts\Campaign\CampaignWriteServiceInterface;
 use App\Contracts\Category\CategoryQueryServiceInterface;
 use App\Contracts\Tag\TagQueryServiceInterface;
+use App\DTOs\Campaign\CampaignFilterDTO;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Campaign\StoreCampaignRequest;
 use App\Http\Requests\Campaign\UpdateCampaignRequest;
@@ -45,34 +46,15 @@ class CampaignController extends Controller
      */
     public function getActiveCampaigns(): AnonymousResourceCollection
     {
-        $filters = [];
-
-        // Get search query
-        if (request()->has('search') && !empty(request()->input('search'))) {
-            $filters['search'] = request()->input('search');
-        }
-
-        // Get category filter
-        if (request()->has('category_id') && !empty(request()->input('category_id'))) {
-            $filters['category_id'] = (int) request()->input('category_id');
-        }
-
-        // Get tags filter
-        if (request()->has('tag_ids') && !empty(request()->input('tag_ids'))) {
-            $tagIds = request()->input('tag_ids');
-            // Handle both array and comma-separated string
-            if (is_string($tagIds)) {
-                $tagIds = explode(',', $tagIds);
-            }
-            $filters['tag_ids'] = array_map('intval', array_filter($tagIds));
-        }
+        // Use DTO to parse and validate filters
+        $filterDTO = CampaignFilterDTO::fromRequest(request());
 
         Log::info('Active campaigns request', [
             'raw_params' => request()->all(),
-            'filters' => $filters,
+            'filters' => $filterDTO->toArray(),
         ]);
 
-        $campaigns = $this->campaignQueryService->getActiveCampaigns($filters);
+        $campaigns = $this->campaignQueryService->getActiveCampaigns($filterDTO->toArray());
 
         Log::info('Active campaigns result', [
             'count' => $campaigns->count(),

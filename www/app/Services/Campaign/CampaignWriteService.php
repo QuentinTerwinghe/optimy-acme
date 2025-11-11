@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace App\Services\Campaign;
 
+use App\Contracts\Campaign\CampaignReadRepositoryInterface;
+use App\Contracts\Campaign\CampaignStatusValidatorInterface;
+use App\Contracts\Campaign\CampaignWriteRepositoryInterface;
 use App\Contracts\Campaign\CampaignWriteServiceInterface;
 use App\Contracts\Tag\TagWriteServiceInterface;
 use App\DTOs\Campaign\CampaignDTO;
 use App\DTOs\Campaign\UpdateCampaignDTO;
-use App\Enums\Campaign\CampaignStatus;
 use App\Models\Campaign\Campaign;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -18,15 +20,22 @@ use Illuminate\Support\Facades\Log;
  *
  * Handles all write operations for campaigns (create, update, delete)
  * Follows Single Responsibility Principle - only writes
+ * Follows Dependency Inversion Principle - depends on abstractions (interfaces)
  */
 class CampaignWriteService implements CampaignWriteServiceInterface
 {
     /**
      * Constructor
      *
+     * @param CampaignReadRepositoryInterface $readRepository
+     * @param CampaignWriteRepositoryInterface $writeRepository
+     * @param CampaignStatusValidatorInterface $statusValidator
      * @param TagWriteServiceInterface $tagWriteService
      */
     public function __construct(
+        private CampaignReadRepositoryInterface $readRepository,
+        private CampaignWriteRepositoryInterface $writeRepository,
+        private CampaignStatusValidatorInterface $statusValidator,
         private TagWriteServiceInterface $tagWriteService
     ) {}
     /**
@@ -44,8 +53,8 @@ class CampaignWriteService implements CampaignWriteServiceInterface
             // Convert DTO to array for database operations
             $data = $dto->toArray();
 
-            // Create campaign
-            $campaign = Campaign::create($data);
+            // Create campaign using repository
+            $campaign = $this->writeRepository->create($data);
 
             // Handle tags if provided
             if (!empty($dto->tags)) {
@@ -94,7 +103,7 @@ class CampaignWriteService implements CampaignWriteServiceInterface
         try {
             DB::beginTransaction();
 
-            $campaign = Campaign::findOrFail($id);
+            $campaign = $this->readRepository->findOrFail($id);
 
             // Convert DTO to array for database operations
             $data = $dto->toArray();
@@ -102,51 +111,11 @@ class CampaignWriteService implements CampaignWriteServiceInterface
             // Get tags from DTO (if present)
             $tagNames = $dto->tags;
 
-            // Check if status is being changed to WAITING_FOR_VALIDATION or ACTIVE
-            $newStatus = $dto->status;
-            $oldStatus = $campaign->status;
+            // Validate status transition using dedicated validator
+            $this->statusValidator->validateStatusTransition($campaign, $dto->status, $dto);
 
-            if ($newStatus !== null &&
-                ($newStatus === CampaignStatus::WAITING_FOR_VALIDATION || $newStatus === CampaignStatus::ACTIVE) &&
-                $newStatus !== $oldStatus) {
-                $requiredFields = [
-                    'goal_amount' => $dto->goalAmount,
-                    'currency' => $dto->currency,
-                    'start_date' => $dto->startDate,
-                    'end_date' => $dto->endDate,
-                ];
-                $missingFields = [];
-
-                // When changing FROM draft TO waiting_for_validation, require fields in DTO
-                // When validating (draft/waiting -> active), check if fields exist in campaign or DTO
-                $requireInDto = ($oldStatus === CampaignStatus::DRAFT &&
-                                 $newStatus === CampaignStatus::WAITING_FOR_VALIDATION);
-
-                foreach ($requiredFields as $fieldName => $dtoValue) {
-                    if ($requireInDto) {
-                        // Must be in the DTO and not null
-                        if ($dtoValue === null) {
-                            $missingFields[] = $fieldName;
-                        }
-                    } else {
-                        // Can be in DTO or already in campaign
-                        $campaignValue = $campaign->{$fieldName};
-
-                        if ($dtoValue === null && ($campaignValue === null || $campaignValue === '')) {
-                            $missingFields[] = $fieldName;
-                        }
-                    }
-                }
-
-                if (!empty($missingFields)) {
-                    throw new \InvalidArgumentException(
-                        'Cannot change status to ' . $newStatus->value . ' without required fields: ' . implode(', ', $missingFields)
-                    );
-                }
-            }
-
-            // Update campaign with data from DTO
-            $campaign->update($data);
+            // Update campaign with data from DTO using repository
+            $this->writeRepository->update($campaign, $data);
 
             // Handle tags if provided (null means don't update tags, empty array means remove all tags)
             if ($tagNames !== null) {
@@ -205,8 +174,8 @@ class CampaignWriteService implements CampaignWriteServiceInterface
         try {
             DB::beginTransaction();
 
-            $campaign = Campaign::findOrFail($id);
-            $deleted = (bool) $campaign->delete();
+            $campaign = $this->readRepository->findOrFail($id);
+            $deleted = $this->writeRepository->delete($campaign);
 
             DB::commit();
 

@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Services\Campaign;
 
 use App\Contracts\Campaign\CampaignQueryServiceInterface;
+use App\Contracts\Campaign\CampaignReadRepositoryInterface;
+use App\Contracts\Campaign\CampaignAggregateRepositoryInterface;
 use App\Enums\Campaign\CampaignPermissions;
 use App\Enums\Campaign\CampaignStatus;
 use App\Models\Campaign\Campaign;
@@ -16,9 +18,20 @@ use Illuminate\Support\Facades\Log;
  *
  * Handles all read operations for campaigns
  * Follows Single Responsibility Principle - only queries/reads
+ * Follows Dependency Inversion Principle - depends on abstractions (interfaces)
  */
 class CampaignQueryService implements CampaignQueryServiceInterface
 {
+    /**
+     * Constructor
+     *
+     * @param CampaignReadRepositoryInterface $readRepository
+     * @param CampaignAggregateRepositoryInterface $aggregateRepository
+     */
+    public function __construct(
+        private CampaignReadRepositoryInterface $readRepository,
+        private CampaignAggregateRepositoryInterface $aggregateRepository
+    ) {}
     /**
      * Get all active campaigns
      *
@@ -33,48 +46,7 @@ class CampaignQueryService implements CampaignQueryServiceInterface
     public function getActiveCampaigns(array $filters = []): Collection
     {
         try {
-            $query = Campaign::query()
-                ->where('status', CampaignStatus::ACTIVE)
-                ->where('start_date', '<=', now())
-                ->where('end_date', '>', now());
-
-            // Apply search filter
-            if (!empty($filters['search'])) {
-                $search = $filters['search'];
-                $query->where('title', 'LIKE', "%{$search}%");
-            }
-
-            // Apply category filter
-            if (!empty($filters['category_id'])) {
-                $query->where('category_id', $filters['category_id']);
-            }
-
-            // Apply tags filter
-            if (!empty($filters['tag_ids']) && is_array($filters['tag_ids'])) {
-                Log::info('Applying tag filter', [
-                    'tag_ids' => $filters['tag_ids'],
-                ]);
-
-                $query->whereHas('tags', function ($q) use ($filters) {
-                    $q->whereIn('tags.id', $filters['tag_ids']);
-                });
-            }
-
-            Log::info('Final query SQL', [
-                'sql' => $query->toSql(),
-                'bindings' => $query->getBindings(),
-            ]);
-
-            $result = $query
-                ->with(['category', 'tags'])
-                ->orderBy('end_date', 'asc')
-                ->get();
-
-            Log::info('Query result', [
-                'count' => $result->count(),
-            ]);
-
-            return $result;
+            return $this->readRepository->getActiveCampaigns($filters);
         } catch (\Exception $e) {
             Log::error('Failed to fetch active campaigns', [
                 'error' => $e->getMessage(),
@@ -98,11 +70,7 @@ class CampaignQueryService implements CampaignQueryServiceInterface
     public function getActiveCampaignsCount(): int
     {
         try {
-            return Campaign::query()
-                ->where('status', CampaignStatus::ACTIVE)
-                ->where('start_date', '<=', now())
-                ->where('end_date', '>', now())
-                ->count();
+            return $this->aggregateRepository->countActiveCampaigns();
         } catch (\Exception $e) {
             Log::error('Failed to count active campaigns', [
                 'error' => $e->getMessage(),
@@ -123,7 +91,7 @@ class CampaignQueryService implements CampaignQueryServiceInterface
     public function findById(string $id): ?Campaign
     {
         try {
-            return Campaign::find($id);
+            return $this->readRepository->find($id);
         } catch (\Exception $e) {
             Log::error('Failed to find campaign by ID', [
                 'id' => $id,
@@ -144,7 +112,7 @@ class CampaignQueryService implements CampaignQueryServiceInterface
     public function findByIdWithRelations(string $id, array $relations = ['category', 'tags', 'creator']): ?Campaign
     {
         try {
-            return Campaign::with($relations)->find($id);
+            return $this->readRepository->findWithRelations($id, $relations);
         } catch (\Exception $e) {
             Log::error('Failed to find campaign by ID with relations', [
                 'id' => $id,
@@ -164,9 +132,7 @@ class CampaignQueryService implements CampaignQueryServiceInterface
     public function getAllCampaigns(): Collection
     {
         try {
-            return Campaign::query()
-                ->orderBy('created_at', 'desc')
-                ->get();
+            return $this->readRepository->getAll();
         } catch (\Exception $e) {
             Log::error('Failed to fetch all campaigns', [
                 'error' => $e->getMessage(),
@@ -185,10 +151,7 @@ class CampaignQueryService implements CampaignQueryServiceInterface
     public function getCampaignsByStatus(CampaignStatus $status): Collection
     {
         try {
-            return Campaign::query()
-                ->where('status', $status)
-                ->orderBy('created_at', 'desc')
-                ->get();
+            return $this->readRepository->getByStatus($status);
         } catch (\Exception $e) {
             Log::error('Failed to fetch campaigns by status', [
                 'status' => $status->value,
@@ -208,11 +171,7 @@ class CampaignQueryService implements CampaignQueryServiceInterface
     public function getCampaignsByCategory(int $categoryId): Collection
     {
         try {
-            return Campaign::query()
-                ->where('category_id', $categoryId)
-                ->with(['category', 'tags'])
-                ->orderBy('created_at', 'desc')
-                ->get();
+            return $this->readRepository->getByCategory($categoryId, ['category', 'tags']);
         } catch (\Exception $e) {
             Log::error('Failed to fetch campaigns by category', [
                 'category_id' => $categoryId,
@@ -232,13 +191,7 @@ class CampaignQueryService implements CampaignQueryServiceInterface
     public function getCampaignsByTags(array $tagIds): Collection
     {
         try {
-            return Campaign::query()
-                ->whereHas('tags', function ($query) use ($tagIds) {
-                    $query->whereIn('tags.id', $tagIds);
-                })
-                ->with(['category', 'tags'])
-                ->orderBy('created_at', 'desc')
-                ->get();
+            return $this->readRepository->getByTags($tagIds, ['category', 'tags']);
         } catch (\Exception $e) {
             Log::error('Failed to fetch campaigns by tags', [
                 'tag_ids' => $tagIds,
@@ -258,15 +211,7 @@ class CampaignQueryService implements CampaignQueryServiceInterface
     public function getCampaignsByAllTags(array $tagIds): Collection
     {
         try {
-            $tagCount = count($tagIds);
-
-            return Campaign::query()
-                ->whereHas('tags', function ($query) use ($tagIds) {
-                    $query->whereIn('tags.id', $tagIds);
-                }, '=', $tagCount)
-                ->with(['category', 'tags'])
-                ->orderBy('created_at', 'desc')
-                ->get();
+            return $this->readRepository->getByAllTags($tagIds, ['category', 'tags']);
         } catch (\Exception $e) {
             Log::error('Failed to fetch campaigns by all tags', [
                 'tag_ids' => $tagIds,
@@ -293,18 +238,13 @@ class CampaignQueryService implements CampaignQueryServiceInterface
     public function getCampaignsForManagement(\App\Models\Auth\User $user): Collection
     {
         try {
-            $query = Campaign::query();
-
-            // If user doesn't have permission to manage all campaigns, filter by created_by
-            // Use hasPermissionTo() instead of can() to properly support wildcard permissions
-            if (!$user->hasPermissionTo(CampaignPermissions::MANAGE_ALL_CAMPAIGNS->value)) {
-                $query->where('created_by', $user->id);
+            // If user has permission to manage all campaigns, return all
+            if ($user->hasPermissionTo(CampaignPermissions::MANAGE_ALL_CAMPAIGNS->value)) {
+                return $this->readRepository->getAll();
             }
 
-            return $query
-                ->with(['category', 'tags'])
-                ->orderBy('created_at', 'desc')
-                ->get();
+            // Otherwise, return only user's campaigns
+            return $this->readRepository->getByCreator($user->id, ['category', 'tags']);
         } catch (\Exception $e) {
             Log::error('Failed to fetch campaigns for management', [
                 'user_id' => $user->id,
@@ -326,11 +266,10 @@ class CampaignQueryService implements CampaignQueryServiceInterface
     public function getTotalFundsRaised(): float
     {
         try {
-            $total = Campaign::query()
-                ->whereIn('status', [CampaignStatus::ACTIVE, CampaignStatus::COMPLETED])
-                ->sum('current_amount');
-
-            return (float) $total;
+            return $this->aggregateRepository->sumByStatus(
+                'current_amount',
+                [CampaignStatus::ACTIVE, CampaignStatus::COMPLETED]
+            );
         } catch (\Exception $e) {
             Log::error('Failed to calculate total funds raised', [
                 'error' => $e->getMessage(),
@@ -352,9 +291,7 @@ class CampaignQueryService implements CampaignQueryServiceInterface
     public function getCompletedCampaignsCount(): int
     {
         try {
-            return Campaign::query()
-                ->where('status', CampaignStatus::COMPLETED)
-                ->count();
+            return $this->aggregateRepository->countByStatus(CampaignStatus::COMPLETED);
         } catch (\Exception $e) {
             Log::error('Failed to count completed campaigns', [
                 'error' => $e->getMessage(),
@@ -379,13 +316,13 @@ class CampaignQueryService implements CampaignQueryServiceInterface
     public function getFundraisingProgress(): array
     {
         try {
-            $campaigns = Campaign::query()
-                ->whereIn('status', [CampaignStatus::ACTIVE, CampaignStatus::COMPLETED])
-                ->selectRaw('SUM(goal_amount) as total_goal, SUM(current_amount) as total_raised')
-                ->first();
+            $data = $this->aggregateRepository->getAggregatedFundingData([
+                CampaignStatus::ACTIVE,
+                CampaignStatus::COMPLETED,
+            ]);
 
-            $totalGoal = (float) ($campaigns->total_goal ?? 0);
-            $totalRaised = (float) ($campaigns->total_raised ?? 0);
+            $totalGoal = $data['total_goal'];
+            $totalRaised = $data['total_raised'];
 
             // Calculate percentage
             $percentage = $totalGoal > 0 ? ($totalRaised / $totalGoal) * 100 : 0;

@@ -29,7 +29,8 @@ class CampaignQueryServiceTest extends TestCase
     {
         parent::setUp();
 
-        $this->service = new CampaignQueryService();
+        // Use app() to resolve the service with all dependencies
+        $this->service = app(\App\Contracts\Campaign\CampaignQueryServiceInterface::class);
 
         // Create permissions
         $manageAllCampaignsPermission = Permission::firstOrCreate([

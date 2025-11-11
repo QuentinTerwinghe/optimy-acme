@@ -14,6 +14,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Campaign\StoreCampaignRequest;
 use App\Http\Requests\Campaign\UpdateCampaignRequest;
 use App\Mappers\Campaign\CampaignMapper;
+use App\Mappers\Validation\ValidationErrorMapper;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
@@ -187,27 +188,10 @@ class CampaignController extends Controller
                 'data' => $updatedCampaign->toArray(),
             ], 200);
         } catch (\InvalidArgumentException $e) {
-            // Parse the exception message to extract field names and return validation error format
-            $message = $e->getMessage();
-            $errors = [];
+            // Use ValidationErrorMapper to transform exception to error format
+            $errorResponse = ValidationErrorMapper::parseInvalidArgumentException($e);
 
-            // Extract missing fields from the message
-            if (str_contains($message, 'without required fields:')) {
-                $fieldsString = substr($message, strpos($message, 'without required fields:') + 25);
-                $fields = array_map('trim', explode(',', $fieldsString));
-
-                foreach ($fields as $field) {
-                    $fieldName = str_replace('_', ' ', $field);
-                    $errors[$field] = [ucfirst($fieldName) . ' is required'];
-                }
-            }
-
-            return response()->json([
-                'message' => count($errors) > 1
-                    ? array_keys($errors)[0] . ' is required (and ' . (count($errors) - 1) . ' more errors)'
-                    : ($errors[array_key_first($errors)][0] ?? $message),
-                'errors' => $errors,
-            ], 422);
+            return response()->json($errorResponse, 422);
         } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
             return response()->json([
                 'success' => false,

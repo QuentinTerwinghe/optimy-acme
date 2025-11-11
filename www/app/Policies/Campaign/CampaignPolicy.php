@@ -76,14 +76,12 @@ class CampaignPolicy
     /**
      * Determine if the campaign status allows editing.
      *
-     * Only DRAFT and WAITING_FOR_VALIDATION campaigns can be edited.
+     * Uses the centralized editable statuses from the CampaignStatus enum.
+     * This follows the Open/Closed Principle - if editable statuses change,
+     * only the enum needs to be updated.
      */
     private function isEditableStatus(Campaign $campaign): bool
     {
-        return in_array($campaign->status, [
-            CampaignStatus::DRAFT,
-            CampaignStatus::WAITING_FOR_VALIDATION,
-            CampaignStatus::REJECTED,
-        ], true);
+        return in_array($campaign->status, CampaignStatus::getEditableStatuses(), true);
     }
 }

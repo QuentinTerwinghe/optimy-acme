@@ -57,4 +57,23 @@ enum CampaignStatus: string
             default => throw new \InvalidArgumentException("Invalid status: {$status}"),
         };
     }
+
+    /**
+     * Get statuses that allow campaign editing
+     *
+     * Campaigns can only be edited when they are in:
+     * - DRAFT: Initial creation state
+     * - WAITING_FOR_VALIDATION: Submitted but not yet approved
+     * - REJECTED: Rejected and can be resubmitted
+     *
+     * @return array<int, CampaignStatus>
+     */
+    public static function getEditableStatuses(): array
+    {
+        return [
+            self::DRAFT,
+            self::WAITING_FOR_VALIDATION,
+            self::REJECTED,
+        ];
+    }
 }

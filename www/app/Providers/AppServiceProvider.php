@@ -33,6 +33,34 @@ class AppServiceProvider extends ServiceProvider
             \App\Services\Auth\PasswordResetService::class
         );
 
+        // Bind Campaign repository interfaces to implementations
+        $this->app->bind(
+            \App\Contracts\Campaign\CampaignRepositoryInterface::class,
+            \App\Repositories\Campaign\CampaignRepository::class
+        );
+
+        // Bind focused repository interfaces to same implementation (follows ISP)
+        $this->app->bind(
+            \App\Contracts\Campaign\CampaignReadRepositoryInterface::class,
+            \App\Repositories\Campaign\CampaignRepository::class
+        );
+
+        $this->app->bind(
+            \App\Contracts\Campaign\CampaignWriteRepositoryInterface::class,
+            \App\Repositories\Campaign\CampaignRepository::class
+        );
+
+        $this->app->bind(
+            \App\Contracts\Campaign\CampaignAggregateRepositoryInterface::class,
+            \App\Repositories\Campaign\CampaignRepository::class
+        );
+
+        // Bind Campaign status validator interface to implementation
+        $this->app->bind(
+            \App\Contracts\Campaign\CampaignStatusValidatorInterface::class,
+            \App\Services\Campaign\CampaignStatusValidator::class
+        );
+
         // Bind Campaign services interfaces to implementations
         $this->app->bind(
             \App\Contracts\Campaign\CampaignQueryServiceInterface::class,
@@ -42,6 +70,22 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(
             \App\Contracts\Campaign\CampaignWriteServiceInterface::class,
             \App\Services\Campaign\CampaignWriteService::class
+        );
+
+        // Bind focused service interfaces to same implementation (follows ISP)
+        $this->app->bind(
+            \App\Contracts\Campaign\CampaignFinderInterface::class,
+            \App\Services\Campaign\CampaignQueryService::class
+        );
+
+        $this->app->bind(
+            \App\Contracts\Campaign\CampaignFilterInterface::class,
+            \App\Services\Campaign\CampaignQueryService::class
+        );
+
+        $this->app->bind(
+            \App\Contracts\Campaign\CampaignStatisticsInterface::class,
+            \App\Services\Campaign\CampaignQueryService::class
         );
 
         // Bind Tag services interfaces to implementations
