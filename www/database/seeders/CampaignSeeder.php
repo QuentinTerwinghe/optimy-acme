@@ -229,8 +229,8 @@ class CampaignSeeder extends Seeder
             $campaignIndex++;
         }
 
-        // Create 5 completed campaigns
-        for ($i = 0; $i < 5; $i++) {
+        // Create 3 completed campaigns with random raised amount
+        for ($i = 0; $i < 3; $i++) {
             $campaignData = $campaigns[$campaignIndex];
             $goalAmount = fake()->numberBetween(5000, 30000);
             $campaign = Campaign::create([
@@ -238,6 +238,31 @@ class CampaignSeeder extends Seeder
                 'description' => $campaignData['description'],
                 'goal_amount' => $goalAmount,
                 'current_amount' => fake()->numberBetween($goalAmount * 0.8, $goalAmount * 1.2), // 80% to 120% of goal
+                'currency' => fake()->randomElement($currencies),
+                'start_date' => now()->subDays(fake()->numberBetween(90, 180)),
+                'end_date' => now()->subDays(fake()->numberBetween(1, 30)), // Ended in the past
+                'status' => CampaignStatus::COMPLETED,
+                'category_id' => $createdCategories[$campaignData['category']]->id,
+                'created_by' => fake()->randomElement($userIds),
+                'updated_by' => fake()->randomElement($userIds),
+            ]);
+
+            // Attach tags
+            $tagIds = collect($campaignData['tags'])->map(fn($tagSlug) => $createdTags[$tagSlug]->id)->toArray();
+            $campaign->tags()->sync($tagIds);
+
+            $campaignIndex++;
+        }
+
+        // Create 2 completed campaigns with 100% goal amount reached
+        for ($i = 0; $i < 2; $i++) {
+            $campaignData = $campaigns[$campaignIndex];
+            $goalAmount = fake()->numberBetween(5000, 30000);
+            $campaign = Campaign::create([
+                'title' => $campaignData['title'],
+                'description' => $campaignData['description'],
+                'goal_amount' => $goalAmount,
+                'current_amount' => $goalAmount,
                 'currency' => fake()->randomElement($currencies),
                 'start_date' => now()->subDays(fake()->numberBetween(90, 180)),
                 'end_date' => now()->subDays(fake()->numberBetween(1, 30)), // Ended in the past
