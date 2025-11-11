@@ -92,7 +92,7 @@ class SendCampaignStatusFlowNotificationJob implements ShouldQueue
                         'campaign_id' => $this->campaignId,
                         'status' => $status,
                     ]);
-                    throw new \Exception($status . ' is not a valid status for campaign status flow');
+                    throw new \Exception($status->value . ' is not a valid status for campaign status flow');
             }
 
             $notificationService->send(

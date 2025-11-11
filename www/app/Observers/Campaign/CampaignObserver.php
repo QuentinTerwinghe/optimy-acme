@@ -142,7 +142,7 @@ class CampaignObserver
                     );
                     break;
                 default:
-                    throw new \Exception($campaign->status . ' is not one of the status that required notification sending.');
+                    throw new \Exception($campaign->status->value . ' is not one of the status that required notification sending.');
             }
 
             Log::info('Campaign validation notification job dispatched', [
