@@ -13,24 +13,22 @@ use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
 /**
- * Mailable for campaign waiting for validation notifications.
- * Sent to campaign managers when a campaign status changes to waiting for validation.
+ * Mailable for campaign rejected notifications.
+ * Sent to campaign creator when a campaign status changes to rejected.
  */
-class CampaignWaitingForValidationMail extends Mailable implements ShouldQueue
+class CampaignRejectedMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
     /**
      * Create a new message instance.
      *
-     * @param User $receiver The campaign manager receiving the notification
-     * @param array<string, mixed> $campaign The campaign waiting for validation
-     * @param User $creator The user who created/submitted the campaign
+     * @param User $receiver The campaign creator receiving the notification
+     * @param array<string, mixed> $campaign The rejected campaign
      */
     public function __construct(
         public readonly User $receiver,
-        public readonly array $campaign,
-        public readonly User $creator
+        public readonly array $campaign
     ) {
     }
 
@@ -40,7 +38,7 @@ class CampaignWaitingForValidationMail extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'New Campaign Awaiting Validation: ' . $this->campaign['title'],
+            subject: 'Your Campaign was rejected: ' . $this->campaign['title'],
         );
     }
 
@@ -50,7 +48,7 @@ class CampaignWaitingForValidationMail extends Mailable implements ShouldQueue
     public function content(): Content
     {
         return new Content(
-            markdown: 'emails.campaign.waiting-for-validation',
+            markdown: 'emails.campaign.rejected',
         );
     }
 

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Observers\Campaign;
 
 use App\Enums\Campaign\CampaignStatus;
+use App\Jobs\SendCampaignStatusFlowNotificationJob;
 use App\Jobs\SendCampaignWaitingForValidationNotificationJob;
 use App\Models\Campaign\Campaign;
 use Illuminate\Support\Facades\Log;
@@ -59,10 +60,17 @@ class CampaignObserver
             $newStatus = $campaign->status;
 
             // Only trigger notification when transitioning from DRAFT to WAITING_FOR_VALIDATION
+            // or when validating/rejecting a campaign
             // This prevents duplicate notifications if status is updated again
             if (
-                $oldStatus === CampaignStatus::DRAFT &&
-                $newStatus === CampaignStatus::WAITING_FOR_VALIDATION
+                (
+                    $oldStatus === CampaignStatus::DRAFT &&
+                    $newStatus === CampaignStatus::WAITING_FOR_VALIDATION
+                )
+                ||
+                $newStatus === CampaignStatus::REJECTED
+                ||
+                $newStatus === CampaignStatus::ACTIVE
             ) {
                 // Mark this campaign for notification after save
                 self::$pendingNotifications[$campaign->id] = $oldStatus;
@@ -117,11 +125,25 @@ class CampaignObserver
                 'creator_id' => $creator->id,
             ]);
 
-            // Dispatch job to queue for async processing
-            SendCampaignWaitingForValidationNotificationJob::dispatch(
-                (string) $campaign->id,
-                (string) $creator->id
-            );
+            switch ($campaign->status) {
+                case CampaignStatus::WAITING_FOR_VALIDATION:
+                    // Dispatch job to queue for async processing
+                    SendCampaignWaitingForValidationNotificationJob::dispatch(
+                        (string) $campaign->id,
+                        (string) $creator->id
+                    );
+                    break;
+                case CampaignStatus::ACTIVE:
+                case CampaignStatus::REJECTED:
+                    // Dispatch job to queue for async processing
+                    SendCampaignStatusFlowNotificationJob::dispatch(
+                        (string) $campaign->created_by,
+                        (string) $campaign->id,
+                    );
+                    break;
+                default:
+                    throw new \Exception($campaign->status . ' is not one of the status that required notification sending.');
+            }
 
             Log::info('Campaign validation notification job dispatched', [
                 'campaign_id' => $campaign->id,

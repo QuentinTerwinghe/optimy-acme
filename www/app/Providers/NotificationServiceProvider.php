@@ -6,6 +6,8 @@ namespace App\Providers;
 
 use App\Contracts\Notifications\NotificationRegistryInterface;
 use App\Contracts\Notifications\NotificationServiceInterface;
+use App\Services\Notifications\Handlers\CampaignRejectedHandler;
+use App\Services\Notifications\Handlers\CampaignValidatedHandler;
 use App\Services\Notifications\Handlers\CampaignWaitingForValidationHandler;
 use App\Services\Notifications\Handlers\ForgotPasswordHandler;
 use App\Services\Notifications\NotificationRegistry;
@@ -42,5 +44,7 @@ class NotificationServiceProvider extends ServiceProvider
         // Register notification handlers
         $registry->register($this->app->make(ForgotPasswordHandler::class));
         $registry->register($this->app->make(CampaignWaitingForValidationHandler::class));
+        $registry->register($this->app->make(CampaignRejectedHandler::class));
+        $registry->register($this->app->make(CampaignValidatedHandler::class));
     }
 }
