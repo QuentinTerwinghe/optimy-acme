@@ -26,13 +26,6 @@ class CampaignUpdateTest extends TestCase
     private Campaign $activeCampaign;
     private Category $category;
 
-    /**
-     * Convert UUID string to binary for database assertions
-     */
-    private function uuidToBinary(string $uuid): string
-    {
-        return hex2bin(str_replace('-', '', $uuid));
-    }
 
     protected function setUp(): void
     {
@@ -99,7 +92,7 @@ class CampaignUpdateTest extends TestCase
 
         // Verify database update
         $this->assertDatabaseHas('campaigns', [
-            'id' => $this->uuidToBinary($this->draftCampaign->id),
+            'id' => $this->draftCampaign->id,
             'title' => 'Updated Campaign Title',
             'description' => 'Updated description',
             'status' => CampaignStatus::DRAFT->value,
@@ -128,7 +121,7 @@ class CampaignUpdateTest extends TestCase
 
         // Verify status changed
         $this->assertDatabaseHas('campaigns', [
-            'id' => $this->uuidToBinary($this->draftCampaign->id),
+            'id' => $this->draftCampaign->id,
             'title' => 'Updated Campaign Title',
             'status' => CampaignStatus::WAITING_FOR_VALIDATION->value,
         ]);
@@ -150,7 +143,7 @@ class CampaignUpdateTest extends TestCase
         $response->assertJson(['success' => true]);
 
         $this->assertDatabaseHas('campaigns', [
-            'id' => $this->uuidToBinary($this->waitingCampaign->id),
+            'id' => $this->waitingCampaign->id,
             'title' => 'Updated Waiting Campaign',
         ]);
     }
@@ -209,7 +202,7 @@ class CampaignUpdateTest extends TestCase
         $response->assertJson(['success' => true]);
 
         $this->assertDatabaseHas('campaigns', [
-            'id' => $this->uuidToBinary($this->draftCampaign->id),
+            'id' => $this->draftCampaign->id,
             'title' => 'Manager Updated Title',
         ]);
     }
@@ -232,7 +225,7 @@ class CampaignUpdateTest extends TestCase
         $response->assertStatus(200);
 
         // Verify tags are associated
-        $updatedCampaign = Campaign::findById($this->draftCampaign->id)->firstOrFail();
+        $updatedCampaign = Campaign::find($this->draftCampaign->id);
         $this->assertCount(3, $updatedCampaign->tags);
         $this->assertTrue($updatedCampaign->tags->contains('name', 'ExistingTag'));
         $this->assertTrue($updatedCampaign->tags->contains('name', 'NewTag1'));
@@ -256,7 +249,7 @@ class CampaignUpdateTest extends TestCase
         $response->assertStatus(200);
 
         $this->assertDatabaseHas('campaigns', [
-            'id' => $this->uuidToBinary($this->draftCampaign->id),
+            'id' => $this->draftCampaign->id,
             'category_id' => $newCategory->id,
         ]);
     }
@@ -316,7 +309,7 @@ class CampaignUpdateTest extends TestCase
 
         // Verify status changed to active
         $this->assertDatabaseHas('campaigns', [
-            'id' => $this->uuidToBinary($this->waitingCampaign->id),
+            'id' => $this->waitingCampaign->id,
             'status' => CampaignStatus::ACTIVE->value,
         ]);
     }
@@ -334,7 +327,7 @@ class CampaignUpdateTest extends TestCase
         $response->assertStatus(200);
 
         // Verify only status changed
-        $updatedCampaign = Campaign::findById($this->waitingCampaign->id)->firstOrFail();
+        $updatedCampaign = Campaign::find($this->waitingCampaign->id);
         $this->assertEquals($originalTitle, $updatedCampaign->title);
         $this->assertEquals($originalDescription, $updatedCampaign->description);
         $this->assertEquals($originalGoalAmount, $updatedCampaign->goal_amount);
@@ -355,7 +348,7 @@ class CampaignUpdateTest extends TestCase
 
         // Verify status did NOT change
         $this->assertDatabaseHas('campaigns', [
-            'id' => $this->uuidToBinary($this->waitingCampaign->id),
+            'id' => $this->waitingCampaign->id,
             'status' => CampaignStatus::WAITING_FOR_VALIDATION->value,
         ]);
     }
@@ -388,7 +381,7 @@ class CampaignUpdateTest extends TestCase
 
         // Verify status changed to active
         $this->assertDatabaseHas('campaigns', [
-            'id' => $this->uuidToBinary($this->draftCampaign->id),
+            'id' => $this->draftCampaign->id,
             'status' => CampaignStatus::ACTIVE->value,
         ]);
     }
@@ -410,7 +403,7 @@ class CampaignUpdateTest extends TestCase
         $response->assertStatus(200);
 
         // Verify only description changed
-        $updatedCampaign = Campaign::findById($this->draftCampaign->id)->firstOrFail();
+        $updatedCampaign = Campaign::find($this->draftCampaign->id);
         $this->assertEquals($originalTitle, $updatedCampaign->title);
         $this->assertEquals($originalGoalAmount, $updatedCampaign->goal_amount);
         $this->assertEquals('Only updating description', $updatedCampaign->description);

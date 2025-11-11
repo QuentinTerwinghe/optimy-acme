@@ -94,8 +94,7 @@ class CampaignController extends Controller
         try {
             // Find the campaign by ID and load relationships
             $campaign = Campaign::with(['category', 'tags', 'creator'])
-                ->findById($id)
-                ->firstOrFail();
+                ->findOrFail($id);
 
             return view('campaigns.show', [
                 'campaign' => $campaign,
@@ -118,7 +117,7 @@ class CampaignController extends Controller
     public function edit(string $id): View|RedirectResponse
     {
         // Find the campaign by ID and load tags relationship
-        $campaign = Campaign::with('tags')->findById($id)->firstOrFail();
+        $campaign = Campaign::with('tags')->findOrFail($id);
 
         // Get current authenticated user
         $user = auth()->user();
@@ -155,7 +154,7 @@ class CampaignController extends Controller
     {
         try {
             // Find the campaign by UUID
-            $campaign = Campaign::findById($id)->firstOrFail();
+            $campaign = Campaign::findOrFail($id);
 
             // Check authorization using the policy
             if (!$request->user()?->can('update', $campaign)) {
@@ -226,7 +225,7 @@ class CampaignController extends Controller
     {
         try {
             // Find the campaign by UUID
-            $campaign = Campaign::findById($id)->firstOrFail();
+            $campaign = Campaign::findOrFail($id);
 
             // Check if user has permission to validate campaigns
             if (!$request->user()?->can('manageAllCampaigns', Campaign::class)) {

@@ -20,7 +20,7 @@ use Illuminate\Support\Str;
 /**
  * Campaign Model
  *
- * @property string $id
+ * @property string $id UUID stored as char(36) following Laravel standards
  * @property string $title
  * @property string|null $description
  * @property string|null $goal_amount
@@ -32,8 +32,8 @@ use Illuminate\Support\Str;
  * @property int|null $category_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property int|null $created_by
- * @property int|null $updated_by
+ * @property string|null $created_by
+ * @property string|null $updated_by
  * @property-read User|null $creator
  * @property-read User|null $updater
  * @property-read Category|null $category
@@ -136,81 +136,10 @@ class Campaign extends Model
     {
         $array = parent::toArray();
 
-        // Ensure ID is properly converted to UUID string
-        if (isset($array['id'])) {
-            $array['id'] = $this->getAttribute('id');
-        }
-
         // Add status label
         $array['status_label'] = $this->status_label;
 
         return $array;
-    }
-
-    /**
-     * Generate a new UUID for the model.
-     */
-    public function newUniqueId(): string
-    {
-        return (string) Str::uuid();
-    }
-
-    /**
-     * Get the columns that should receive a unique identifier.
-     *
-     * @return array<int, string>
-     */
-    public function uniqueIds(): array
-    {
-        return ['id'];
-    }
-
-    /**
-     * Convert UUID to binary for storage.
-     */
-    public function setAttribute($key, $value): mixed
-    {
-        if ($key === 'id' && is_string($value) && strlen($value) === 36) {
-            // Convert UUID string (36 chars with dashes) to binary
-            $value = hex2bin(str_replace('-', '', $value));
-        }
-
-        return parent::setAttribute($key, $value);
-    }
-
-    /**
-     * Convert binary UUID back to string.
-     */
-    public function getAttribute($key): mixed
-    {
-        $value = parent::getAttribute($key);
-
-        if ($key === 'id' && is_string($value) && strlen($value) === 16) {
-            // Convert binary back to UUID string format
-            $hex = bin2hex($value);
-            return sprintf(
-                '%s-%s-%s-%s-%s',
-                substr($hex, 0, 8),
-                substr($hex, 8, 4),
-                substr($hex, 12, 4),
-                substr($hex, 16, 4),
-                substr($hex, 20, 12)
-            );
-        }
-
-        return $value;
-    }
-
-    /**
-     * Scope a query to find by UUID string
-     *
-     * @param Builder<Campaign> $query
-     * @return Builder<Campaign>
-     */
-    public function scopeFindById(Builder $query, string $uuid): Builder
-    {
-        $binary = hex2bin(str_replace('-', '', $uuid));
-        return $query->where('id', $binary);
     }
 
     /**

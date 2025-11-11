@@ -203,11 +203,11 @@ describe('Campaign Model', function () {
         expect($campaign->uniqueIds())->toBe(['id']);
     });
 
-    test('can find by UUID using scope', function () {
+    test('can find by UUID', function () {
         $campaign = Campaign::factory()->create();
         $uuid = $campaign->id;
 
-        $found = Campaign::findById($uuid)->first();
+        $found = Campaign::find($uuid);
 
         expect($found)->not->toBeNull()
             ->and($found->id)->toBe($uuid);

@@ -61,7 +61,7 @@ class SendCampaignWaitingForValidationNotificationJob implements ShouldQueue
     {
         try {
             // Find the campaign
-            $campaign = Campaign::findById($this->campaignId)->first();
+            $campaign = Campaign::find($this->campaignId);
 
             if (!$campaign) {
                 Log::error('Campaign not found for notification job', [

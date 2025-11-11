@@ -94,7 +94,7 @@ class CampaignWriteService implements CampaignWriteServiceInterface
         try {
             DB::beginTransaction();
 
-            $campaign = Campaign::findById($id)->firstOrFail();
+            $campaign = Campaign::findOrFail($id);
 
             // Convert DTO to array for database operations
             $data = $dto->toArray();
@@ -205,7 +205,7 @@ class CampaignWriteService implements CampaignWriteServiceInterface
         try {
             DB::beginTransaction();
 
-            $campaign = Campaign::findById($id)->firstOrFail();
+            $campaign = Campaign::findOrFail($id);
             $deleted = (bool) $campaign->delete();
 
             DB::commit();
