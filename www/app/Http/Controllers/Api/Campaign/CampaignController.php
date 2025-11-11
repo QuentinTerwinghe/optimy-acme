@@ -11,8 +11,11 @@ use App\Http\Requests\Campaign\StoreCampaignRequest;
 use App\Http\Requests\Campaign\UpdateCampaignRequest;
 use App\Http\Resources\Campaign\CampaignResource;
 use App\Mappers\Campaign\CampaignMapper;
+use App\Models\Campaign\Category;
+use App\Models\Campaign\Tag;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Campaign API Controller
@@ -36,10 +39,42 @@ class CampaignController extends Controller
      * Get all active campaigns
      *
      * Returns a list of campaigns that are currently active and not yet ended
+     * Supports filtering by search, category_id, and tag_ids
      */
     public function getActiveCampaigns(): AnonymousResourceCollection
     {
-        $campaigns = $this->campaignQueryService->getActiveCampaigns();
+        $filters = [];
+
+        // Get search query
+        if (request()->has('search') && !empty(request()->input('search'))) {
+            $filters['search'] = request()->input('search');
+        }
+
+        // Get category filter
+        if (request()->has('category_id') && !empty(request()->input('category_id'))) {
+            $filters['category_id'] = (int) request()->input('category_id');
+        }
+
+        // Get tags filter
+        if (request()->has('tag_ids') && !empty(request()->input('tag_ids'))) {
+            $tagIds = request()->input('tag_ids');
+            // Handle both array and comma-separated string
+            if (is_string($tagIds)) {
+                $tagIds = explode(',', $tagIds);
+            }
+            $filters['tag_ids'] = array_map('intval', array_filter($tagIds));
+        }
+
+        Log::info('Active campaigns request', [
+            'raw_params' => request()->all(),
+            'filters' => $filters,
+        ]);
+
+        $campaigns = $this->campaignQueryService->getActiveCampaigns($filters);
+
+        Log::info('Active campaigns result', [
+            'count' => $campaigns->count(),
+        ]);
 
         return CampaignResource::collection($campaigns);
     }
@@ -157,5 +192,36 @@ class CampaignController extends Controller
                 'message' => 'Campaign not found',
             ], 404);
         }
+    }
+
+    /**
+     * Get all active categories
+     *
+     * Returns categories that are currently active
+     */
+    public function getCategories(): JsonResponse
+    {
+        $categories = Category::where('is_active', true)
+            ->orderBy('name')
+            ->get(['id', 'name', 'slug', 'description']);
+
+        return response()->json([
+            'data' => $categories,
+        ]);
+    }
+
+    /**
+     * Get all tags
+     *
+     * Returns all tags
+     */
+    public function getTags(): JsonResponse
+    {
+        $tags = Tag::orderBy('name')
+            ->get(['id', 'name', 'slug', 'color']);
+
+        return response()->json([
+            'data' => $tags,
+        ]);
     }
 }

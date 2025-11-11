@@ -14,4 +14,10 @@ Route::middleware(['web', 'auth'])->group(function () {
         ->name('api.campaigns.active.count');
     Route::get('/campaigns/manage', [CampaignController::class, 'getCampaignsForManagement'])
         ->name('api.campaigns.manage');
+
+    // Category and Tag Routes
+    Route::get('/categories', [CampaignController::class, 'getCategories'])
+        ->name('api.categories.index');
+    Route::get('/tags', [CampaignController::class, 'getTags'])
+        ->name('api.tags.index');
 });

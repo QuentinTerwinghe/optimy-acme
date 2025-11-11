@@ -27,6 +27,109 @@
                 </button>
             </div>
 
+            <!-- Filters -->
+            <div class="mb-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- Search Filter -->
+                <div>
+                    <label for="search" class="block text-sm font-medium text-gray-700 mb-1">Search</label>
+                    <input
+                        id="search"
+                        v-model="filters.search"
+                        type="text"
+                        placeholder="Search by title..."
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        @input="debouncedFetchCampaigns"
+                    />
+                </div>
+
+                <!-- Category Filter -->
+                <div>
+                    <label for="category" class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                    <select
+                        id="category"
+                        v-model="filters.category_id"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        @change="fetchCampaigns"
+                    >
+                        <option value="">All Categories</option>
+                        <option v-for="category in categories" :key="category.id" :value="category.id">
+                            {{ category.name }}
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Tags Filter -->
+                <div>
+                    <label for="tags" class="block text-sm font-medium text-gray-700 mb-1">Tags</label>
+                    <div class="relative">
+                        <!-- Selected Tags Display and Dropdown Trigger -->
+                        <div
+                            class="appearance-none min-h-[42px] w-full px-3 py-2 border border-gray-300 rounded-md bg-white cursor-pointer hover:border-indigo-500 focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500"
+                            @click="toggleTagDropdown"
+                        >
+                            <!-- Selected Tags as Chips -->
+                            <div v-if="filters.selectedTags.length > 0" class="flex flex-wrap gap-2">
+                                <span
+                                    v-for="tag in filters.selectedTags"
+                                    :key="tag.id"
+                                    class="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium bg-indigo-100 text-indigo-800"
+                                >
+                                    {{ tag.name }}
+                                    <button
+                                        type="button"
+                                        @click.stop="removeTagFilter(tag)"
+                                        class="hover:text-indigo-600 focus:outline-none"
+                                    >
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                </span>
+                            </div>
+                            <!-- Placeholder -->
+                            <div v-else class="text-sm text-gray-400">
+                                Select tags to filter...
+                            </div>
+                        </div>
+
+                        <!-- Dropdown with Tag Options -->
+                        <div
+                            v-if="showTagDropdown"
+                            class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto"
+                        >
+                            <div
+                                v-for="tag in tags"
+                                :key="tag.id"
+                                @click="toggleTag(tag)"
+                                class="flex items-center px-3 py-2 hover:bg-indigo-50 cursor-pointer transition-colors"
+                            >
+                                <input
+                                    type="checkbox"
+                                    :checked="isTagSelected(tag)"
+                                    class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded pointer-events-none"
+                                >
+                                <label class="ml-2 text-sm text-gray-900 cursor-pointer">
+                                    {{ tag.name }}
+                                </label>
+                            </div>
+                            <div v-if="tags.length === 0" class="px-3 py-2 text-sm text-gray-500">
+                                No tags available
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Clear Filters Button -->
+            <div class="mb-4 flex justify-end" v-if="hasActiveFilters">
+                <button
+                    @click="clearFilters"
+                    class="text-sm text-indigo-600 hover:text-indigo-800 font-medium"
+                >
+                    Clear Filters
+                </button>
+            </div>
+
             <!-- Loading State -->
             <div v-if="loading && campaigns.length === 0" class="text-center py-8">
                 <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
@@ -60,7 +163,7 @@
             <!-- Campaigns List -->
             <div v-else class="space-y-4">
                 <a
-                    v-for="campaign in campaigns"
+                    v-for="campaign in paginatedCampaigns"
                     :key="campaign.id"
                     :href="`/campaigns/${campaign.id}`"
                     class="block border border-gray-200 rounded-lg p-4 hover:border-indigo-300 hover:shadow-md transition-all cursor-pointer"
@@ -79,6 +182,24 @@
                             class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"
                         >
                             {{ campaign.status_label }}
+                        </span>
+                    </div>
+
+                    <!-- Category and Tags -->
+                    <div class="mb-3 flex flex-wrap gap-2">
+                        <span v-if="campaign.category" class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-blue-100 text-blue-800">
+                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                            </svg>
+                            {{ campaign.category.name }}
+                        </span>
+                        <span
+                            v-for="tag in campaign.tags"
+                            :key="tag.id"
+                            class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium"
+                            :style="{ backgroundColor: tag.color ? tag.color + '20' : '#F3F4F6', color: tag.color || '#374151' }"
+                        >
+                            {{ tag.name }}
                         </span>
                     </div>
 
@@ -114,30 +235,106 @@
                         </div>
                     </div>
                 </a>
+
+                <!-- Pagination -->
+                <div v-if="totalPages > 1" class="mt-6 flex items-center justify-between border-t border-gray-200 pt-4">
+                    <div class="text-sm text-gray-700">
+                        Showing <span class="font-medium">{{ startIndex + 1 }}</span> to
+                        <span class="font-medium">{{ endIndex }}</span> of
+                        <span class="font-medium">{{ campaigns.length }}</span> campaigns
+                    </div>
+                    <div class="flex space-x-2">
+                        <button
+                            @click="previousPage"
+                            :disabled="currentPage === 1"
+                            class="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            Previous
+                        </button>
+                        <button
+                            v-for="page in displayedPages"
+                            :key="page"
+                            @click="currentPage = page"
+                            :class="[
+                                'px-3 py-1 border rounded-md text-sm font-medium',
+                                currentPage === page
+                                    ? 'bg-indigo-600 text-white border-indigo-600'
+                                    : 'border-gray-300 text-gray-700 bg-white hover:bg-gray-50'
+                            ]"
+                        >
+                            {{ page }}
+                        </button>
+                        <button
+                            @click="nextPage"
+                            :disabled="currentPage === totalPages"
+                            class="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            Next
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import axios from 'axios';
 
 // State
 const campaigns = ref([]);
+const categories = ref([]);
+const tags = ref([]);
 const loading = ref(false);
 const error = ref(null);
+const showTagDropdown = ref(false);
+
+// Filters
+const filters = ref({
+    search: '',
+    category_id: '',
+    selectedTags: [], // Array of tag objects
+});
+
+// Pagination
+const currentPage = ref(1);
+const itemsPerPage = 5;
 
 /**
- * Fetch active campaigns from API
+ * Fetch active campaigns from API with filters
  */
 const fetchCampaigns = async () => {
     loading.value = true;
     error.value = null;
 
     try {
-        const response = await axios.get('/api/campaigns/active');
+        const params = {};
+
+        if (filters.value.search) {
+            params.search = filters.value.search;
+        }
+        if (filters.value.category_id) {
+            params.category_id = filters.value.category_id;
+        }
+        if (filters.value.selectedTags.length > 0) {
+            // Extract tag IDs from selected tag objects
+            const tagIds = filters.value.selectedTags.map(tag => tag.id);
+            params.tag_ids = tagIds.join(',');
+        }
+
+        console.log('Fetching campaigns with params:', params);
+        console.log('Selected tags:', filters.value.selectedTags);
+
+        const response = await axios.get('/api/campaigns/active', { params });
+
+        console.log('API Response:', response.data);
+        console.log('Campaigns received:', response.data.data?.length || 0);
+
         campaigns.value = response.data.data || [];
+
+        // Reset to first page when filters change
+        currentPage.value = 1;
     } catch (err) {
         console.error('Error fetching campaigns:', err);
         error.value = err.response?.data?.message || 'Failed to load campaigns. Please try again.';
@@ -146,8 +343,91 @@ const fetchCampaigns = async () => {
     }
 };
 
+/**
+ * Toggle tag dropdown visibility
+ */
+const toggleTagDropdown = () => {
+    showTagDropdown.value = !showTagDropdown.value;
+};
+
+/**
+ * Check if a tag is currently selected
+ */
+const isTagSelected = (tag) => {
+    return filters.value.selectedTags.some(t => t.id === tag.id);
+};
+
+/**
+ * Toggle tag selection
+ */
+const toggleTag = (tag) => {
+    if (isTagSelected(tag)) {
+        removeTagFilter(tag);
+    } else {
+        filters.value.selectedTags.push(tag);
+        fetchCampaigns();
+    }
+};
+
+/**
+ * Remove a tag from filters
+ */
+const removeTagFilter = (tag) => {
+    filters.value.selectedTags = filters.value.selectedTags.filter(t => t.id !== tag.id);
+    fetchCampaigns();
+};
+
+/**
+ * Close dropdown when clicking outside
+ */
+const handleClickOutside = (event) => {
+    // Check if click is outside the tags filter dropdown
+    const tagsFilter = document.querySelector('.relative');
+    if (tagsFilter && !tagsFilter.contains(event.target)) {
+        showTagDropdown.value = false;
+    }
+};
+
+
+/**
+ * Fetch categories from API
+ */
+const fetchCategories = async () => {
+    try {
+        const response = await axios.get('/api/categories');
+        categories.value = response.data.data || [];
+    } catch (err) {
+        console.error('Error fetching categories:', err);
+    }
+};
+
+/**
+ * Fetch tags from API
+ */
+const fetchTags = async () => {
+    try {
+        const response = await axios.get('/api/tags');
+        tags.value = response.data.data || [];
+    } catch (err) {
+        console.error('Error fetching tags:', err);
+    }
+};
+
 // Define emits
 const emit = defineEmits(['refresh']);
+
+/**
+ * Debounce helper for search
+ */
+let debounceTimeout = null;
+const debouncedFetchCampaigns = () => {
+    if (debounceTimeout) {
+        clearTimeout(debounceTimeout);
+    }
+    debounceTimeout = setTimeout(() => {
+        fetchCampaigns();
+    }, 300);
+};
 
 /**
  * Refresh campaigns list
@@ -156,6 +436,70 @@ const refreshCampaigns = () => {
     fetchCampaigns();
     // Emit refresh event to parent so it can refresh other components
     emit('refresh');
+};
+
+/**
+ * Clear all filters
+ */
+const clearFilters = () => {
+    filters.value = {
+        search: '',
+        category_id: '',
+        selectedTags: [],
+    };
+    fetchCampaigns();
+};
+
+/**
+ * Check if any filters are active
+ */
+const hasActiveFilters = computed(() => {
+    return filters.value.search !== '' ||
+           filters.value.category_id !== '' ||
+           filters.value.selectedTags.length > 0;
+});
+
+/**
+ * Pagination computed properties
+ */
+const totalPages = computed(() => Math.ceil(campaigns.value.length / itemsPerPage));
+const startIndex = computed(() => (currentPage.value - 1) * itemsPerPage);
+const endIndex = computed(() => Math.min(startIndex.value + itemsPerPage, campaigns.value.length));
+
+const paginatedCampaigns = computed(() => {
+    return campaigns.value.slice(startIndex.value, endIndex.value);
+});
+
+const displayedPages = computed(() => {
+    const pages = [];
+    const maxDisplayed = 5;
+    let start = Math.max(1, currentPage.value - Math.floor(maxDisplayed / 2));
+    let end = Math.min(totalPages.value, start + maxDisplayed - 1);
+
+    if (end - start < maxDisplayed - 1) {
+        start = Math.max(1, end - maxDisplayed + 1);
+    }
+
+    for (let i = start; i <= end; i++) {
+        pages.push(i);
+    }
+
+    return pages;
+});
+
+/**
+ * Pagination functions
+ */
+const nextPage = () => {
+    if (currentPage.value < totalPages.value) {
+        currentPage.value++;
+    }
+};
+
+const previousPage = () => {
+    if (currentPage.value > 1) {
+        currentPage.value--;
+    }
 };
 
 /**
@@ -177,9 +521,17 @@ const formatCurrency = (amount, currency) => {
     return (symbols[currency] || currency) + formatted;
 };
 
-// Load campaigns on component mount
+// Load data on component mount
 onMounted(() => {
+    document.addEventListener('click', handleClickOutside);
     fetchCampaigns();
+    fetchCategories();
+    fetchTags();
+});
+
+// Clean up listener on unmount
+onUnmounted(() => {
+    document.removeEventListener('click', handleClickOutside);
 });
 </script>
 

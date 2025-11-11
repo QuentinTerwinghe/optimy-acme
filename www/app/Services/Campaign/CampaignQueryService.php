@@ -27,17 +27,54 @@ class CampaignQueryService implements CampaignQueryServiceInterface
      * - End date is in the future
      * - Ordered by end date (soonest first)
      *
+     * @param array<string, mixed> $filters Optional filters (search, category_id, tag_ids)
      * @return Collection<int, Campaign>
      */
-    public function getActiveCampaigns(): Collection
+    public function getActiveCampaigns(array $filters = []): Collection
     {
         try {
-            return Campaign::query()
+            $query = Campaign::query()
                 ->where('status', CampaignStatus::ACTIVE)
                 ->where('start_date', '<=', now())
-                ->where('end_date', '>', now())
+                ->where('end_date', '>', now());
+
+            // Apply search filter
+            if (!empty($filters['search'])) {
+                $search = $filters['search'];
+                $query->where('title', 'LIKE', "%{$search}%");
+            }
+
+            // Apply category filter
+            if (!empty($filters['category_id'])) {
+                $query->where('category_id', $filters['category_id']);
+            }
+
+            // Apply tags filter
+            if (!empty($filters['tag_ids']) && is_array($filters['tag_ids'])) {
+                Log::info('Applying tag filter', [
+                    'tag_ids' => $filters['tag_ids'],
+                ]);
+
+                $query->whereHas('tags', function ($q) use ($filters) {
+                    $q->whereIn('tags.id', $filters['tag_ids']);
+                });
+            }
+
+            Log::info('Final query SQL', [
+                'sql' => $query->toSql(),
+                'bindings' => $query->getBindings(),
+            ]);
+
+            $result = $query
+                ->with(['category', 'tags'])
                 ->orderBy('end_date', 'asc')
                 ->get();
+
+            Log::info('Query result', [
+                'count' => $result->count(),
+            ]);
+
+            return $result;
         } catch (\Exception $e) {
             Log::error('Failed to fetch active campaigns', [
                 'error' => $e->getMessage(),

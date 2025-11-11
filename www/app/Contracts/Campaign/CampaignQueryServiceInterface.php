@@ -23,9 +23,10 @@ interface CampaignQueryServiceInterface
      * - End date is in the future
      * - Ordered by end date (soonest first)
      *
+     * @param array<string, mixed> $filters Optional filters (search, category_id, tag_ids)
      * @return Collection<int, Campaign>
      */
-    public function getActiveCampaigns(): Collection;
+    public function getActiveCampaigns(array $filters = []): Collection;
 
     /**
      * Get count of active campaigns
