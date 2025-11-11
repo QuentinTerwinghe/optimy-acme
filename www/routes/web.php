@@ -58,4 +58,6 @@ Route::middleware(['auth'])->group(function () {
         ->name('campaigns.update');
     Route::post('/campaigns/{id}/validate', [CampaignController::class, 'validate'])
         ->name('campaigns.validate');
+    Route::post('/campaigns/{id}/reject', [CampaignController::class, 'reject'])
+        ->name('campaigns.reject');
 });

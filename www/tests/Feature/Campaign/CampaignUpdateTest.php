@@ -408,4 +408,95 @@ class CampaignUpdateTest extends TestCase
         $this->assertEquals($originalGoalAmount, $updatedCampaign->goal_amount);
         $this->assertEquals('Only updating description', $updatedCampaign->description);
     }
+
+    /** @test */
+    public function campaign_manager_can_reject_waiting_for_validation_campaign(): void
+    {
+        $response = $this->actingAs($this->campaignManager)
+            ->postJson(route('campaigns.reject', ['id' => $this->waitingCampaign->id]));
+
+        $response->assertStatus(200);
+        $response->assertJson([
+            'success' => true,
+            'message' => 'Campaign rejected successfully',
+        ]);
+
+        // Verify status changed to rejected
+        $this->assertDatabaseHas('campaigns', [
+            'id' => $this->waitingCampaign->id,
+            'status' => CampaignStatus::REJECTED->value,
+        ]);
+    }
+
+    /** @test */
+    public function reject_endpoint_does_not_modify_other_campaign_fields(): void
+    {
+        $originalTitle = $this->waitingCampaign->title;
+        $originalDescription = $this->waitingCampaign->description;
+        $originalGoalAmount = $this->waitingCampaign->goal_amount;
+
+        $response = $this->actingAs($this->campaignManager)
+            ->postJson(route('campaigns.reject', ['id' => $this->waitingCampaign->id]));
+
+        $response->assertStatus(200);
+
+        // Verify only status changed
+        $updatedCampaign = Campaign::find($this->waitingCampaign->id);
+        $this->assertEquals($originalTitle, $updatedCampaign->title);
+        $this->assertEquals($originalDescription, $updatedCampaign->description);
+        $this->assertEquals($originalGoalAmount, $updatedCampaign->goal_amount);
+        $this->assertEquals(CampaignStatus::REJECTED, $updatedCampaign->status);
+    }
+
+    /** @test */
+    public function regular_user_cannot_reject_campaign(): void
+    {
+        $response = $this->actingAs($this->regularUser)
+            ->postJson(route('campaigns.reject', ['id' => $this->waitingCampaign->id]));
+
+        $response->assertStatus(403);
+        $response->assertJson([
+            'success' => false,
+            'message' => 'You are not authorized to reject campaigns.',
+        ]);
+
+        // Verify status did NOT change
+        $this->assertDatabaseHas('campaigns', [
+            'id' => $this->waitingCampaign->id,
+            'status' => CampaignStatus::WAITING_FOR_VALIDATION->value,
+        ]);
+    }
+
+    /** @test */
+    public function guest_user_cannot_reject_campaign(): void
+    {
+        $response = $this->postJson(route('campaigns.reject', ['id' => $this->waitingCampaign->id]));
+
+        $response->assertStatus(401);
+    }
+
+    /** @test */
+    public function reject_returns_404_for_nonexistent_campaign(): void
+    {
+        $response = $this->actingAs($this->campaignManager)
+            ->postJson(route('campaigns.reject', ['id' => '00000000-0000-0000-0000-000000000000']));
+
+        $response->assertStatus(404);
+    }
+
+    /** @test */
+    public function campaign_manager_can_reject_draft_campaign(): void
+    {
+        // Although unusual, the reject endpoint should work on any status
+        $response = $this->actingAs($this->campaignManager)
+            ->postJson(route('campaigns.reject', ['id' => $this->draftCampaign->id]));
+
+        $response->assertStatus(200);
+
+        // Verify status changed to rejected
+        $this->assertDatabaseHas('campaigns', [
+            'id' => $this->draftCampaign->id,
+            'status' => CampaignStatus::REJECTED->value,
+        ]);
+    }
 }

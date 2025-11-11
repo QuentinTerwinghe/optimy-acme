@@ -268,6 +268,56 @@ class CampaignController extends Controller
     }
 
     /**
+     * Reject a campaign (set status to rejected)
+     * This endpoint ONLY changes the status, does not modify other fields
+     */
+    public function reject(Request $request, string $id): JsonResponse
+    {
+        try {
+            // Find the campaign by UUID
+            $campaign = Campaign::findOrFail($id);
+
+            // Check if user has permission to reject campaigns
+            if (!$request->user()?->can('manageAllCampaigns', Campaign::class)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'You are not authorized to reject campaigns.',
+                ], 403);
+            }
+
+            // Create DTO with only status change
+            $dto = new \App\DTOs\Campaign\UpdateCampaignDTO(
+                status: CampaignStatus::REJECTED
+            );
+
+            // Update campaign using the service
+            $updatedCampaign = $this->campaignWriteService->updateCampaign(
+                (string) $campaign->id,
+                $dto
+            );
+
+            // Refresh to ensure all attributes are properly loaded
+            $updatedCampaign->refresh();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Campaign rejected successfully',
+                'data' => $updatedCampaign->toArray(),
+            ], 200);
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Campaign not found.',
+            ], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to reject campaign: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
      * Remove the specified resource from storage.
      */
     public function destroy(string $id): never

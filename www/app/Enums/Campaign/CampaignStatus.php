@@ -9,6 +9,7 @@ enum CampaignStatus: string
     case DRAFT = 'draft';
     case WAITING_FOR_VALIDATION = 'waiting_for_validation';
     case ACTIVE = 'active';
+    case REJECTED = 'rejected';
     case COMPLETED = 'completed';
     case CANCELLED = 'cancelled';
 
@@ -31,6 +32,7 @@ enum CampaignStatus: string
             self::DRAFT => 'Draft',
             self::WAITING_FOR_VALIDATION => 'Waiting for Validation',
             self::ACTIVE => 'Active',
+            self::REJECTED => 'Rejected',
             self::COMPLETED => 'Completed',
             self::CANCELLED => 'Cancelled',
         };
@@ -39,6 +41,9 @@ enum CampaignStatus: string
     /**
      * Create from request status value
      * Maps user-friendly status names to enum cases
+     *
+     * @param string $status
+     * @return CampaignStatus
      */
     public static function fromRequest(string $status): self
     {
@@ -46,6 +51,7 @@ enum CampaignStatus: string
             'draft' => self::DRAFT,
             'waiting_for_validation' => self::WAITING_FOR_VALIDATION,
             'active' => self::ACTIVE,
+            'rejected' => self::REJECTED,
             'completed' => self::COMPLETED,
             'cancelled' => self::CANCELLED,
             default => throw new \InvalidArgumentException("Invalid status: {$status}"),

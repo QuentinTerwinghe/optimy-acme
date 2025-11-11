@@ -8,10 +8,11 @@ describe('CampaignStatus Enum', function () {
     test('has all expected cases', function () {
         $cases = CampaignStatus::cases();
 
-        expect($cases)->toHaveCount(5)
+        expect($cases)->toHaveCount(6)
             ->and($cases)->toContain(CampaignStatus::DRAFT)
             ->and($cases)->toContain(CampaignStatus::WAITING_FOR_VALIDATION)
             ->and($cases)->toContain(CampaignStatus::ACTIVE)
+            ->and($cases)->toContain(CampaignStatus::REJECTED)
             ->and($cases)->toContain(CampaignStatus::COMPLETED)
             ->and($cases)->toContain(CampaignStatus::CANCELLED);
     });
@@ -28,6 +29,10 @@ describe('CampaignStatus Enum', function () {
         expect(CampaignStatus::COMPLETED->value)->toBe('completed');
     });
 
+    test('rejected case has correct value', function () {
+        expect(CampaignStatus::REJECTED->value)->toBe('rejected');
+    });
+
     test('cancelled case has correct value', function () {
         expect(CampaignStatus::CANCELLED->value)->toBe('cancelled');
     });
@@ -35,8 +40,8 @@ describe('CampaignStatus Enum', function () {
     test('values() returns all values', function () {
         $values = CampaignStatus::values();
 
-        expect($values)->toBe(['draft', 'waiting_for_validation', 'active', 'completed', 'cancelled'])
-            ->and($values)->toHaveCount(5);
+        expect($values)->toBe(['draft', 'waiting_for_validation', 'active', 'rejected', 'completed', 'cancelled'])
+            ->and($values)->toHaveCount(6);
     });
 
     test('draft label returns correct text', function () {
@@ -45,6 +50,10 @@ describe('CampaignStatus Enum', function () {
 
     test('active label returns correct text', function () {
         expect(CampaignStatus::ACTIVE->label())->toBe('Active');
+    });
+
+    test('rejected label returns correct text', function () {
+        expect(CampaignStatus::REJECTED->label())->toBe('Rejected');
     });
 
     test('completed label returns correct text', function () {
@@ -91,7 +100,9 @@ describe('CampaignStatus Enum', function () {
 
         $result = match ($status) {
             CampaignStatus::DRAFT => 'not_started',
+            CampaignStatus::WAITING_FOR_VALIDATION => 'pending',
             CampaignStatus::ACTIVE => 'running',
+            CampaignStatus::REJECTED => 'denied',
             CampaignStatus::COMPLETED => 'finished',
             CampaignStatus::CANCELLED => 'stopped',
         };
