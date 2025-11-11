@@ -16,12 +16,14 @@ use App\Models\Campaign\Category;
 use App\Models\Campaign\Tag;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 
 class CampaignController extends Controller
 {
+    use AuthorizesRequests;
+
     /**
      * Constructor
      *
@@ -116,35 +118,33 @@ class CampaignController extends Controller
      */
     public function edit(string $id): View|RedirectResponse
     {
-        // Find the campaign by ID and load tags relationship
-        $campaign = Campaign::with('tags')->findOrFail($id);
+        try {
+            // Find the campaign by ID and load tags relationship
+            $campaign = Campaign::with('tags')->findOrFail($id);
 
-        // Get current authenticated user
-        $user = auth()->user();
+            // Check authorization using the policy
+            $this->authorize('update', $campaign);
 
-        // Check authorization using the policy
-        if ($user === null || !$user->can('update', $campaign)) {
-            // Redirect to campaigns list if unauthorized
+            // Load necessary data for the form
+            $categories = Category::where('is_active', true)
+                ->orderBy('name')
+                ->get();
+
+            $tags = Tag::orderBy('name')->get();
+
+            $currencies = Currency::cases();
+
+            return view('campaigns.edit', [
+                'campaign' => $campaign,
+                'categories' => $categories,
+                'tags' => $tags,
+                'currencies' => $currencies,
+            ]);
+        } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
             return redirect()
                 ->route('campaigns.index')
                 ->with('error', 'You are not authorized to edit this campaign or the campaign cannot be edited in its current status.');
         }
-
-        // Load necessary data for the form
-        $categories = Category::where('is_active', true)
-            ->orderBy('name')
-            ->get();
-
-        $tags = Tag::orderBy('name')->get();
-
-        $currencies = Currency::cases();
-
-        return view('campaigns.edit', [
-            'campaign' => $campaign,
-            'categories' => $categories,
-            'tags' => $tags,
-            'currencies' => $currencies,
-        ]);
     }
 
     /**
@@ -157,12 +157,7 @@ class CampaignController extends Controller
             $campaign = Campaign::findOrFail($id);
 
             // Check authorization using the policy
-            if (!$request->user()?->can('update', $campaign)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'You are not authorized to update this campaign.',
-                ], 403);
-            }
+            $this->authorize('update', $campaign);
 
             // Convert request to DTO using mapper
             $dto = CampaignMapper::fromUpdateRequest($request);
@@ -209,6 +204,11 @@ class CampaignController extends Controller
                     : ($errors[array_key_first($errors)][0] ?? $message),
                 'errors' => $errors,
             ], 422);
+        } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You are not authorized to update this campaign.',
+            ], 403);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -221,19 +221,14 @@ class CampaignController extends Controller
      * Validate a campaign (set status to active)
      * This endpoint ONLY changes the status, does not modify other fields
      */
-    public function validate(Request $request, string $id): JsonResponse
+    public function validate(string $id): JsonResponse
     {
         try {
             // Find the campaign by UUID
             $campaign = Campaign::findOrFail($id);
 
-            // Check if user has permission to validate campaigns
-            if (!$request->user()?->can('manageAllCampaigns', Campaign::class)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'You are not authorized to validate campaigns.',
-                ], 403);
-            }
+            // Check authorization using the policy
+            $this->authorize('validate', $campaign);
 
             // Create DTO with only status change
             $dto = new \App\DTOs\Campaign\UpdateCampaignDTO(
@@ -259,6 +254,11 @@ class CampaignController extends Controller
                 'success' => false,
                 'message' => 'Campaign not found.',
             ], 404);
+        } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You are not authorized to validate campaigns.',
+            ], 403);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -271,19 +271,14 @@ class CampaignController extends Controller
      * Reject a campaign (set status to rejected)
      * This endpoint ONLY changes the status, does not modify other fields
      */
-    public function reject(Request $request, string $id): JsonResponse
+    public function reject(string $id): JsonResponse
     {
         try {
             // Find the campaign by UUID
             $campaign = Campaign::findOrFail($id);
 
-            // Check if user has permission to reject campaigns
-            if (!$request->user()?->can('manageAllCampaigns', Campaign::class)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'You are not authorized to reject campaigns.',
-                ], 403);
-            }
+            // Check authorization using the policy
+            $this->authorize('reject', $campaign);
 
             // Create DTO with only status change
             $dto = new \App\DTOs\Campaign\UpdateCampaignDTO(
@@ -309,6 +304,11 @@ class CampaignController extends Controller
                 'success' => false,
                 'message' => 'Campaign not found.',
             ], 404);
+        } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You are not authorized to reject campaigns.',
+            ], 403);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,

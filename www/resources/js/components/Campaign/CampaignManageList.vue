@@ -472,9 +472,9 @@ const getStatusBadgeClass = (status) => {
     return classes[status] || 'bg-gray-100 text-gray-800';
 };
 
-// Check if campaign can be edited (only draft and waiting_for_validation)
+// Check if campaign can be edited (only draft, waiting_for_validation and rejectd)
 const canEditCampaign = (campaign) => {
-    return campaign.status === 'draft' || campaign.status === 'waiting_for_validation';
+    return campaign.status === 'draft' || campaign.status === 'waiting_for_validation' || campaign.status === 'rejected';
 };
 
 // Action handlers

@@ -222,4 +222,82 @@ class CampaignPolicyTest extends TestCase
 
         $this->assertFalse($result);
     }
+
+    /** @test */
+    public function manager_can_validate_campaign(): void
+    {
+        $campaign = Campaign::factory()->create([
+            'status' => CampaignStatus::WAITING_FOR_VALIDATION,
+            'created_by' => $this->userWithEditOwn->id,
+        ]);
+
+        $result = $this->policy->validate($this->userWithManageAll, $campaign);
+
+        $this->assertTrue($result);
+    }
+
+    /** @test */
+    public function user_without_manage_all_permission_cannot_validate_campaign(): void
+    {
+        $campaign = Campaign::factory()->create([
+            'status' => CampaignStatus::WAITING_FOR_VALIDATION,
+            'created_by' => $this->userWithEditOwn->id,
+        ]);
+
+        $result = $this->policy->validate($this->userWithEditOwn, $campaign);
+
+        $this->assertFalse($result);
+    }
+
+    /** @test */
+    public function user_without_permissions_cannot_validate_campaign(): void
+    {
+        $campaign = Campaign::factory()->create([
+            'status' => CampaignStatus::WAITING_FOR_VALIDATION,
+            'created_by' => $this->userWithoutPermissions->id,
+        ]);
+
+        $result = $this->policy->validate($this->userWithoutPermissions, $campaign);
+
+        $this->assertFalse($result);
+    }
+
+    /** @test */
+    public function manager_can_reject_campaign(): void
+    {
+        $campaign = Campaign::factory()->create([
+            'status' => CampaignStatus::WAITING_FOR_VALIDATION,
+            'created_by' => $this->userWithEditOwn->id,
+        ]);
+
+        $result = $this->policy->reject($this->userWithManageAll, $campaign);
+
+        $this->assertTrue($result);
+    }
+
+    /** @test */
+    public function user_without_manage_all_permission_cannot_reject_campaign(): void
+    {
+        $campaign = Campaign::factory()->create([
+            'status' => CampaignStatus::WAITING_FOR_VALIDATION,
+            'created_by' => $this->userWithEditOwn->id,
+        ]);
+
+        $result = $this->policy->reject($this->userWithEditOwn, $campaign);
+
+        $this->assertFalse($result);
+    }
+
+    /** @test */
+    public function user_without_permissions_cannot_reject_campaign(): void
+    {
+        $campaign = Campaign::factory()->create([
+            'status' => CampaignStatus::WAITING_FOR_VALIDATION,
+            'created_by' => $this->userWithoutPermissions->id,
+        ]);
+
+        $result = $this->policy->reject($this->userWithoutPermissions, $campaign);
+
+        $this->assertFalse($result);
+    }
 }

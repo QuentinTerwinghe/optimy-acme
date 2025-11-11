@@ -265,7 +265,7 @@
 
                     <!-- Save as Draft Button - Only show if status is Draft -->
                     <button
-                        v-if="isDraftStatus"
+                        v-if="isDraftableStatus"
                         type="button"
                         @click="handleSubmit('draft')"
                         :disabled="isSubmitting || !canSaveAsDraft"
@@ -484,9 +484,9 @@ const hasPermission = (permission) => {
     return props.userPermissions.includes(permission);
 };
 
-// Check if current campaign status is Draft
-const isDraftStatus = computed(() => {
-    return props.campaign.status === 'draft';
+// Check if current campaign status is Draft or Rejected
+const isDraftableStatus = computed(() => {
+    return props.campaign.status === 'draft' || props.campaign.status === 'rejected';
 });
 
 // Check if current campaign status is Waiting for Validation

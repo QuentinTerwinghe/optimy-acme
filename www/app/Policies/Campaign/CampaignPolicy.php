@@ -54,6 +54,26 @@ class CampaignPolicy
     }
 
     /**
+     * Determine if the user can validate a campaign.
+     *
+     * Only users with 'manageAllCampaigns' permission can validate campaigns.
+     */
+    public function validate(User $user, Campaign $campaign): bool
+    {
+        return $user->can(CampaignPermissions::MANAGE_ALL_CAMPAIGNS->value);
+    }
+
+    /**
+     * Determine if the user can reject a campaign.
+     *
+     * Only users with 'manageAllCampaigns' permission can reject campaigns.
+     */
+    public function reject(User $user, Campaign $campaign): bool
+    {
+        return $user->can(CampaignPermissions::MANAGE_ALL_CAMPAIGNS->value);
+    }
+
+    /**
      * Determine if the campaign status allows editing.
      *
      * Only DRAFT and WAITING_FOR_VALIDATION campaigns can be edited.
@@ -63,6 +83,7 @@ class CampaignPolicy
         return in_array($campaign->status, [
             CampaignStatus::DRAFT,
             CampaignStatus::WAITING_FOR_VALIDATION,
+            CampaignStatus::REJECTED,
         ], true);
     }
 }
