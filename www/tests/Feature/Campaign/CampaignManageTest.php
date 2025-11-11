@@ -253,14 +253,14 @@ class CampaignManageTest extends TestCase
             'created_by' => $this->user->id,
             'title' => 'Old Campaign',
             'category_id' => $this->category->id,
-            'creation_date' => now()->subDays(5),
+            'created_at' => now()->subDays(5),
         ]);
 
         $newCampaign = Campaign::factory()->create([
             'created_by' => $this->user->id,
             'title' => 'New Campaign',
             'category_id' => $this->category->id,
-            'creation_date' => now(),
+            'created_at' => now(),
         ]);
 
         $response = $this->actingAs($this->user)

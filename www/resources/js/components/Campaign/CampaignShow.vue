@@ -112,11 +112,11 @@
                             </div>
                             <div>
                                 <dt class="text-sm font-medium text-gray-500">Created Date</dt>
-                                <dd class="mt-1 text-sm text-gray-900">{{ formatDateTime(campaign.creation_date) }}</dd>
+                                <dd class="mt-1 text-sm text-gray-900">{{ formatDateTime(campaign.created_at) }}</dd>
                             </div>
-                            <div v-if="campaign.update_date">
+                            <div v-if="campaign.updated_at">
                                 <dt class="text-sm font-medium text-gray-500">Last Updated</dt>
-                                <dd class="mt-1 text-sm text-gray-900">{{ formatDateTime(campaign.update_date) }}</dd>
+                                <dd class="mt-1 text-sm text-gray-900">{{ formatDateTime(campaign.updated_at) }}</dd>
                             </div>
                         </dl>
                     </div>

@@ -34,9 +34,8 @@ return new class extends Migration
             // Campaign status
             $table->string('status', 20)->default('draft');
 
-            // Timestamps - custom names for HasTimestamps trait
-            $table->dateTime('creation_date')->nullable();
-            $table->dateTime('update_date')->nullable();
+            // Timestamps - Laravel standard columns
+            $table->timestamps();
 
             // User tracking - for HasUserTracking trait
             $table->foreignUuid('created_by')->nullable();

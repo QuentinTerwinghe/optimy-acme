@@ -30,8 +30,8 @@ use Illuminate\Support\Str;
  * @property \Illuminate\Support\Carbon|null $end_date
  * @property CampaignStatus $status
  * @property int|null $category_id
- * @property \Illuminate\Support\Carbon|null $creation_date
- * @property \Illuminate\Support\Carbon|null $update_date
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
  * @property int|null $created_by
  * @property int|null $updated_by
  * @property-read User|null $creator

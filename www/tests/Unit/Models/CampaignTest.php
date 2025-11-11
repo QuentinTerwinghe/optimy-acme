@@ -175,11 +175,11 @@ describe('Campaign Model', function () {
     test('has HasTimestamps trait', function () {
         $campaign = Campaign::factory()->create();
 
-        // Check that the custom timestamp columns are set
-        expect($campaign->creation_date)->not->toBeNull()
-            ->and($campaign->update_date)->not->toBeNull()
-            ->and($campaign->creation_date)->toBeInstanceOf(\Illuminate\Support\Carbon::class)
-            ->and($campaign->update_date)->toBeInstanceOf(\Illuminate\Support\Carbon::class);
+        // Check that the standard timestamp columns are set
+        expect($campaign->created_at)->not->toBeNull()
+            ->and($campaign->updated_at)->not->toBeNull()
+            ->and($campaign->created_at)->toBeInstanceOf(\Illuminate\Support\Carbon::class)
+            ->and($campaign->updated_at)->toBeInstanceOf(\Illuminate\Support\Carbon::class);
     });
 
     test('has HasUserTracking trait', function () {

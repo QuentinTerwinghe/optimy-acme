@@ -146,14 +146,14 @@ class CampaignQueryServiceTest extends TestCase
             'created_by' => $this->regularUser->id,
             'category_id' => $this->category->id,
             'title' => 'Old Campaign',
-            'creation_date' => now()->subDays(5),
+            'created_at' => now()->subDays(5),
         ]);
 
         $newCampaign = Campaign::factory()->create([
             'created_by' => $this->regularUser->id,
             'category_id' => $this->category->id,
             'title' => 'New Campaign',
-            'creation_date' => now(),
+            'created_at' => now(),
         ]);
 
         $result = $this->service->getCampaignsForManagement($this->regularUser);

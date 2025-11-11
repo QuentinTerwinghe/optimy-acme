@@ -281,7 +281,7 @@ class CampaignQueryService implements CampaignQueryServiceInterface
 
             return $query
                 ->with(['category', 'tags'])
-                ->orderBy('creation_date', 'desc')
+                ->orderBy('created_at', 'desc')
                 ->get();
         } catch (\Exception $e) {
             Log::error('Failed to fetch campaigns for management', [
