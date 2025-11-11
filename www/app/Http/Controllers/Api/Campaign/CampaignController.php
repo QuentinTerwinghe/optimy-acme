@@ -6,13 +6,13 @@ namespace App\Http\Controllers\Api\Campaign;
 
 use App\Contracts\Campaign\CampaignQueryServiceInterface;
 use App\Contracts\Campaign\CampaignWriteServiceInterface;
+use App\Contracts\Category\CategoryQueryServiceInterface;
+use App\Contracts\Tag\TagQueryServiceInterface;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Campaign\StoreCampaignRequest;
 use App\Http\Requests\Campaign\UpdateCampaignRequest;
 use App\Http\Resources\Campaign\CampaignResource;
 use App\Mappers\Campaign\CampaignMapper;
-use App\Models\Campaign\Category;
-use App\Models\Campaign\Tag;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Log;
@@ -32,7 +32,9 @@ class CampaignController extends Controller
     public function __construct(
         private readonly CampaignQueryServiceInterface $campaignQueryService,
         /** @phpstan-ignore-next-line property.onlyWritten - Write service will be used for create/update/delete endpoints */
-        private readonly CampaignWriteServiceInterface $campaignWriteService
+        private readonly CampaignWriteServiceInterface $campaignWriteService,
+        private readonly CategoryQueryServiceInterface $categoryQueryService,
+        private readonly TagQueryServiceInterface $tagQueryService
     ) {}
 
     /**
@@ -241,9 +243,13 @@ class CampaignController extends Controller
      */
     public function getCategories(): JsonResponse
     {
-        $categories = Category::where('is_active', true)
-            ->orderBy('name')
-            ->get(['id', 'name', 'slug', 'description']);
+        $categories = $this->categoryQueryService->getActiveCategories()
+            ->map(fn ($category) => [
+                'id' => $category->id,
+                'name' => $category->name,
+                'slug' => $category->slug,
+                'description' => $category->description,
+            ]);
 
         return response()->json([
             'data' => $categories,
@@ -257,8 +263,13 @@ class CampaignController extends Controller
      */
     public function getTags(): JsonResponse
     {
-        $tags = Tag::orderBy('name')
-            ->get(['id', 'name', 'slug', 'color']);
+        $tags = $this->tagQueryService->getAllTags()
+            ->map(fn ($tag) => [
+                'id' => $tag->id,
+                'name' => $tag->name,
+                'slug' => $tag->slug,
+                'color' => $tag->color,
+            ]);
 
         return response()->json([
             'data' => $tags,

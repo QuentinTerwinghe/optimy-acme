@@ -48,6 +48,15 @@ interface CampaignQueryServiceInterface
     public function findById(string $id): ?Campaign;
 
     /**
+     * Find a campaign by ID with relationships loaded
+     *
+     * @param string $id
+     * @param array<int, string> $relations
+     * @return Campaign|null
+     */
+    public function findByIdWithRelations(string $id, array $relations = ['category', 'tags', 'creator']): ?Campaign;
+
+    /**
      * Get all campaigns
      *
      * @return Collection<int, Campaign>

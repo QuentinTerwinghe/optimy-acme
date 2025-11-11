@@ -4,18 +4,17 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Campaign;
 
+use App\Contracts\Campaign\CampaignQueryServiceInterface;
 use App\Contracts\Campaign\CampaignWriteServiceInterface;
+use App\Contracts\Category\CategoryQueryServiceInterface;
+use App\Contracts\Tag\TagQueryServiceInterface;
 use App\Enums\Campaign\CampaignStatus;
 use App\Enums\Common\Currency;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Campaign\StoreCampaignRequest;
 use App\Http\Requests\Campaign\UpdateCampaignRequest;
 use App\Mappers\Campaign\CampaignMapper;
-use App\Models\Campaign\Campaign;
-use App\Models\Campaign\Category;
-use App\Models\Campaign\Tag;
 use Illuminate\Contracts\View\View;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -27,10 +26,16 @@ class CampaignController extends Controller
     /**
      * Constructor
      *
+     * @param CampaignQueryServiceInterface $campaignQueryService
      * @param CampaignWriteServiceInterface $campaignWriteService
+     * @param CategoryQueryServiceInterface $categoryQueryService
+     * @param TagQueryServiceInterface $tagQueryService
      */
     public function __construct(
-        private CampaignWriteServiceInterface $campaignWriteService
+        private readonly CampaignQueryServiceInterface $campaignQueryService,
+        private readonly CampaignWriteServiceInterface $campaignWriteService,
+        private readonly CategoryQueryServiceInterface $categoryQueryService,
+        private readonly TagQueryServiceInterface $tagQueryService
     ) {}
     /**
      * Display a listing of the resource.
@@ -45,12 +50,8 @@ class CampaignController extends Controller
      */
     public function create(): View
     {
-        $categories = Category::where('is_active', true)
-            ->orderBy('name')
-            ->get();
-
-        $tags = Tag::orderBy('name')->get();
-
+        $categories = $this->categoryQueryService->getActiveCategories();
+        $tags = $this->tagQueryService->getAllTags();
         $currencies = Currency::cases();
 
         return view('campaigns.create', [
@@ -94,17 +95,18 @@ class CampaignController extends Controller
     public function show(string $id): View|RedirectResponse
     {
         try {
-            // Find the campaign by ID and load relationships
-            $campaign = Campaign::with(['category', 'tags', 'creator'])
-                ->findOrFail($id);
+            // Find the campaign by ID using the query service
+            $campaign = $this->campaignQueryService->findByIdWithRelations($id);
+
+            if (!$campaign) {
+                return redirect()
+                    ->route('dashboard')
+                    ->with('error', 'Campaign not found.');
+            }
 
             return view('campaigns.show', [
                 'campaign' => $campaign,
             ]);
-        } catch (ModelNotFoundException $e) {
-            return redirect()
-                ->route('dashboard')
-                ->with('error', 'Campaign not found.');
         } catch (\Exception $e) {
             // Handle invalid UUIDs or other errors
             return redirect()
@@ -120,18 +122,18 @@ class CampaignController extends Controller
     {
         try {
             // Find the campaign by ID and load tags relationship
-            $campaign = Campaign::with('tags')->findOrFail($id);
+            $campaign = $this->campaignQueryService->findByIdWithRelations($id, ['tags']);
+
+            if (!$campaign) {
+                abort(404, 'Campaign not found');
+            }
 
             // Check authorization using the policy
             $this->authorize('update', $campaign);
 
             // Load necessary data for the form
-            $categories = Category::where('is_active', true)
-                ->orderBy('name')
-                ->get();
-
-            $tags = Tag::orderBy('name')->get();
-
+            $categories = $this->categoryQueryService->getActiveCategories();
+            $tags = $this->tagQueryService->getAllTags();
             $currencies = Currency::cases();
 
             return view('campaigns.edit', [
@@ -154,7 +156,14 @@ class CampaignController extends Controller
     {
         try {
             // Find the campaign by UUID
-            $campaign = Campaign::findOrFail($id);
+            $campaign = $this->campaignQueryService->findById($id);
+
+            if (!$campaign) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Campaign not found.',
+                ], 404);
+            }
 
             // Check authorization using the policy
             $this->authorize('update', $campaign);
@@ -177,11 +186,6 @@ class CampaignController extends Controller
                 'message' => 'Campaign updated successfully',
                 'data' => $updatedCampaign->toArray(),
             ], 200);
-        } catch (ModelNotFoundException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Campaign not found.',
-            ], 404);
         } catch (\InvalidArgumentException $e) {
             // Parse the exception message to extract field names and return validation error format
             $message = $e->getMessage();
@@ -225,7 +229,14 @@ class CampaignController extends Controller
     {
         try {
             // Find the campaign by UUID
-            $campaign = Campaign::findOrFail($id);
+            $campaign = $this->campaignQueryService->findById($id);
+
+            if (!$campaign) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Campaign not found.',
+                ], 404);
+            }
 
             // Check authorization using the policy
             $this->authorize('validate', $campaign);
@@ -249,11 +260,6 @@ class CampaignController extends Controller
                 'message' => 'Campaign validated successfully',
                 'data' => $updatedCampaign->toArray(),
             ], 200);
-        } catch (ModelNotFoundException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Campaign not found.',
-            ], 404);
         } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
             return response()->json([
                 'success' => false,
@@ -275,7 +281,14 @@ class CampaignController extends Controller
     {
         try {
             // Find the campaign by UUID
-            $campaign = Campaign::findOrFail($id);
+            $campaign = $this->campaignQueryService->findById($id);
+
+            if (!$campaign) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Campaign not found.',
+                ], 404);
+            }
 
             // Check authorization using the policy
             $this->authorize('reject', $campaign);
@@ -299,11 +312,6 @@ class CampaignController extends Controller
                 'message' => 'Campaign rejected successfully',
                 'data' => $updatedCampaign->toArray(),
             ], 200);
-        } catch (ModelNotFoundException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Campaign not found.',
-            ], 404);
         } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
             return response()->json([
                 'success' => false,

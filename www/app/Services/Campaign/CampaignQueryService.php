@@ -135,6 +135,28 @@ class CampaignQueryService implements CampaignQueryServiceInterface
     }
 
     /**
+     * Find a campaign by ID with relationships loaded
+     *
+     * @param string $id
+     * @param array<int, string> $relations
+     * @return Campaign|null
+     */
+    public function findByIdWithRelations(string $id, array $relations = ['category', 'tags', 'creator']): ?Campaign
+    {
+        try {
+            return Campaign::with($relations)->find($id);
+        } catch (\Exception $e) {
+            Log::error('Failed to find campaign by ID with relations', [
+                'id' => $id,
+                'relations' => $relations,
+                'error' => $e->getMessage(),
+            ]);
+
+            return null;
+        }
+    }
+
+    /**
      * Get all campaigns
      *
      * @return Collection<int, Campaign>
