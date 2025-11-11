@@ -6,6 +6,7 @@ namespace Tests\Feature\Campaign;
 
 use App\Enums\Campaign\CampaignPermissions;
 use App\Enums\Campaign\CampaignStatus;
+use App\Jobs\SendCampaignStatusFlowNotificationJob;
 use App\Jobs\SendCampaignWaitingForValidationNotificationJob;
 use App\Mail\Campaign\CampaignWaitingForValidationMail;
 use App\Models\Auth\User;
@@ -267,5 +268,212 @@ class CampaignStatusNotificationTest extends TestCase
             return $job->campaignId === $campaign->id
                 && $job->creatorId === $creator->id;
         });
+    }
+
+    public function test_notification_sent_when_campaign_status_changes_to_validated(): void
+    {
+        Queue::fake();
+
+        // Create users
+        $creator = User::factory()->create();
+        $creator->assignRole('user');
+
+        $campaignManager = User::factory()->create();
+        $campaignManager->assignRole('campaign_manager');
+
+        // Create campaign in waiting for validation status
+        $campaign = Campaign::factory()->create([
+            'title' => 'Test Campaign',
+            'status' => CampaignStatus::WAITING_FOR_VALIDATION,
+            'created_by' => $creator->id,
+        ]);
+
+        // Clear queue from creation
+        Queue::fake();
+
+        // Update campaign status to active (validated)
+        $campaign->status = CampaignStatus::ACTIVE;
+        $campaign->save();
+
+        // Assert notification job was dispatched
+        Queue::assertPushed(SendCampaignStatusFlowNotificationJob::class, function ($job) use ($campaign, $creator) {
+            return $job->campaignId === $campaign->id;
+        });
+    }
+
+    public function test_notification_sent_when_campaign_status_changes_to_rejected(): void
+    {
+        Queue::fake();
+
+        // Create users
+        $creator = User::factory()->create();
+        $creator->assignRole('user');
+
+        $campaignManager = User::factory()->create();
+        $campaignManager->assignRole('campaign_manager');
+
+        // Create campaign in waiting for validation status
+        $campaign = Campaign::factory()->create([
+            'title' => 'Test Campaign',
+            'status' => CampaignStatus::WAITING_FOR_VALIDATION,
+            'created_by' => $creator->id,
+        ]);
+
+        // Clear queue from creation
+        Queue::fake();
+
+        // Update campaign status to rejected
+        $campaign->status = CampaignStatus::REJECTED;
+        $campaign->save();
+
+        // Assert notification job was dispatched
+        Queue::assertPushed(SendCampaignStatusFlowNotificationJob::class, function ($job) use ($campaign, $creator) {
+            return $job->campaignId === $campaign->id;
+        });
+    }
+
+    public function test_notification_not_sent_when_campaign_status_changes_from_draft_to_active(): void
+    {
+        Queue::fake();
+
+        // Create users
+        $creator = User::factory()->create();
+        $creator->assignRole('user');
+
+        // Create campaign in draft status
+        $campaign = Campaign::factory()->create([
+            'title' => 'Test Campaign',
+            'status' => CampaignStatus::DRAFT,
+            'created_by' => $creator->id,
+        ]);
+
+        // Update campaign status to active (bypassing validation flow)
+        $campaign->status = CampaignStatus::ACTIVE;
+        $campaign->save();
+
+        // Assert notification job was dispatched (because status changed to ACTIVE)
+        Queue::assertPushed(SendCampaignStatusFlowNotificationJob::class);
+    }
+
+    public function test_notification_sent_to_campaign_creator_on_validation(): void
+    {
+        Queue::fake();
+
+        // Create campaign creator
+        $creator = User::factory()->create([
+            'email' => 'creator@example.com',
+            'name' => 'Campaign Creator',
+        ]);
+        $creator->assignRole('user');
+
+        // Create campaign manager
+        $campaignManager = User::factory()->create();
+        $campaignManager->assignRole('campaign_manager');
+
+        // Create campaign in waiting for validation status
+        $campaign = Campaign::factory()->create([
+            'title' => 'Test Campaign',
+            'status' => CampaignStatus::WAITING_FOR_VALIDATION,
+            'created_by' => $creator->id,
+        ]);
+
+        // Clear queue from creation
+        Queue::fake();
+
+        // Validate campaign
+        $campaign->status = CampaignStatus::ACTIVE;
+        $campaign->save();
+
+        // Assert notification job was dispatched with correct campaign
+        Queue::assertPushed(SendCampaignStatusFlowNotificationJob::class, function ($job) use ($campaign) {
+            return $job->campaignId === $campaign->id;
+        });
+    }
+
+    public function test_notification_sent_to_campaign_creator_on_rejection(): void
+    {
+        Queue::fake();
+
+        // Create campaign creator
+        $creator = User::factory()->create([
+            'email' => 'creator@example.com',
+            'name' => 'Campaign Creator',
+        ]);
+        $creator->assignRole('user');
+
+        // Create campaign manager
+        $campaignManager = User::factory()->create();
+        $campaignManager->assignRole('campaign_manager');
+
+        // Create campaign in waiting for validation status
+        $campaign = Campaign::factory()->create([
+            'title' => 'Test Campaign',
+            'status' => CampaignStatus::WAITING_FOR_VALIDATION,
+            'created_by' => $creator->id,
+        ]);
+
+        // Clear queue from creation
+        Queue::fake();
+
+        // Reject campaign
+        $campaign->status = CampaignStatus::REJECTED;
+        $campaign->save();
+
+        // Assert notification job was dispatched with correct campaign
+        Queue::assertPushed(SendCampaignStatusFlowNotificationJob::class, function ($job) use ($campaign) {
+            return $job->campaignId === $campaign->id;
+        });
+    }
+
+    public function test_notification_not_sent_when_campaign_already_active(): void
+    {
+        Queue::fake();
+
+        // Create users
+        $creator = User::factory()->create();
+        $creator->assignRole('user');
+
+        // Create campaign already in active status
+        $campaign = Campaign::factory()->create([
+            'title' => 'Test Campaign',
+            'status' => CampaignStatus::ACTIVE,
+            'created_by' => $creator->id,
+        ]);
+
+        // Clear any queued jobs from the creation
+        Queue::fake();
+
+        // Update campaign (but status remains the same)
+        $campaign->title = 'Updated Title';
+        $campaign->save();
+
+        // Assert no notification jobs were dispatched for the update
+        Queue::assertNotPushed(SendCampaignStatusFlowNotificationJob::class);
+    }
+
+    public function test_notification_not_sent_when_campaign_already_rejected(): void
+    {
+        Queue::fake();
+
+        // Create users
+        $creator = User::factory()->create();
+        $creator->assignRole('user');
+
+        // Create campaign already in rejected status
+        $campaign = Campaign::factory()->create([
+            'title' => 'Test Campaign',
+            'status' => CampaignStatus::REJECTED,
+            'created_by' => $creator->id,
+        ]);
+
+        // Clear any queued jobs from the creation
+        Queue::fake();
+
+        // Update campaign (but status remains the same)
+        $campaign->title = 'Updated Title';
+        $campaign->save();
+
+        // Assert no notification jobs were dispatched for the update
+        Queue::assertNotPushed(SendCampaignStatusFlowNotificationJob::class);
     }
 }
