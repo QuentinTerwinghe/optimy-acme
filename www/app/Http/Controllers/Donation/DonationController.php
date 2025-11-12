@@ -55,7 +55,9 @@ class DonationController extends Controller
             }
 
             // Get authenticated user
-            $user = auth()->user();
+            if (empty($user = auth()->user())) {
+                return redirect()->route('login.form');
+            }
 
             // Authorize: check if user can create a donation using injected policy
             if (!$this->donationPolicy->create($user, $campaign)) {

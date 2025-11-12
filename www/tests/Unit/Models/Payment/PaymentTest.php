@@ -193,8 +193,9 @@ class PaymentTest extends TestCase
         $payment->refresh();
 
         // Assert
-        $this->assertIsFloat($payment->amount);
-        $this->assertEquals(123.45, $payment->amount);
+        // Amount is cast as decimal:2, which returns a string to preserve precision (important for financial data)
+        $this->assertIsString($payment->amount);
+        $this->assertEquals('123.45', $payment->amount);
         $this->assertIsArray($payment->metadata);
         $this->assertEquals(['key' => 'value'], $payment->metadata);
         $this->assertInstanceOf(PaymentMethodEnum::class, $payment->payment_method);
