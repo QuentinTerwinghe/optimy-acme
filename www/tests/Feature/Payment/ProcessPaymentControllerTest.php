@@ -81,7 +81,7 @@ class ProcessPaymentControllerTest extends TestCase
         $this->assertEquals(PaymentMethodEnum::FAKE->value, $responseData['payment']['payment_method']);
         $this->assertEquals(PaymentStatusEnum::PENDING->value, $responseData['payment']['status']);
         $this->assertNotNull($responseData['redirect_url']);
-        $this->assertStringContainsString('/payment/fake/checkout/', $responseData['redirect_url']);
+        $this->assertStringContainsString('/payment/fake/', $responseData['redirect_url']);
 
         // Assert database records
         $this->assertDatabaseHas('donations', [

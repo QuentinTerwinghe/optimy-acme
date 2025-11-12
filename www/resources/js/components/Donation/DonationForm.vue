@@ -354,17 +354,21 @@ const handleContinueToPayment = async () => {
         });
 
         if (response.data.success) {
-            const { donation, payment } = response.data.data;
+            const { donation, payment, redirect_url } = response.data.data;
 
             // Log success for debugging
-            console.log('Payment initialized successfully:', { donation, payment });
+            console.log('Payment initialized successfully:', { donation, payment, redirect_url });
 
-            // TODO: Redirect to next step of payment processing
-            // For now, show success message
-            alert(`Payment initialized! Donation ID: ${donation.id}, Payment ID: ${payment.id}`);
+            // Open the redirect URL in a new window
+            if (redirect_url) {
+                const paymentWindow = window.open(redirect_url, '_blank', 'width=800,height=600,resizable=yes,scrollbars=yes');
 
-            // In the future, you would redirect to a payment processing page:
-            // window.location.href = `/payments/${payment.id}/process`;
+                if (!paymentWindow) {
+                    errorMessage.value = 'Please allow pop-ups to continue with payment';
+                }
+            } else {
+                errorMessage.value = 'No redirect URL received from server';
+            }
         } else {
             errorMessage.value = response.data.message || 'Failed to initialize payment';
         }

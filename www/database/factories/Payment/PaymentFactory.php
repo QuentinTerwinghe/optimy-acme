@@ -75,7 +75,7 @@ class PaymentFactory extends Factory
                 'session_id' => 'FAKE_SESSION_' . strtoupper($this->faker->bothify('??##??##??##??##')),
                 'gateway' => 'fake',
             ],
-            'redirect_url' => 'https://fake-gateway.example.com/checkout/' . $this->faker->uuid(),
+            'redirect_url' => 'https://fake-gateway.example.com/show/' . $this->faker->uuid(),
             'prepared_at' => now(),
             'initiated_at' => now(),
         ]);

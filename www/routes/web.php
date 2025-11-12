@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\Campaign\CampaignController;
 use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\Donation\DonationController;
+use App\Http\Controllers\Payment\FakePaymentController;
 use Illuminate\Support\Facades\Route;
 
 // Redirect root to login
@@ -66,13 +67,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/campaigns/{campaignId}/donate', [DonationController::class, 'create'])
         ->name('donations.create');
 
-    // Payment Routes (Fake Gateway Checkout - for testing/development)
-    // This is a placeholder route for the fake payment gateway
-    // In a real implementation, this would display a checkout page
-    Route::get('/payment/fake/checkout/{payment}/{session}', function () {
-        return response()->json([
-            'message' => 'Fake payment checkout page',
-            'note' => 'This is a placeholder for the fake payment gateway checkout',
-        ]);
-    })->name('payment.fake.checkout');
+    // Payment Routes (Fake Gateway - for testing/development)
+    Route::get('/payment/fake/{payment}/{session?}', [FakePaymentController::class, 'show'])
+        ->name('payment.fake.show');
 });

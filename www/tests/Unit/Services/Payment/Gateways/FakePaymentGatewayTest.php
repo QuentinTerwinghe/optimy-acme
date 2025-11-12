@@ -255,6 +255,6 @@ class FakePaymentGatewayTest extends TestCase
         $this->assertArrayHasKey('currency', $result->payload);
         $this->assertArrayHasKey('gateway', $result->payload);
         $this->assertEquals('fake', $result->payload['gateway']);
-        $this->assertStringContainsString('/payment/fake/checkout/', $result->redirectUrl);
+        $this->assertStringContainsString('/payment/fake/', $result->redirectUrl);
     }
 }

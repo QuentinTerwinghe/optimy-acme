@@ -14,6 +14,7 @@ import CampaignShow from './components/Campaign/CampaignShow.vue';
 import TagInput from './components/Common/TagInput.vue';
 import DonationForm from './components/Donation/DonationForm.vue';
 import PaymentMethodSelector from './components/Donation/PaymentMethodSelector.vue';
+import FakePaymentService from './components/Payment/FakePaymentService.vue';
 
 // Create Vue app
 const app = createApp({
@@ -41,6 +42,7 @@ app.component('campaign-show', CampaignShow);
 app.component('tag-input', TagInput);
 app.component('donation-form', DonationForm);
 app.component('payment-method-selector', PaymentMethodSelector);
+app.component('fake-payment-service', FakePaymentService);
 
 // Mount the app
 app.mount('#app');

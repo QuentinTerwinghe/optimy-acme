@@ -60,7 +60,7 @@ class PaymentPreparationServiceTest extends TestCase
             'session_id' => 'TEST_SESSION_123',
             'gateway' => 'test',
         ];
-        $expectedRedirectUrl = 'https://test-gateway.com/checkout/123';
+        $expectedRedirectUrl = 'https://test-gateway.com/show/123';
 
         $mockHandler->expects($this->once())
             ->method('prepare')

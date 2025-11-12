@@ -120,8 +120,8 @@ class FakePaymentGateway extends AbstractPaymentGateway implements PaymentMethod
         ];
 
         // Generate the redirect URL where the user will complete payment
-        // In a real implementation, this would be the gateway's checkout URL
-        $redirectUrl = route('payment.fake.checkout', [
+        // In a real implementation, this would be the gateway's show URL
+        $redirectUrl = route('payment.fake.show', [
             'payment' => $payment->id,
             'session' => $sessionId,
         ]);
