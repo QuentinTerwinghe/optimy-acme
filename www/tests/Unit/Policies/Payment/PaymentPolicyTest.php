@@ -12,6 +12,7 @@ use App\Models\Donation\Donation;
 use App\Models\Payment\Payment;
 use App\Policies\Payment\PaymentPolicy;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class PaymentPolicyTest extends TestCase
@@ -35,9 +36,7 @@ class PaymentPolicyTest extends TestCase
     // ACCESS METHOD TESTS (for fake payment page)
     // ============================================================
 
-    /**
-     * @test
-     */
+    #[Test]
     public function access_allows_when_all_conditions_are_met(): void
     {
         // Arrange
@@ -59,9 +58,7 @@ class PaymentPolicyTest extends TestCase
         $this->assertTrue($result);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function access_denies_when_payment_does_not_belong_to_user(): void
     {
         // Arrange
@@ -84,9 +81,7 @@ class PaymentPolicyTest extends TestCase
         $this->assertFalse($result);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function access_denies_when_payment_status_is_not_pending(): void
     {
         // Arrange
@@ -108,9 +103,7 @@ class PaymentPolicyTest extends TestCase
         $this->assertFalse($result);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function access_denies_when_payment_method_is_not_fake(): void
     {
         // Arrange
@@ -132,9 +125,7 @@ class PaymentPolicyTest extends TestCase
         $this->assertFalse($result);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function access_denies_when_payment_is_failed(): void
     {
         // Arrange
@@ -156,9 +147,7 @@ class PaymentPolicyTest extends TestCase
         $this->assertFalse($result);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function access_denies_when_payment_is_processing(): void
     {
         // Arrange
@@ -184,9 +173,7 @@ class PaymentPolicyTest extends TestCase
     // VIEW METHOD TESTS (for payment result page)
     // ============================================================
 
-    /**
-     * @test
-     */
+    #[Test]
     public function view_allows_when_payment_is_completed_and_belongs_to_user(): void
     {
         // Arrange
@@ -208,9 +195,7 @@ class PaymentPolicyTest extends TestCase
         $this->assertTrue($result);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function view_allows_when_payment_is_failed_and_belongs_to_user(): void
     {
         // Arrange
@@ -232,9 +217,7 @@ class PaymentPolicyTest extends TestCase
         $this->assertTrue($result);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function view_denies_when_payment_does_not_belong_to_user(): void
     {
         // Arrange
@@ -257,9 +240,7 @@ class PaymentPolicyTest extends TestCase
         $this->assertFalse($result);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function view_denies_when_payment_status_is_pending(): void
     {
         // Arrange
@@ -281,9 +262,7 @@ class PaymentPolicyTest extends TestCase
         $this->assertFalse($result);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function view_denies_when_payment_status_is_processing(): void
     {
         // Arrange
@@ -305,9 +284,7 @@ class PaymentPolicyTest extends TestCase
         $this->assertFalse($result);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function view_denies_when_payment_status_is_refunded(): void
     {
         // Arrange
@@ -329,9 +306,7 @@ class PaymentPolicyTest extends TestCase
         $this->assertFalse($result);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function view_denies_when_payment_has_no_donation(): void
     {
         // Arrange - Create a payment with a donation first
@@ -357,9 +332,7 @@ class PaymentPolicyTest extends TestCase
         $this->assertFalse($result);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function view_denies_when_different_user_tries_to_access_completed_payment(): void
     {
         // Arrange
@@ -382,9 +355,7 @@ class PaymentPolicyTest extends TestCase
         $this->assertFalse($result);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function view_denies_when_different_user_tries_to_access_failed_payment(): void
     {
         // Arrange
@@ -407,9 +378,7 @@ class PaymentPolicyTest extends TestCase
         $this->assertFalse($result);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function view_works_with_different_payment_methods(): void
     {
         // Test with PayPal
@@ -436,9 +405,7 @@ class PaymentPolicyTest extends TestCase
         $this->assertTrue($this->policy->view($this->user, $creditCardPayment));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function access_denies_when_payment_has_no_donation(): void
     {
         // Arrange - Create a payment with a donation first
@@ -468,9 +435,7 @@ class PaymentPolicyTest extends TestCase
     // PROCESS CALLBACK METHOD TESTS (for payment callback processing)
     // ============================================================
 
-    /**
-     * @test
-     */
+    #[Test]
     public function processCallback_allows_when_payment_is_pending_and_belongs_to_user(): void
     {
         // Arrange
@@ -492,9 +457,7 @@ class PaymentPolicyTest extends TestCase
         $this->assertTrue($result);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function processCallback_allows_pending_payment_with_different_payment_methods(): void
     {
         // Test with PayPal
@@ -521,9 +484,7 @@ class PaymentPolicyTest extends TestCase
         $this->assertTrue($this->policy->processCallback($this->user, $creditCardPayment));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function processCallback_denies_when_payment_does_not_belong_to_user(): void
     {
         // Arrange
@@ -546,9 +507,7 @@ class PaymentPolicyTest extends TestCase
         $this->assertFalse($result);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function processCallback_denies_when_payment_status_is_completed(): void
     {
         // Arrange
@@ -570,9 +529,7 @@ class PaymentPolicyTest extends TestCase
         $this->assertFalse($result);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function processCallback_denies_when_payment_status_is_failed(): void
     {
         // Arrange
@@ -594,9 +551,7 @@ class PaymentPolicyTest extends TestCase
         $this->assertFalse($result);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function processCallback_denies_when_payment_status_is_processing(): void
     {
         // Arrange
@@ -618,9 +573,7 @@ class PaymentPolicyTest extends TestCase
         $this->assertFalse($result);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function processCallback_denies_when_payment_status_is_refunded(): void
     {
         // Arrange
@@ -642,9 +595,7 @@ class PaymentPolicyTest extends TestCase
         $this->assertFalse($result);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function processCallback_denies_when_payment_has_no_donation(): void
     {
         // Arrange - Create a payment with a donation first
@@ -670,9 +621,7 @@ class PaymentPolicyTest extends TestCase
         $this->assertFalse($result);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function processCallback_denies_when_different_user_tries_to_process_pending_payment(): void
     {
         // Arrange
@@ -695,9 +644,7 @@ class PaymentPolicyTest extends TestCase
         $this->assertFalse($result);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function processCallback_prevents_double_processing_of_completed_payment(): void
     {
         // Arrange - Simulate a completed payment being triggered again
@@ -720,9 +667,7 @@ class PaymentPolicyTest extends TestCase
         $this->assertFalse($result, 'Should prevent double processing of completed payment');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function processCallback_prevents_reprocessing_of_failed_payment(): void
     {
         // Arrange - Simulate a failed payment being triggered again

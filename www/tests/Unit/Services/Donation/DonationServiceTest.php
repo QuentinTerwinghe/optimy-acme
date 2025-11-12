@@ -8,6 +8,7 @@ use App\Enums\Common\Currency;
 use App\Models\Campaign\Campaign;
 use App\Services\Donation\DonationService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class DonationServiceTest extends TestCase
@@ -23,9 +24,7 @@ class DonationServiceTest extends TestCase
         $this->service = new DonationService();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_returns_donation_page_data_for_campaign(): void
     {
         // Arrange
@@ -53,9 +52,7 @@ class DonationServiceTest extends TestCase
         $this->assertEquals('250.00', $campaignData['current_amount']);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_returns_standard_quick_donation_amounts(): void
     {
         // Arrange
@@ -71,9 +68,7 @@ class DonationServiceTest extends TestCase
         $this->assertEquals([5, 10, 20, 50, 100], $result);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_returns_quick_amounts_for_different_currencies(): void
     {
         // Arrange - EUR

@@ -10,6 +10,7 @@ use App\Models\Auth\User;
 use App\Models\Campaign\Campaign;
 use App\Models\Campaign\Category;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
@@ -70,7 +71,7 @@ class CampaignEditTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_edit_own_draft_campaign(): void
     {
         $response = $this->actingAs($this->regularUser)
@@ -84,7 +85,7 @@ class CampaignEditTest extends TestCase
         $response->assertViewHas('currencies');
     }
 
-    /** @test */
+    #[Test]
     public function user_can_edit_own_waiting_for_validation_campaign(): void
     {
         $response = $this->actingAs($this->regularUser)
@@ -95,7 +96,7 @@ class CampaignEditTest extends TestCase
         $response->assertViewHas('campaign');
     }
 
-    /** @test */
+    #[Test]
     public function user_cannot_edit_own_active_campaign(): void
     {
         $response = $this->actingAs($this->regularUser)
@@ -105,7 +106,7 @@ class CampaignEditTest extends TestCase
         $response->assertSessionHas('error', 'You are not authorized to edit this campaign or the campaign cannot be edited in its current status.');
     }
 
-    /** @test */
+    #[Test]
     public function user_cannot_edit_campaign_created_by_another_user(): void
     {
         $otherUser = User::factory()->create();
@@ -124,7 +125,7 @@ class CampaignEditTest extends TestCase
         $response->assertSessionHas('error');
     }
 
-    /** @test */
+    #[Test]
     public function campaign_manager_can_edit_any_draft_campaign(): void
     {
         $response = $this->actingAs($this->campaignManager)
@@ -135,7 +136,7 @@ class CampaignEditTest extends TestCase
         $response->assertViewHas('campaign');
     }
 
-    /** @test */
+    #[Test]
     public function campaign_manager_can_edit_any_waiting_for_validation_campaign(): void
     {
         $response = $this->actingAs($this->campaignManager)
@@ -146,7 +147,7 @@ class CampaignEditTest extends TestCase
         $response->assertViewHas('campaign');
     }
 
-    /** @test */
+    #[Test]
     public function campaign_manager_cannot_edit_active_campaign(): void
     {
         $response = $this->actingAs($this->campaignManager)
@@ -156,7 +157,7 @@ class CampaignEditTest extends TestCase
         $response->assertSessionHas('error');
     }
 
-    /** @test */
+    #[Test]
     public function guest_user_cannot_access_edit_page(): void
     {
         $response = $this->get(route('campaigns.edit', ['id' => $this->draftCampaign->id]));
@@ -164,7 +165,7 @@ class CampaignEditTest extends TestCase
         $response->assertRedirect(route('login.form'));
     }
 
-    /** @test */
+    #[Test]
     public function edit_page_returns_404_for_nonexistent_campaign(): void
     {
         $this->actingAs($this->regularUser)
@@ -172,7 +173,7 @@ class CampaignEditTest extends TestCase
             ->assertStatus(404);
     }
 
-    /** @test */
+    #[Test]
     public function user_cannot_edit_completed_campaign(): void
     {
         $completedCampaign = Campaign::factory()->create([
@@ -188,7 +189,7 @@ class CampaignEditTest extends TestCase
         $response->assertSessionHas('error');
     }
 
-    /** @test */
+    #[Test]
     public function user_cannot_edit_cancelled_campaign(): void
     {
         $cancelledCampaign = Campaign::factory()->create([
@@ -204,7 +205,7 @@ class CampaignEditTest extends TestCase
         $response->assertSessionHas('error');
     }
 
-    /** @test */
+    #[Test]
     public function edit_page_loads_campaign_data_correctly(): void
     {
         $response = $this->actingAs($this->regularUser)
@@ -219,7 +220,7 @@ class CampaignEditTest extends TestCase
         $this->assertEquals($this->draftCampaign->description, $viewCampaign->description);
     }
 
-    /** @test */
+    #[Test]
     public function edit_page_loads_all_active_categories(): void
     {
         // Create additional categories
@@ -236,7 +237,7 @@ class CampaignEditTest extends TestCase
         $this->assertCount(4, $categories); // 1 from setUp + 3 created here
     }
 
-    /** @test */
+    #[Test]
     public function user_without_edit_permission_cannot_edit_campaign(): void
     {
         // Create a user without any permissions
@@ -249,7 +250,7 @@ class CampaignEditTest extends TestCase
         $response->assertSessionHas('error');
     }
 
-    /** @test */
+    #[Test]
     public function edit_page_passes_user_permissions_for_regular_user(): void
     {
         $response = $this->actingAs($this->regularUser)
@@ -268,7 +269,7 @@ class CampaignEditTest extends TestCase
         $this->assertStringNotContainsString(CampaignPermissions::MANAGE_ALL_CAMPAIGNS->value, $content);
     }
 
-    /** @test */
+    #[Test]
     public function edit_page_passes_user_permissions_for_campaign_manager(): void
     {
         $response = $this->actingAs($this->campaignManager)
@@ -284,7 +285,7 @@ class CampaignEditTest extends TestCase
         $this->assertStringContainsString(CampaignPermissions::MANAGE_ALL_CAMPAIGNS->value, $content);
     }
 
-    /** @test */
+    #[Test]
     public function edit_page_passes_campaign_status_to_component(): void
     {
         // Test with draft campaign
@@ -308,7 +309,7 @@ class CampaignEditTest extends TestCase
         $this->assertStringContainsString(CampaignStatus::WAITING_FOR_VALIDATION->value, $content);
     }
 
-    /** @test */
+    #[Test]
     public function validate_button_logic_for_draft_campaign(): void
     {
         // Campaign manager editing a draft campaign should NOT see validate button
@@ -326,7 +327,7 @@ class CampaignEditTest extends TestCase
         $this->assertStringContainsString(CampaignStatus::DRAFT->value, $content);
     }
 
-    /** @test */
+    #[Test]
     public function validate_button_logic_for_waiting_for_validation_campaign(): void
     {
         // Campaign manager editing a waiting_for_validation campaign SHOULD see validate button
@@ -343,7 +344,7 @@ class CampaignEditTest extends TestCase
         $this->assertStringContainsString(CampaignStatus::WAITING_FOR_VALIDATION->value, $content);
     }
 
-    /** @test */
+    #[Test]
     public function regular_user_does_not_see_validate_button_even_on_waiting_campaign(): void
     {
         // Regular user editing a waiting_for_validation campaign should NOT see validate button

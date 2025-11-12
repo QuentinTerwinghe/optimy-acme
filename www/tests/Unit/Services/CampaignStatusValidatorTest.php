@@ -10,6 +10,7 @@ use App\Enums\Common\Currency;
 use App\Models\Campaign\Campaign;
 use App\Services\Campaign\CampaignStatusValidator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 /**
@@ -29,7 +30,7 @@ class CampaignStatusValidatorTest extends TestCase
         $this->validator = new CampaignStatusValidator();
     }
 
-    /** @test */
+    #[Test]
     public function it_allows_valid_transition_from_draft_to_waiting_with_all_fields(): void
     {
         $campaign = Campaign::factory()->create(['status' => CampaignStatus::DRAFT]);
@@ -52,7 +53,7 @@ class CampaignStatusValidatorTest extends TestCase
         $this->assertTrue(true);
     }
 
-    /** @test */
+    #[Test]
     public function it_rejects_transition_from_draft_to_waiting_without_required_fields(): void
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -75,7 +76,7 @@ class CampaignStatusValidatorTest extends TestCase
         $this->validator->validateStatusTransition($campaign, CampaignStatus::WAITING_FOR_VALIDATION, $dto);
     }
 
-    /** @test */
+    #[Test]
     public function it_allows_transition_to_active_when_fields_exist_in_campaign(): void
     {
         $campaign = Campaign::factory()->create([
@@ -104,7 +105,7 @@ class CampaignStatusValidatorTest extends TestCase
         $this->assertTrue(true);
     }
 
-    /** @test */
+    #[Test]
     public function it_rejects_transition_to_active_when_fields_missing_in_both_dto_and_campaign(): void
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -133,7 +134,7 @@ class CampaignStatusValidatorTest extends TestCase
         $this->validator->validateStatusTransition($campaign, CampaignStatus::ACTIVE, $dto);
     }
 
-    /** @test */
+    #[Test]
     public function it_does_not_validate_when_status_is_not_changing(): void
     {
         $campaign = Campaign::factory()->create(['status' => CampaignStatus::DRAFT]);
@@ -156,7 +157,7 @@ class CampaignStatusValidatorTest extends TestCase
         $this->assertTrue(true);
     }
 
-    /** @test */
+    #[Test]
     public function it_does_not_validate_transitions_to_other_statuses(): void
     {
         $campaign = Campaign::factory()->create(['status' => CampaignStatus::ACTIVE]);
@@ -179,7 +180,7 @@ class CampaignStatusValidatorTest extends TestCase
         $this->assertTrue(true);
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_required_fields_for_validated_statuses(): void
     {
         $fields = $this->validator->getRequiredFieldsForStatus(CampaignStatus::ACTIVE);
@@ -190,7 +191,7 @@ class CampaignStatusValidatorTest extends TestCase
         $this->assertArrayHasKey('end_date', $fields);
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_empty_array_for_non_validated_statuses(): void
     {
         $fields = $this->validator->getRequiredFieldsForStatus(CampaignStatus::DRAFT);
@@ -198,7 +199,7 @@ class CampaignStatusValidatorTest extends TestCase
         $this->assertEmpty($fields);
     }
 
-    /** @test */
+    #[Test]
     public function it_correctly_identifies_statuses_requiring_validation(): void
     {
         $this->assertTrue($this->validator->requiresValidation(CampaignStatus::WAITING_FOR_VALIDATION));

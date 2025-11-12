@@ -8,6 +8,7 @@ use App\Enums\Campaign\CampaignStatus;
 use App\Models\Auth\User;
 use App\Models\Campaign\Campaign;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class DonationCreateTest extends TestCase
@@ -23,9 +24,7 @@ class DonationCreateTest extends TestCase
         $this->user = User::factory()->create();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_shows_donation_page_for_active_campaign(): void
     {
         // Arrange
@@ -46,9 +45,7 @@ class DonationCreateTest extends TestCase
         $response->assertViewHas('quickAmounts', [5, 10, 20, 50, 100]);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_redirects_with_error_when_campaign_is_not_active(): void
     {
         // Arrange
@@ -65,9 +62,7 @@ class DonationCreateTest extends TestCase
         $response->assertSessionHas('error', 'This campaign is not accepting donations at this time.');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_redirects_when_campaign_is_waiting_for_validation(): void
     {
         // Arrange
@@ -84,9 +79,7 @@ class DonationCreateTest extends TestCase
         $response->assertSessionHas('error');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_redirects_when_campaign_is_rejected(): void
     {
         // Arrange
@@ -103,9 +96,7 @@ class DonationCreateTest extends TestCase
         $response->assertSessionHas('error');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_redirects_when_campaign_is_completed(): void
     {
         // Arrange
@@ -122,9 +113,7 @@ class DonationCreateTest extends TestCase
         $response->assertSessionHas('error');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_redirects_when_campaign_is_cancelled(): void
     {
         // Arrange
@@ -141,9 +130,7 @@ class DonationCreateTest extends TestCase
         $response->assertSessionHas('error');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_redirects_to_dashboard_when_campaign_not_found(): void
     {
         // Act
@@ -155,9 +142,7 @@ class DonationCreateTest extends TestCase
         $response->assertSessionHas('error', 'Campaign not found.');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_requires_authentication_to_access_donation_page(): void
     {
         // Arrange

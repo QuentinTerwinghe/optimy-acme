@@ -8,6 +8,7 @@ use App\Enums\Campaign\CampaignStatus;
 use App\Models\Campaign\Campaign;
 use App\Repositories\Campaign\CampaignRepository;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 /**
@@ -27,7 +28,7 @@ class CampaignRepositoryTest extends TestCase
         $this->repository = new CampaignRepository();
     }
 
-    /** @test */
+    #[Test]
     public function it_can_create_a_campaign(): void
     {
         $data = [
@@ -43,7 +44,7 @@ class CampaignRepositoryTest extends TestCase
         $this->assertDatabaseHas('campaigns', ['title' => 'Test Campaign']);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_find_a_campaign_by_id(): void
     {
         $campaign = Campaign::factory()->create(['title' => 'Find Me']);
@@ -54,7 +55,7 @@ class CampaignRepositoryTest extends TestCase
         $this->assertEquals('Find Me', $found->title);
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_null_when_campaign_not_found(): void
     {
         $found = $this->repository->find('non-existent-id');
@@ -62,7 +63,7 @@ class CampaignRepositoryTest extends TestCase
         $this->assertNull($found);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_find_campaign_with_relations(): void
     {
         $campaign = Campaign::factory()->create();
@@ -73,7 +74,7 @@ class CampaignRepositoryTest extends TestCase
         $this->assertTrue($found->relationLoaded('category'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_update_a_campaign(): void
     {
         $campaign = Campaign::factory()->create(['title' => 'Original Title']);
@@ -84,7 +85,7 @@ class CampaignRepositoryTest extends TestCase
         $this->assertEquals('Updated Title', $campaign->fresh()->title);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_delete_a_campaign(): void
     {
         $campaign = Campaign::factory()->create();
@@ -96,7 +97,7 @@ class CampaignRepositoryTest extends TestCase
         $this->assertDatabaseMissing('campaigns', ['id' => $campaignId]);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_get_all_campaigns(): void
     {
         Campaign::factory()->count(3)->create();
@@ -106,7 +107,7 @@ class CampaignRepositoryTest extends TestCase
         $this->assertCount(3, $campaigns);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_get_campaigns_by_status(): void
     {
         Campaign::factory()->count(2)->create(['status' => CampaignStatus::ACTIVE]);
@@ -118,7 +119,7 @@ class CampaignRepositoryTest extends TestCase
         $this->assertTrue($activeCampaigns->every(fn ($c) => $c->status === CampaignStatus::ACTIVE));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_count_campaigns_by_status(): void
     {
         Campaign::factory()->count(3)->create(['status' => CampaignStatus::COMPLETED]);
@@ -129,7 +130,7 @@ class CampaignRepositoryTest extends TestCase
         $this->assertEquals(3, $count);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_count_active_campaigns(): void
     {
         // Active campaign (within date range)
@@ -158,7 +159,7 @@ class CampaignRepositoryTest extends TestCase
         $this->assertEquals(1, $count);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_sum_field_by_status(): void
     {
         Campaign::factory()->create([
@@ -184,7 +185,7 @@ class CampaignRepositoryTest extends TestCase
         $this->assertEquals(300.0, $sum);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_get_aggregated_funding_data(): void
     {
         Campaign::factory()->create([

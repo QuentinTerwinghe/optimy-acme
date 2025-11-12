@@ -9,6 +9,7 @@ use App\Models\Auth\User;
 use App\Models\Campaign\Campaign;
 use App\Policies\Donation\DonationPolicy;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class DonationPolicyTest extends TestCase
@@ -26,9 +27,7 @@ class DonationPolicyTest extends TestCase
         $this->user = User::factory()->create();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_allows_donation_when_campaign_is_active(): void
     {
         // Arrange
@@ -43,9 +42,7 @@ class DonationPolicyTest extends TestCase
         $this->assertTrue($result);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_denies_donation_when_campaign_is_draft(): void
     {
         // Arrange
@@ -60,9 +57,7 @@ class DonationPolicyTest extends TestCase
         $this->assertFalse($result);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_denies_donation_when_campaign_is_waiting_for_validation(): void
     {
         // Arrange
@@ -77,9 +72,7 @@ class DonationPolicyTest extends TestCase
         $this->assertFalse($result);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_denies_donation_when_campaign_is_rejected(): void
     {
         // Arrange
@@ -94,9 +87,7 @@ class DonationPolicyTest extends TestCase
         $this->assertFalse($result);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_denies_donation_when_campaign_is_completed(): void
     {
         // Arrange
@@ -111,9 +102,7 @@ class DonationPolicyTest extends TestCase
         $this->assertFalse($result);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_denies_donation_when_campaign_is_cancelled(): void
     {
         // Arrange

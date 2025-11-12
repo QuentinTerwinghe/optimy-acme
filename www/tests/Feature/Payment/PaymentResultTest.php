@@ -10,6 +10,7 @@ use App\Models\Campaign\Campaign;
 use App\Models\Donation\Donation;
 use App\Models\Payment\Payment;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class PaymentResultTest extends TestCase
@@ -80,7 +81,7 @@ class PaymentResultTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_displays_success_view_for_completed_payment(): void
     {
         $response = $this->actingAs($this->user)->get(route('payment.result', ['payment' => $this->successfulPayment->id]));
@@ -89,7 +90,7 @@ class PaymentResultTest extends TestCase
         $response->assertViewIs('payment.success');
     }
 
-    /** @test */
+    #[Test]
     public function it_displays_failure_view_for_failed_payment(): void
     {
         $response = $this->actingAs($this->user)->get(route('payment.result', ['payment' => $this->failedPayment->id]));
@@ -98,7 +99,7 @@ class PaymentResultTest extends TestCase
         $response->assertViewIs('payment.failure');
     }
 
-    /** @test */
+    #[Test]
     public function it_passes_correct_data_to_success_view(): void
     {
         $response = $this->actingAs($this->user)->get(route('payment.result', ['payment' => $this->successfulPayment->id]));
@@ -126,7 +127,7 @@ class PaymentResultTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_passes_correct_data_to_failure_view(): void
     {
         $response = $this->actingAs($this->user)->get(route('payment.result', ['payment' => $this->failedPayment->id]));
@@ -155,7 +156,7 @@ class PaymentResultTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_requires_authentication_to_view_result_page(): void
     {
         $response = $this->get(route('payment.result', ['payment' => $this->successfulPayment->id]));
@@ -163,7 +164,7 @@ class PaymentResultTest extends TestCase
         $response->assertRedirect(route('login.form'));
     }
 
-    /** @test */
+    #[Test]
     public function it_handles_payment_not_found(): void
     {
         $response = $this->actingAs($this->user)->get(route('payment.result', ['payment' => 'non-existent-id']));
@@ -171,7 +172,7 @@ class PaymentResultTest extends TestCase
         $response->assertStatus(404);
     }
 
-    /** @test */
+    #[Test]
     public function result_page_loads_all_required_relationships(): void
     {
         $response = $this->actingAs($this->user)->get(route('payment.result', ['payment' => $this->successfulPayment->id]));
@@ -185,7 +186,7 @@ class PaymentResultTest extends TestCase
         $this->assertTrue($payment->donation->relationLoaded('user'));
     }
 
-    /** @test */
+    #[Test]
     public function callback_redirects_to_result_page_on_successful_payment(): void
     {
         // Create a new pending donation and payment for this test
@@ -220,7 +221,7 @@ class PaymentResultTest extends TestCase
         $response->assertSessionHas('success', 'Payment completed successfully!');
     }
 
-    /** @test */
+    #[Test]
     public function callback_redirects_to_result_page_on_failed_payment(): void
     {
         // Create a new pending donation and payment for this test
@@ -256,7 +257,7 @@ class PaymentResultTest extends TestCase
         $response->assertSessionHas('error', 'Card declined');
     }
 
-    /** @test */
+    #[Test]
     public function it_prevents_url_manipulation_by_checking_actual_payment_status(): void
     {
         // This is the key security test: even though a user might try to access
@@ -276,7 +277,7 @@ class PaymentResultTest extends TestCase
         $response->assertViewIs('payment.success');  // Not failure!
     }
 
-    /** @test */
+    #[Test]
     public function callback_handler_returns_correct_redirect_route(): void
     {
         // This test verifies that the FakePaymentCallbackHandler returns the correct result route
@@ -316,7 +317,7 @@ class PaymentResultTest extends TestCase
     // AUTHORIZATION TESTS
     // ============================================================
 
-    /** @test */
+    #[Test]
     public function it_denies_access_to_payment_result_belonging_to_different_user(): void
     {
         // Create another user
@@ -332,7 +333,7 @@ class PaymentResultTest extends TestCase
         $response->assertStatus(403);
     }
 
-    /** @test */
+    #[Test]
     public function it_denies_access_to_payment_with_pending_status(): void
     {
         // Create a pending payment
@@ -358,7 +359,7 @@ class PaymentResultTest extends TestCase
         $response->assertStatus(403);
     }
 
-    /** @test */
+    #[Test]
     public function it_denies_access_to_payment_with_processing_status(): void
     {
         // Create a processing payment
@@ -384,7 +385,7 @@ class PaymentResultTest extends TestCase
         $response->assertStatus(403);
     }
 
-    /** @test */
+    #[Test]
     public function it_denies_access_to_payment_with_refunded_status(): void
     {
         // Create a refunded payment
@@ -411,7 +412,7 @@ class PaymentResultTest extends TestCase
         $response->assertStatus(403);
     }
 
-    /** @test */
+    #[Test]
     public function it_allows_owner_to_view_their_own_completed_payment(): void
     {
         // The user should be able to view their own completed payment
@@ -421,7 +422,7 @@ class PaymentResultTest extends TestCase
         $response->assertViewIs('payment.success');
     }
 
-    /** @test */
+    #[Test]
     public function it_allows_owner_to_view_their_own_failed_payment(): void
     {
         // The user should be able to view their own failed payment

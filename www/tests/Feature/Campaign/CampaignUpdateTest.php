@@ -11,6 +11,7 @@ use App\Models\Campaign\Campaign;
 use App\Models\Campaign\Category;
 use App\Models\Campaign\Tag;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
@@ -72,7 +73,7 @@ class CampaignUpdateTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_update_own_draft_campaign_with_draft_status(): void
     {
         $updateData = [
@@ -99,7 +100,7 @@ class CampaignUpdateTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_update_own_draft_campaign_to_waiting_for_validation(): void
     {
         $updateData = [
@@ -127,7 +128,7 @@ class CampaignUpdateTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_update_own_waiting_for_validation_campaign(): void
     {
         $updateData = [
@@ -148,7 +149,7 @@ class CampaignUpdateTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function user_cannot_update_own_active_campaign(): void
     {
         $updateData = [
@@ -166,7 +167,7 @@ class CampaignUpdateTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function user_cannot_update_campaign_created_by_another_user(): void
     {
         $otherUser = User::factory()->create();
@@ -187,7 +188,7 @@ class CampaignUpdateTest extends TestCase
         $response->assertStatus(403);
     }
 
-    /** @test */
+    #[Test]
     public function campaign_manager_can_update_any_draft_campaign(): void
     {
         $updateData = [
@@ -207,7 +208,7 @@ class CampaignUpdateTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function update_campaign_with_tags(): void
     {
         // Create some existing tags
@@ -232,7 +233,7 @@ class CampaignUpdateTest extends TestCase
         $this->assertTrue($updatedCampaign->tags->contains('name', 'NewTag2'));
     }
 
-    /** @test */
+    #[Test]
     public function update_campaign_can_change_category(): void
     {
         $newCategory = Category::factory()->create(['is_active' => true]);
@@ -254,7 +255,7 @@ class CampaignUpdateTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function guest_user_cannot_update_campaign(): void
     {
         $updateData = [
@@ -266,7 +267,7 @@ class CampaignUpdateTest extends TestCase
         $response->assertStatus(401);
     }
 
-    /** @test */
+    #[Test]
     public function update_returns_404_for_nonexistent_campaign(): void
     {
         $updateData = [
@@ -279,7 +280,7 @@ class CampaignUpdateTest extends TestCase
         $response->assertStatus(404);
     }
 
-    /** @test */
+    #[Test]
     public function validation_fails_when_updating_to_waiting_for_validation_without_required_fields(): void
     {
         $updateData = [
@@ -295,7 +296,7 @@ class CampaignUpdateTest extends TestCase
         $response->assertJsonValidationErrors(['goal_amount', 'currency', 'start_date', 'end_date']);
     }
 
-    /** @test */
+    #[Test]
     public function campaign_manager_can_validate_waiting_for_validation_campaign(): void
     {
         $response = $this->actingAs($this->campaignManager)
@@ -314,7 +315,7 @@ class CampaignUpdateTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function validate_endpoint_does_not_modify_other_campaign_fields(): void
     {
         $originalTitle = $this->waitingCampaign->title;
@@ -334,7 +335,7 @@ class CampaignUpdateTest extends TestCase
         $this->assertEquals(CampaignStatus::ACTIVE, $updatedCampaign->status);
     }
 
-    /** @test */
+    #[Test]
     public function regular_user_cannot_validate_campaign(): void
     {
         $response = $this->actingAs($this->regularUser)
@@ -353,7 +354,7 @@ class CampaignUpdateTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function guest_user_cannot_validate_campaign(): void
     {
         $response = $this->postJson(route('campaigns.validate', ['id' => $this->waitingCampaign->id]));
@@ -361,7 +362,7 @@ class CampaignUpdateTest extends TestCase
         $response->assertStatus(401);
     }
 
-    /** @test */
+    #[Test]
     public function validate_returns_404_for_nonexistent_campaign(): void
     {
         $response = $this->actingAs($this->campaignManager)
@@ -370,7 +371,7 @@ class CampaignUpdateTest extends TestCase
         $response->assertStatus(404);
     }
 
-    /** @test */
+    #[Test]
     public function campaign_manager_can_validate_draft_campaign(): void
     {
         // Although unusual, the validate endpoint should work on any status
@@ -386,7 +387,7 @@ class CampaignUpdateTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function update_campaign_partial_update_only_sends_provided_fields(): void
     {
         $originalTitle = $this->draftCampaign->title;
@@ -409,7 +410,7 @@ class CampaignUpdateTest extends TestCase
         $this->assertEquals('Only updating description', $updatedCampaign->description);
     }
 
-    /** @test */
+    #[Test]
     public function campaign_manager_can_reject_waiting_for_validation_campaign(): void
     {
         $response = $this->actingAs($this->campaignManager)
@@ -428,7 +429,7 @@ class CampaignUpdateTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function reject_endpoint_does_not_modify_other_campaign_fields(): void
     {
         $originalTitle = $this->waitingCampaign->title;
@@ -448,7 +449,7 @@ class CampaignUpdateTest extends TestCase
         $this->assertEquals(CampaignStatus::REJECTED, $updatedCampaign->status);
     }
 
-    /** @test */
+    #[Test]
     public function regular_user_cannot_reject_campaign(): void
     {
         $response = $this->actingAs($this->regularUser)
@@ -467,7 +468,7 @@ class CampaignUpdateTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function guest_user_cannot_reject_campaign(): void
     {
         $response = $this->postJson(route('campaigns.reject', ['id' => $this->waitingCampaign->id]));
@@ -475,7 +476,7 @@ class CampaignUpdateTest extends TestCase
         $response->assertStatus(401);
     }
 
-    /** @test */
+    #[Test]
     public function reject_returns_404_for_nonexistent_campaign(): void
     {
         $response = $this->actingAs($this->campaignManager)
@@ -484,7 +485,7 @@ class CampaignUpdateTest extends TestCase
         $response->assertStatus(404);
     }
 
-    /** @test */
+    #[Test]
     public function campaign_manager_can_reject_draft_campaign(): void
     {
         // Although unusual, the reject endpoint should work on any status
