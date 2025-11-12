@@ -6,6 +6,7 @@ use App\Contracts\Payment\PaymentCallbackServiceInterface;
 use App\Exceptions\Payment\PaymentCallbackException;
 use App\Http\Controllers\Controller;
 use App\Models\Payment\Payment;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -16,6 +17,8 @@ use Illuminate\Support\Facades\Log;
  */
 class PaymentCallbackController extends Controller
 {
+    use AuthorizesRequests;
+
     public function __construct(
         private PaymentCallbackServiceInterface $callbackService
     ) {
@@ -32,6 +35,12 @@ class PaymentCallbackController extends Controller
      */
     public function handle(Payment $payment, Request $request): RedirectResponse
     {
+        // Authorize: Check if user can process this payment callback
+        // This prevents:
+        // - Multiple callback processing for already completed/failed payments
+        // - Unauthorized users from triggering callbacks for payments they don't own
+        $this->authorize('processCallback', $payment);
+
         Log::info('Received payment callback', [
             'payment_id' => $payment->id,
             'payment_method' => $payment->payment_method->value,

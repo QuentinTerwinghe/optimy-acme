@@ -108,4 +108,53 @@ class PaymentPolicy
 
         return true;
     }
+
+    /**
+     * Determine if the user can process a payment callback
+     *
+     * A user can process a payment callback only if:
+     * - The user is authenticated
+     * - The payment belongs to the user (through donation)
+     * - The payment status is PENDING (not already completed/failed/processing)
+     *
+     * This prevents:
+     * - Multiple callback processing for the same payment
+     * - Unauthorized users from triggering callbacks
+     * - Processing payments in invalid states
+     *
+     * @param User $user The user attempting to process the callback
+     * @param Payment $payment The payment to process
+     * @return bool True if user can process callback, false otherwise
+     */
+    public function processCallback(User $user, Payment $payment): bool
+    {
+        // Load donation if not already loaded
+        if (!$payment->relationLoaded('donation')) {
+            try {
+                $payment->load('donation');
+            } catch (\Exception $e) {
+                // If loading fails, deny access
+                return false;
+            }
+        }
+
+        // Check if payment has a donation
+        $donation = $payment->donation;
+        if (!$donation) {
+            return false;
+        }
+
+        // Check if payment belongs to the user
+        if ($donation->user_id !== $user->id) {
+            return false;
+        }
+
+        // Check if payment is pending (not already processed)
+        // This prevents duplicate callback processing
+        if ($payment->status !== PaymentStatusEnum::PENDING) {
+            return false;
+        }
+
+        return true;
+    }
 }
