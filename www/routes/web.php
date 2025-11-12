@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\Campaign\CampaignController;
 use App\Http\Controllers\Dashboard\DashboardController;
+use App\Http\Controllers\Donation\DonationController;
 use Illuminate\Support\Facades\Route;
 
 // Redirect root to login
@@ -60,4 +61,8 @@ Route::middleware(['auth'])->group(function () {
         ->name('campaigns.validate');
     Route::post('/campaigns/{id}/reject', [CampaignController::class, 'reject'])
         ->name('campaigns.reject');
+
+    // Donation Routes
+    Route::get('/campaigns/{campaignId}/donate', [DonationController::class, 'create'])
+        ->name('donations.create');
 });

@@ -13,7 +13,6 @@ use Illuminate\View\View;
 
 /**
  * Controller for handling password reset operations.
- * Follows SOLID principles: Thin controller that delegates to service.
  */
 class PasswordResetController extends Controller
 {

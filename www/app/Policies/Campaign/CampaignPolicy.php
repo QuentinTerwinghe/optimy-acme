@@ -13,7 +13,6 @@ use App\Models\Campaign\Campaign;
  * Campaign Policy
  *
  * Handles authorization for campaign-related actions.
- * Follows SOLID principles by separating authorization logic from controllers.
  */
 class CampaignPolicy
 {

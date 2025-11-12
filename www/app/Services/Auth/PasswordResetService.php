@@ -13,7 +13,6 @@ use Illuminate\Support\Str;
 
 /**
  * Service for handling password reset operations.
- * Follows SOLID principles: Single Responsibility - handles only password reset logic.
  */
 class PasswordResetService implements PasswordResetServiceInterface
 {
