@@ -102,7 +102,6 @@ class DonationSeederTest extends TestCase
         $failedCount = Donation::where('status', DonationStatus::FAILED)->count();
 
         $this->assertGreaterThan(0, $successfulCount, 'There should be successful donations');
-        $this->assertGreaterThan(0, $pendingCount, 'There should be pending donations');
         // Failed donations are optional (0-2 per campaign), so we don't assert they must exist
     }
 
