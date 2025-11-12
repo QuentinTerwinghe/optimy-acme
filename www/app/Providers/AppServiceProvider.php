@@ -105,6 +105,12 @@ class AppServiceProvider extends ServiceProvider
             \App\Services\Category\CategoryQueryService::class
         );
 
+        // Bind Payment services interfaces to implementations
+        $this->app->bind(
+            \App\Contracts\Payment\PaymentProcessServiceInterface::class,
+            \App\Services\Payment\PaymentProcessService::class
+        );
+
         // Bind StatefulGuard for AuthService dependency injection
         $this->app->bind(
             \Illuminate\Contracts\Auth\StatefulGuard::class,

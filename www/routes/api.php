@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Http\Controllers\Api\Campaign\CampaignController;
 use App\Http\Controllers\Payment\PaymentMethodController;
+use App\Http\Controllers\Payment\ProcessPaymentController;
 use Illuminate\Support\Facades\Route;
 
 // Protected API Routes - using web middleware for session-based auth
@@ -33,4 +34,8 @@ Route::middleware(['web', 'auth'])->group(function () {
     // Payment Method Routes
     Route::get('/payment-methods', [PaymentMethodController::class, 'index'])
         ->name('api.payment-methods.index');
+
+    // Payment Processing Routes
+    Route::post('/payments/initialize', [ProcessPaymentController::class, 'initialize'])
+        ->name('api.payments.initialize');
 });

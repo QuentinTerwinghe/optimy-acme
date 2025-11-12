@@ -133,6 +133,23 @@
                     :api-url="paymentMethodsApiUrl"
                 />
 
+                <!-- Error Message -->
+                <div v-if="errorMessage" class="mt-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <div class="flex items-start">
+                        <svg class="h-5 w-5 text-red-400 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                        </svg>
+                        <div class="ml-3">
+                            <p class="text-sm text-red-800">{{ errorMessage }}</p>
+                        </div>
+                        <button @click="errorMessage = ''" class="ml-auto">
+                            <svg class="h-5 w-5 text-red-400 hover:text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
                 <!-- Action Buttons -->
                 <div class="flex items-center justify-between pt-6 border-t border-gray-200">
                     <a
@@ -147,16 +164,21 @@
 
                     <button
                         type="button"
-                        :disabled="!canProceed"
+                        @click="handleContinueToPayment"
+                        :disabled="!canProceed || isProcessing"
                         :class="[
                             'inline-flex items-center px-6 py-3 rounded-lg font-semibold transition-colors duration-200',
-                            canProceed
+                            canProceed && !isProcessing
                                 ? 'bg-indigo-600 hover:bg-indigo-700 text-white cursor-pointer'
                                 : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                         ]"
                     >
-                        Continue to Payment
-                        <svg class="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg v-if="isProcessing" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        {{ isProcessing ? 'Processing...' : 'Continue to Payment' }}
+                        <svg v-if="!isProcessing" class="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                         </svg>
                     </button>
@@ -199,6 +221,8 @@ const selectedQuickAmount = ref(null);
 const customAmount = ref('');
 const amountError = ref('');
 const selectedPaymentMethod = ref(null);
+const isProcessing = ref(false);
+const errorMessage = ref('');
 
 /**
  * Select a quick amount button
@@ -305,5 +329,73 @@ const formatCurrencySimple = (amount, currency) => {
     }).format(amount);
 
     return getCurrencySymbol(currency) + formatted;
+};
+
+/**
+ * Handle continue to payment button click
+ */
+const handleContinueToPayment = async () => {
+    if (!canProceed.value || isProcessing.value) {
+        return;
+    }
+
+    isProcessing.value = true;
+    errorMessage.value = '';
+
+    try {
+        const response = await window.axios.post('/api/payments/initialize', {
+            campaign_id: props.campaign.id,
+            amount: finalAmount.value,
+            payment_method: selectedPaymentMethod.value,
+            metadata: {
+                source: 'web',
+                campaign_title: props.campaign.title,
+            },
+        });
+
+        if (response.data.success) {
+            const { donation, payment } = response.data.data;
+
+            // Log success for debugging
+            console.log('Payment initialized successfully:', { donation, payment });
+
+            // TODO: Redirect to next step of payment processing
+            // For now, show success message
+            alert(`Payment initialized! Donation ID: ${donation.id}, Payment ID: ${payment.id}`);
+
+            // In the future, you would redirect to a payment processing page:
+            // window.location.href = `/payments/${payment.id}/process`;
+        } else {
+            errorMessage.value = response.data.message || 'Failed to initialize payment';
+        }
+    } catch (error) {
+        console.error('Payment initialization error:', error);
+
+        if (error.response) {
+            // Server responded with an error status
+            if (error.response.status === 422) {
+                // Validation errors
+                const errors = error.response.data.errors;
+                if (errors) {
+                    const errorMessages = Object.values(errors).flat();
+                    errorMessage.value = errorMessages.join(', ');
+                } else {
+                    errorMessage.value = error.response.data.message || 'Validation failed';
+                }
+            } else if (error.response.status === 401) {
+                errorMessage.value = 'Please log in to continue with your donation';
+            } else {
+                errorMessage.value = error.response.data.message || 'An error occurred while processing your request';
+            }
+        } else if (error.request) {
+            // Request was made but no response received
+            errorMessage.value = 'No response from server. Please check your internet connection';
+        } else {
+            // Something else happened
+            errorMessage.value = 'An unexpected error occurred';
+        }
+    } finally {
+        isProcessing.value = false;
+    }
 };
 </script>
