@@ -124,11 +124,14 @@ class PaymentSuccessTest extends TestCase
         ]);
 
         // Simulate callback from fake payment gateway with success status
-        $response = $this->actingAs($this->user)->get(route('payment.callback', ['payment' => $pendingPayment->id]), [
-            'status' => 'success',
-            'transaction_id' => 'FAKE_TXN_456',
-            'session_id' => 'test_session_123',
-        ]);
+        $response = $this->actingAs($this->user)->get(
+            route('payment.callback', [
+                'payment' => $pendingPayment->id,
+                'status' => 'success',
+                'transaction_id' => 'FAKE_TXN_456',
+                'session_id' => 'test_session_123',
+            ])
+        );
 
         // Assert redirected to success page
         $response->assertRedirect(route('payment.success', ['payment' => $pendingPayment->id]));
