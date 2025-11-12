@@ -60,7 +60,7 @@ class DonationController extends Controller
             }
 
             // Authorize: check if user can create a donation using injected policy
-            if (!$this->donationPolicy->create($user, $campaign)) {
+            if (!$this->donationPolicy->create($campaign)) {
                 return redirect()
                     ->route('campaigns.show', $campaignId)
                     ->with('error', 'This campaign is not accepting donations at this time.');
