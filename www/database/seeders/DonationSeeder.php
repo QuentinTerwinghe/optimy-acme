@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 use App\Enums\Donation\DonationStatus;
+use App\Enums\Payment\PaymentMethodEnum;
+use App\Enums\Payment\PaymentStatusEnum;
 use App\Models\Auth\User;
 use App\Models\Campaign\Campaign;
 use App\Models\Donation\Donation;
+use App\Models\Payment\Payment;
 use Illuminate\Database\Seeder;
 
 class DonationSeeder extends Seeder
@@ -15,10 +18,11 @@ class DonationSeeder extends Seeder
     /**
      * Run the database seeds.
      *
-     * This seeder creates donations for each campaign, ensuring that:
+     * This seeder creates donations and corresponding payments for each campaign, ensuring that:
      * 1. The sum of successful donations equals the campaign's current_amount
      * 2. Multiple donations are created to simulate realistic donation patterns
-     * 3. A mix of successful, pending, and failed donations are included
+     * 3. A mix of successful and failed donations are included
+     * 4. Each donation has a corresponding payment record with appropriate status
      */
     public function run(): void
     {
@@ -49,7 +53,9 @@ class DonationSeeder extends Seeder
 
             // Create successful donations that sum to current_amount
             foreach ($donationAmounts as $amount) {
-                Donation::create([
+                $createdAt = $this->randomDateBetween($campaign->start_date, now());
+
+                $donation = Donation::create([
                     'campaign_id' => $campaign->id,
                     'user_id' => $users->random()->id,
                     'amount' => $amount,
@@ -57,34 +63,69 @@ class DonationSeeder extends Seeder
                     'error_message' => null,
                     'created_by' => $users->random()->id,
                     'updated_by' => $users->random()->id,
-                    'created_at' => $this->randomDateBetween($campaign->start_date, now()),
+                    'created_at' => $createdAt,
+                ]);
+
+                // Create corresponding completed payment
+                Payment::create([
+                    'donation_id' => $donation->id,
+                    'payment_method' => PaymentMethodEnum::FAKE,
+                    'status' => PaymentStatusEnum::COMPLETED,
+                    'amount' => $amount,
+                    'currency' => 'EUR',
+                    'transaction_id' => 'txn_' . fake()->uuid(),
+                    'gateway_response' => json_encode(['status' => 'success']),
+                    'prepared_at' => $createdAt,
+                    'initiated_at' => $createdAt->copy()->addSeconds(1),
+                    'completed_at' => $createdAt->copy()->addSeconds(2),
+                    'created_at' => $createdAt,
                 ]);
             }
 
             // Add some failed donations (0-2 per campaign)
             $failedCount = fake()->numberBetween(0, 2);
             for ($i = 0; $i < $failedCount; $i++) {
-                Donation::create([
+                $failedAmount = fake()->randomFloat(2, 10, 1000);
+                $failedAt = $this->randomDateBetween($campaign->start_date, now());
+                $errorMessage = fake()->randomElement([
+                    'Payment gateway timeout',
+                    'Insufficient funds',
+                    'Card declined',
+                    'Payment processor error',
+                    'Invalid card details',
+                    'Transaction limit exceeded',
+                ]);
+
+                $donation = Donation::create([
                     'campaign_id' => $campaign->id,
                     'user_id' => $users->random()->id,
-                    'amount' => fake()->randomFloat(2, 10, 1000),
+                    'amount' => $failedAmount,
                     'status' => DonationStatus::FAILED,
-                    'error_message' => fake()->randomElement([
-                        'Payment gateway timeout',
-                        'Insufficient funds',
-                        'Card declined',
-                        'Payment processor error',
-                        'Invalid card details',
-                        'Transaction limit exceeded',
-                    ]),
+                    'error_message' => $errorMessage,
                     'created_by' => $users->random()->id,
                     'updated_by' => $users->random()->id,
-                    'created_at' => $this->randomDateBetween($campaign->start_date, now()),
+                    'created_at' => $failedAt,
+                ]);
+
+                // Create corresponding failed payment
+                Payment::create([
+                    'donation_id' => $donation->id,
+                    'payment_method' => PaymentMethodEnum::FAKE,
+                    'status' => PaymentStatusEnum::FAILED,
+                    'amount' => $failedAmount,
+                    'currency' => 'EUR',
+                    'error_message' => $errorMessage,
+                    'error_code' => fake()->randomElement(['ERR_001', 'ERR_002', 'ERR_003', 'ERR_004']),
+                    'gateway_response' => json_encode(['status' => 'failed', 'message' => $errorMessage]),
+                    'prepared_at' => $failedAt,
+                    'initiated_at' => $failedAt->copy()->addSeconds(1),
+                    'failed_at' => $failedAt->copy()->addSeconds(2),
+                    'created_at' => $failedAt,
                 ]);
             }
         }
 
-        $this->command->info('Donations seeded successfully!');
+        $this->command->info('Donations and payments seeded successfully!');
     }
 
     /**
