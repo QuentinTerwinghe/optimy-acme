@@ -20,21 +20,39 @@ class UserSeeder extends Seeder
     {
         $users = [
             [
-                'name' => 'Admin User',
                 'email' => 'admin@acme.corp',
                 'password' => 'admin',
+                'name' => 'Admin User',
                 'role' => 'admin',
             ],
             [
-                'name' => 'Campaign Manager',
                 'email' => 'campaign@acme.corp',
                 'password' => 'campaign',
+                'name' => 'Campaign Manager',
                 'role' => 'campaign_manager',
             ],
             [
-                'name' => 'Regular User',
                 'email' => 'user@acme.corp',
                 'password' => 'user',
+                'name' => 'Regular User',
+                'role' => 'user',
+            ],
+            [
+                'email' => 'donator1@acme.corp',
+                'password' => 'user',
+                'name' => 'Donator User 1',
+                'role' => 'user',
+            ],
+            [
+                'email' => 'donator2@acme.corp',
+                'password' => 'user',
+                'name' => 'Donator User 2',
+                'role' => 'user',
+            ],
+            [
+                'email' => 'donator3@acme.corp',
+                'password' => 'user',
+                'name' => 'Donator User 3',
                 'role' => 'user',
             ],
         ];
@@ -66,11 +84,7 @@ class UserSeeder extends Seeder
 
         $this->command->table(
             ['Email', 'Password', 'Name', 'Role'],
-            [
-                ['admin@acme.corp', 'admin', 'Admin User', 'admin'],
-                ['campaign@acme.corp', 'campaign', 'Campaign Manager', 'campaign_manager'],
-                ['user@acme.corp', 'user', 'Regular User', 'user'],
-            ]
+            $users
         );
 
         $this->command->info('');
