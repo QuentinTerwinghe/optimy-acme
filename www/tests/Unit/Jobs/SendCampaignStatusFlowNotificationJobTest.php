@@ -7,7 +7,7 @@ namespace Tests\Unit\Jobs;
 use App\Contracts\Notifications\NotificationServiceInterface;
 use App\Enums\Campaign\CampaignStatus;
 use App\Enums\Notification\NotificationType;
-use App\Jobs\SendCampaignStatusFlowNotificationJob;
+use App\Jobs\Notification\SendCampaignStatusFlowNotificationJob;
 use App\Models\Auth\User;
 use App\Models\Campaign\Campaign;
 use Illuminate\Foundation\Testing\RefreshDatabase;

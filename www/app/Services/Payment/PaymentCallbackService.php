@@ -9,6 +9,7 @@ use App\Enums\Donation\DonationStatus;
 use App\Enums\Payment\PaymentMethodEnum;
 use App\Enums\Payment\PaymentStatusEnum;
 use App\Exceptions\Payment\PaymentCallbackException;
+use App\Jobs\Campaign\UpdateCampaignAmountJob;
 use App\Models\Payment\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -175,6 +176,16 @@ class PaymentCallbackService implements PaymentCallbackServiceInterface
             Log::info('Donation marked as successful', [
                 'donation_id' => $donation->id,
                 'payment_id' => $payment->id,
+                'campaign_id' => $donation->campaign_id,
+            ]);
+
+            // Dispatch job to update campaign amount via RabbitMQ
+            // This ensures campaign amounts are updated sequentially and consistently
+            UpdateCampaignAmountJob::dispatch($donation->campaign_id);
+
+            Log::info('Campaign amount update job dispatched', [
+                'donation_id' => $donation->id,
+                'campaign_id' => $donation->campaign_id,
             ]);
         } elseif ($result->isFailed()) {
             $donation->update([

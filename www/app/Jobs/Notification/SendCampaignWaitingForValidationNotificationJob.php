@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Jobs;
+namespace App\Jobs\Notification;
 
 use App\Contracts\Notifications\NotificationServiceInterface;
 use App\Enums\Campaign\CampaignPermissions;

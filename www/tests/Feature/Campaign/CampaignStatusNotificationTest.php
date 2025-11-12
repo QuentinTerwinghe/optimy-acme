@@ -6,8 +6,8 @@ namespace Tests\Feature\Campaign;
 
 use App\Enums\Campaign\CampaignPermissions;
 use App\Enums\Campaign\CampaignStatus;
-use App\Jobs\SendCampaignStatusFlowNotificationJob;
-use App\Jobs\SendCampaignWaitingForValidationNotificationJob;
+use App\Jobs\Notification\SendCampaignStatusFlowNotificationJob;
+use App\Jobs\Notification\SendCampaignWaitingForValidationNotificationJob;
 use App\Mail\Campaign\CampaignWaitingForValidationMail;
 use App\Models\Auth\User;
 use App\Models\Campaign\Campaign;

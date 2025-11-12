@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Observers\Campaign;
 
 use App\Enums\Campaign\CampaignStatus;
-use App\Jobs\SendCampaignStatusFlowNotificationJob;
-use App\Jobs\SendCampaignWaitingForValidationNotificationJob;
+use App\Jobs\Notification\SendCampaignStatusFlowNotificationJob;
+use App\Jobs\Notification\SendCampaignWaitingForValidationNotificationJob;
 use App\Models\Campaign\Campaign;
 use Illuminate\Support\Facades\Log;
 

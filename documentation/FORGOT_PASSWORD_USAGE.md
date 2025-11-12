@@ -112,7 +112,7 @@ class SendForgotPasswordNotificationJob implements ShouldQueue
 #### 2. Dispatch the Job
 
 ```php
-use App\Jobs\SendForgotPasswordNotificationJob;
+use App\Jobs\Notification\SendForgotPasswordNotificationJob;
 
 public function sendResetLink(Request $request)
 {

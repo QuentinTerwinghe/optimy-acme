@@ -11,6 +11,7 @@ use App\Contracts\Campaign\CampaignWriteServiceInterface;
 use App\Contracts\Tag\TagWriteServiceInterface;
 use App\DTOs\Campaign\CampaignDTO;
 use App\DTOs\Campaign\UpdateCampaignDTO;
+use App\Enums\Donation\DonationStatus;
 use App\Models\Campaign\Campaign;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -193,6 +194,52 @@ class CampaignWriteService implements CampaignWriteServiceInterface
             ]);
 
             throw $e;
+        }
+    }
+
+    /**
+     * Recalculate the total amount of a campaign based on all successful donations
+     *
+     * This method ensures data consistency by recalculating the current_amount
+     * from scratch rather than incrementing, which prevents amount drift and
+     * handles edge cases like refunds or donation status changes.
+     *
+     * @param Campaign $campaign The campaign to recalculate
+     * @return bool True if update was successful
+     */
+    public function recalculateTotalAmount(Campaign $campaign): bool
+    {
+        try {
+            return DB::transaction(function () use ($campaign) {
+                // Sum all successful donations for this campaign
+                $totalAmount = $campaign->donations()
+                    ->where('status', DonationStatus::SUCCESS->value)
+                    ->sum('amount');
+
+                // Update the campaign's current_amount
+                $campaign->current_amount = (string) $totalAmount;
+                $updated = $campaign->save();
+
+                if ($updated) {
+                    Log::info('Campaign amount recalculated', [
+                        'campaign_id' => $campaign->id,
+                        'new_amount' => $totalAmount,
+                        'successful_donations_count' => $campaign->donations()
+                            ->where('status', DonationStatus::SUCCESS->value)
+                            ->count(),
+                    ]);
+                }
+
+                return $updated;
+            });
+        } catch (\Exception $e) {
+            Log::error('Failed to recalculate campaign amount', [
+                'campaign_id' => $campaign->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return false;
         }
     }
 }

@@ -43,4 +43,16 @@ interface CampaignWriteServiceInterface
      * @throws \Exception
      */
     public function deleteCampaign(string $id): bool;
+
+    /**
+     * Recalculate the total amount of a campaign based on all successful donations
+     *
+     * This method ensures data consistency by recalculating the current_amount
+     * from scratch rather than incrementing, which prevents amount drift and
+     * handles edge cases like refunds or donation status changes.
+     *
+     * @param Campaign $campaign The campaign to recalculate
+     * @return bool True if update was successful
+     */
+    public function recalculateTotalAmount(Campaign $campaign): bool;
 }
