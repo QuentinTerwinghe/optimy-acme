@@ -3,6 +3,7 @@
 namespace App\Services\Payment;
 
 use App\Contracts\Payment\PaymentCallbackHandlerInterface;
+use App\Contracts\Payment\PaymentCallbackServiceInterface;
 use App\DTOs\Payment\PaymentCallbackResultDTO;
 use App\Enums\Donation\DonationStatus;
 use App\Enums\Payment\PaymentMethodEnum;
@@ -18,7 +19,7 @@ use Illuminate\Support\Facades\Log;
  * This service resolves the appropriate handler for each payment method
  * and coordinates the update of Payment and Donation models.
  */
-class PaymentCallbackService
+class PaymentCallbackService implements PaymentCallbackServiceInterface
 {
     /**
      * @var array<string, PaymentCallbackHandlerInterface>

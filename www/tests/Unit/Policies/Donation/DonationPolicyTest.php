@@ -37,7 +37,7 @@ class DonationPolicyTest extends TestCase
         ]);
 
         // Act
-        $result = $this->policy->create($campaign);
+        $result = $this->policy->donate($this->user, $campaign);
 
         // Assert
         $this->assertTrue($result);
@@ -54,7 +54,7 @@ class DonationPolicyTest extends TestCase
         ]);
 
         // Act
-        $result = $this->policy->create($campaign);
+        $result = $this->policy->donate($this->user, $campaign);
 
         // Assert
         $this->assertFalse($result);
@@ -71,7 +71,7 @@ class DonationPolicyTest extends TestCase
         ]);
 
         // Act
-        $result = $this->policy->create($campaign);
+        $result = $this->policy->donate($this->user, $campaign);
 
         // Assert
         $this->assertFalse($result);
@@ -88,7 +88,7 @@ class DonationPolicyTest extends TestCase
         ]);
 
         // Act
-        $result = $this->policy->create($campaign);
+        $result = $this->policy->donate($this->user, $campaign);
 
         // Assert
         $this->assertFalse($result);
@@ -105,7 +105,7 @@ class DonationPolicyTest extends TestCase
         ]);
 
         // Act
-        $result = $this->policy->create($campaign);
+        $result = $this->policy->donate($this->user, $campaign);
 
         // Assert
         $this->assertFalse($result);
@@ -122,7 +122,7 @@ class DonationPolicyTest extends TestCase
         ]);
 
         // Act
-        $result = $this->policy->create($campaign);
+        $result = $this->policy->donate($this->user, $campaign);
 
         // Assert
         $this->assertFalse($result);

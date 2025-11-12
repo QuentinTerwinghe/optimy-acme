@@ -6,6 +6,7 @@ use App\Models\Campaign\Campaign;
 use App\Models\Payment\Payment;
 use App\Observers\Campaign\CampaignObserver;
 use App\Policies\Campaign\CampaignPolicy;
+use App\Policies\Donation\DonationPolicy;
 use App\Policies\Payment\FakePaymentPolicy;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
@@ -115,7 +116,7 @@ class AppServiceProvider extends ServiceProvider
 
         // Register PaymentCallbackService as singleton to maintain handler registrations
         $this->app->singleton(
-            \App\Services\Payment\PaymentCallbackService::class,
+            \App\Contracts\Payment\PaymentCallbackServiceInterface::class,
             function ($app) {
                 $service = new \App\Services\Payment\PaymentCallbackService();
 
@@ -130,6 +131,12 @@ class AppServiceProvider extends ServiceProvider
 
                 return $service;
             }
+        );
+
+        // Bind concrete class to interface for backwards compatibility
+        $this->app->alias(
+            \App\Contracts\Payment\PaymentCallbackServiceInterface::class,
+            \App\Services\Payment\PaymentCallbackService::class
         );
 
         // Bind StatefulGuard for AuthService dependency injection
@@ -148,6 +155,9 @@ class AppServiceProvider extends ServiceProvider
     {
         // Register Campaign Policy
         Gate::policy(Campaign::class, CampaignPolicy::class);
+
+        // Register Donation Policy abilities
+        Gate::define('donate', [DonationPolicy::class, 'donate']);
 
         // Register Payment Policy
         Gate::policy(Payment::class, FakePaymentPolicy::class);

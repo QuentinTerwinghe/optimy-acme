@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Policies\Donation;
 
 use App\Enums\Campaign\CampaignStatus;
+use App\Models\Auth\User;
 use App\Models\Campaign\Campaign;
 
 /**
@@ -23,7 +24,7 @@ class DonationPolicy
      * @param Campaign $campaign The campaign to donate to
      * @return bool True if user can donate, false otherwise
      */
-    public function create(Campaign $campaign): bool
+    public function donate(User $user, Campaign $campaign): bool
     {
         return $campaign->status === CampaignStatus::ACTIVE;
     }

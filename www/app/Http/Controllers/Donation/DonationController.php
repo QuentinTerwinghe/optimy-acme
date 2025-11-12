@@ -6,11 +6,11 @@ namespace App\Http\Controllers\Donation;
 
 use App\Contracts\Campaign\CampaignReadRepositoryInterface;
 use App\Http\Controllers\Controller;
-use App\Policies\Donation\DonationPolicy;
 use App\Services\Donation\DonationService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Gate;
 
 /**
  * Controller for handling donation-related HTTP requests
@@ -26,12 +26,10 @@ class DonationController extends Controller
      *
      * @param DonationService $donationService Service for business logic
      * @param CampaignReadRepositoryInterface $campaignRepository Repository for data access
-     * @param DonationPolicy $donationPolicy Policy for authorization
      */
     public function __construct(
         private readonly DonationService $donationService,
-        private readonly CampaignReadRepositoryInterface $campaignRepository,
-        private readonly DonationPolicy $donationPolicy
+        private readonly CampaignReadRepositoryInterface $campaignRepository
     ) {}
 
     /**
@@ -54,13 +52,8 @@ class DonationController extends Controller
                     ->with('error', 'Campaign not found.');
             }
 
-            // Get authenticated user
-            if (empty($user = auth()->user())) {
-                return redirect()->route('login.form');
-            }
-
-            // Authorize: check if user can create a donation using injected policy
-            if (!$this->donationPolicy->create($campaign)) {
+            // Authorize: check if user can create a donation using Laravel's authorization
+            if (!Gate::allows('donate', $campaign)) {
                 return redirect()
                     ->route('campaigns.show', $campaignId)
                     ->with('error', 'This campaign is not accepting donations at this time.');

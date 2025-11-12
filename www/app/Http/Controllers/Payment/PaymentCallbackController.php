@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Payment;
 
+use App\Contracts\Payment\PaymentCallbackServiceInterface;
 use App\Exceptions\Payment\PaymentCallbackException;
 use App\Http\Controllers\Controller;
 use App\Models\Payment\Payment;
-use App\Services\Payment\PaymentCallbackService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Log;
 class PaymentCallbackController extends Controller
 {
     public function __construct(
-        private PaymentCallbackService $callbackService
+        private PaymentCallbackServiceInterface $callbackService
     ) {
     }
 
