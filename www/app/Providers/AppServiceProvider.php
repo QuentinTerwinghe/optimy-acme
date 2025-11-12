@@ -7,7 +7,7 @@ use App\Models\Payment\Payment;
 use App\Observers\Campaign\CampaignObserver;
 use App\Policies\Campaign\CampaignPolicy;
 use App\Policies\Donation\DonationPolicy;
-use App\Policies\Payment\FakePaymentPolicy;
+use App\Policies\Payment\PaymentPolicy;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
@@ -159,8 +159,8 @@ class AppServiceProvider extends ServiceProvider
         // Register Donation Policy abilities
         Gate::define('donate', [DonationPolicy::class, 'donate']);
 
-        // Register Payment Policy
-        Gate::policy(Payment::class, FakePaymentPolicy::class);
+        // Register Payment Policy (includes both access and view methods)
+        Gate::policy(Payment::class, PaymentPolicy::class);
 
         // Register Campaign Observer
         Campaign::observe(CampaignObserver::class);

@@ -61,21 +61,6 @@ class DonationSeeder extends Seeder
                 ]);
             }
 
-            // Add some pending donations (1-3 per campaign)
-            $pendingCount = fake()->numberBetween(1, 3);
-            for ($i = 0; $i < $pendingCount; $i++) {
-                Donation::create([
-                    'campaign_id' => $campaign->id,
-                    'user_id' => $users->random()->id,
-                    'amount' => fake()->randomFloat(2, 10, 500),
-                    'status' => DonationStatus::PENDING,
-                    'error_message' => null,
-                    'created_by' => $users->random()->id,
-                    'updated_by' => $users->random()->id,
-                    'created_at' => $this->randomDateBetween($campaign->start_date, now()),
-                ]);
-            }
-
             // Add some failed donations (0-2 per campaign)
             $failedCount = fake()->numberBetween(0, 2);
             for ($i = 0; $i < $failedCount; $i++) {

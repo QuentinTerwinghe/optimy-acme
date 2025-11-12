@@ -5,60 +5,38 @@ namespace App\Http\Controllers\Payment;
 use App\Http\Controllers\Controller;
 use App\Models\Payment\Payment;
 use Illuminate\Contracts\View\View;
-use Illuminate\Http\Request;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 /**
- * Controller that displays payment success/failure result pages.
+ * Controller that displays payment result pages based on payment status.
+ * Uses a single endpoint that determines the view based on the payment status.
  */
 class PaymentResultController extends Controller
 {
+    use AuthorizesRequests;
+
     /**
-     * Display the payment success page.
+     * Display the payment result page (success or failure) based on payment status.
      *
-     * @param Payment $payment The completed payment
-     * @param Request $request
+     * @param Payment $payment The payment to display
      * @return View
      */
-    public function success(Payment $payment, Request $request): View
+    public function show(Payment $payment): View
     {
-        // Load the donation with campaign relationship
-        $payment->load(['donation.campaign', 'donation.user']);
+        // Authorize the user can view this payment result
+        $this->authorize('view', $payment);
 
-        /** @var view-string $viewName */
-        $viewName = 'payment.success';
+        // Load additional relationships
+        $payment->load(['donation.campaign', 'donation.user']);
 
         $donation = $payment->donation;
         if ($donation === null) {
             abort(404, 'Donation not found for this payment');
         }
 
-        return view($viewName, [
-            'payment' => $payment,
-            'donation' => $donation,
-            'campaign' => $donation->campaign,
-            'user' => $donation->user,
-        ]);
-    }
-
-    /**
-     * Display the payment failure page.
-     *
-     * @param Payment $payment The failed payment
-     * @param Request $request
-     * @return View
-     */
-    public function failure(Payment $payment, Request $request): View
-    {
-        // Load the donation with campaign relationship
-        $payment->load(['donation.campaign', 'donation.user']);
-
+        // Determine which view to show based on payment status
         /** @var view-string $viewName */
-        $viewName = 'payment.failure';
-
-        $donation = $payment->donation;
-        if ($donation === null) {
-            abort(404, 'Donation not found for this payment');
-        }
+        $viewName = $payment->isCompleted() ? 'payment.success' : 'payment.failure';
 
         return view($viewName, [
             'payment' => $payment,

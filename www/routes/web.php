@@ -78,9 +78,7 @@ Route::middleware(['auth'])->group(function () {
     Route::match(['get', 'post'], '/payment/callback/{payment}', [PaymentCallbackController::class, 'handle'])
         ->name('payment.callback');
 
-    // Payment Result Routes (display success/failure pages after payment)
-    Route::get('/payment/{payment}/success', [PaymentResultController::class, 'success'])
-        ->name('payment.success');
-    Route::get('/payment/{payment}/failure', [PaymentResultController::class, 'failure'])
-        ->name('payment.failure');
+    // Payment Result Route (displays success/failure page based on payment status)
+    Route::get('/payment/{payment}', [PaymentResultController::class, 'show'])
+        ->name('payment.result');
 });
