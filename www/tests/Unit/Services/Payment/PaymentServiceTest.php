@@ -196,6 +196,33 @@ class PaymentServiceTest extends TestCase
         $this->assertCount(1, $methods); // Only FAKE is enabled
     }
 
+    public function test_get_enabled_payment_methods_for_display(): void
+    {
+        // Act
+        $methods = $this->paymentService->getEnabledPaymentMethodsForDisplay();
+
+        // Assert
+        $this->assertIsArray($methods);
+        $this->assertNotEmpty($methods);
+
+        // Check the structure of each method
+        foreach ($methods as $method) {
+            $this->assertArrayHasKey('value', $method);
+            $this->assertArrayHasKey('label', $method);
+            $this->assertArrayHasKey('isTest', $method);
+        }
+
+        // Verify at least the fake payment method is present
+        $values = array_column($methods, 'value');
+        $this->assertContains('fake', $values);
+
+        // Find the fake method and verify its properties
+        $fakeMethod = collect($methods)->firstWhere('value', 'fake');
+        $this->assertNotNull($fakeMethod);
+        $this->assertEquals('Fake Payment (Test)', $fakeMethod['label']);
+        $this->assertTrue($fakeMethod['isTest']);
+    }
+
     public function test_get_payment_statistics(): void
     {
         // Arrange

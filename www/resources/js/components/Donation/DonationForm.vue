@@ -127,6 +127,12 @@
                     </div>
                 </div>
 
+                <!-- Payment Method Selection -->
+                <payment-method-selector
+                    v-model="selectedPaymentMethod"
+                    :api-url="paymentMethodsApiUrl"
+                />
+
                 <!-- Action Buttons -->
                 <div class="flex items-center justify-between pt-6 border-t border-gray-200">
                     <a
@@ -162,6 +168,7 @@
 
 <script setup>
 import { ref, computed } from 'vue';
+import PaymentMethodSelector from './PaymentMethodSelector.vue';
 
 const props = defineProps({
     campaign: {
@@ -181,12 +188,17 @@ const props = defineProps({
         type: String,
         required: true,
     },
+    paymentMethodsApiUrl: {
+        type: String,
+        default: '/api/payment-methods',
+    },
 });
 
 // State
 const selectedQuickAmount = ref(null);
 const customAmount = ref('');
 const amountError = ref('');
+const selectedPaymentMethod = ref(null);
 
 /**
  * Select a quick amount button
@@ -255,7 +267,7 @@ const finalAmount = computed(() => {
  * Check if user can proceed to payment
  */
 const canProceed = computed(() => {
-    return finalAmount.value > 0 && !amountError.value;
+    return finalAmount.value > 0 && !amountError.value && selectedPaymentMethod.value !== null;
 });
 
 /**

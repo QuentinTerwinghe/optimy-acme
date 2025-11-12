@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\Api\Campaign\CampaignController;
+use App\Http\Controllers\Payment\PaymentMethodController;
 use Illuminate\Support\Facades\Route;
 
 // Protected API Routes - using web middleware for session-based auth
@@ -28,4 +29,8 @@ Route::middleware(['web', 'auth'])->group(function () {
         ->name('api.categories.index');
     Route::get('/tags', [CampaignController::class, 'getTags'])
         ->name('api.tags.index');
+
+    // Payment Method Routes
+    Route::get('/payment-methods', [PaymentMethodController::class, 'index'])
+        ->name('api.payment-methods.index');
 });

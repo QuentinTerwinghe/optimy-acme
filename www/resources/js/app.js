@@ -13,6 +13,7 @@ import CampaignManageList from './components/Campaign/CampaignManageList.vue';
 import CampaignShow from './components/Campaign/CampaignShow.vue';
 import TagInput from './components/Common/TagInput.vue';
 import DonationForm from './components/Donation/DonationForm.vue';
+import PaymentMethodSelector from './components/Donation/PaymentMethodSelector.vue';
 
 // Create Vue app
 const app = createApp({
@@ -39,6 +40,7 @@ app.component('campaign-manage-list', CampaignManageList);
 app.component('campaign-show', CampaignShow);
 app.component('tag-input', TagInput);
 app.component('donation-form', DonationForm);
+app.component('payment-method-selector', PaymentMethodSelector);
 
 // Mount the app
 app.mount('#app');

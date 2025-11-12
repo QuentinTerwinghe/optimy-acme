@@ -196,6 +196,25 @@ class PaymentService implements PaymentServiceInterface
     }
 
     /**
+     * Get enabled payment methods with their metadata for display.
+     *
+     * @return array<array{value: string, label: string, isTest: bool}>
+     */
+    public function getEnabledPaymentMethodsForDisplay(): array
+    {
+        $availableMethods = $this->getAvailablePaymentMethods();
+
+        return array_map(
+            fn (PaymentMethodEnum $method) => [
+                'value' => $method->value,
+                'label' => $method->label(),
+                'isTest' => $method->isTest(),
+            ],
+            $availableMethods
+        );
+    }
+
+    /**
      * Handle successful payment by updating related donation.
      *
      * @param Payment $payment
