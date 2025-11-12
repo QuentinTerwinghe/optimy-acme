@@ -27,11 +27,16 @@ class PaymentResultController extends Controller
         /** @var view-string $viewName */
         $viewName = 'payment.success';
 
+        $donation = $payment->donation;
+        if ($donation === null) {
+            abort(404, 'Donation not found for this payment');
+        }
+
         return view($viewName, [
             'payment' => $payment,
-            'donation' => $payment->donation,
-            'campaign' => $payment->donation->campaign,
-            'user' => $payment->donation->user,
+            'donation' => $donation,
+            'campaign' => $donation->campaign,
+            'user' => $donation->user,
         ]);
     }
 
@@ -50,11 +55,16 @@ class PaymentResultController extends Controller
         /** @var view-string $viewName */
         $viewName = 'payment.failure';
 
+        $donation = $payment->donation;
+        if ($donation === null) {
+            abort(404, 'Donation not found for this payment');
+        }
+
         return view($viewName, [
             'payment' => $payment,
-            'donation' => $payment->donation,
-            'campaign' => $payment->donation->campaign,
-            'user' => $payment->donation->user,
+            'donation' => $donation,
+            'campaign' => $donation->campaign,
+            'user' => $donation->user,
         ]);
     }
 }
