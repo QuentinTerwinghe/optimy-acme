@@ -22,7 +22,7 @@ class FakePaymentGateway extends AbstractPaymentGateway
      * Process a payment through the fake gateway.
      *
      * @param Payment $payment The payment to process
-     * @param FakeProcessPaymentDTO $dto Payment processing data
+     * @param ProcessPaymentDTOInterface $dto Payment processing data (must be FakeProcessPaymentDTO)
      * @return Payment The updated payment with transaction details
      * @throws PaymentProcessingException
      */
