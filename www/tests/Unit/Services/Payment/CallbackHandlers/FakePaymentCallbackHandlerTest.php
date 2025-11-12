@@ -50,7 +50,8 @@ class FakePaymentCallbackHandlerTest extends TestCase
         $this->assertEquals('TXN_123456', $result->transactionId);
         $this->assertArrayHasKey('gateway', $result->gatewayResponse);
         $this->assertEquals('fake', $result->gatewayResponse['gateway']);
-        $this->assertEquals('dashboard', $result->redirectRoute);
+        $this->assertEquals('payment.success', $result->redirectRoute);
+        $this->assertEquals($payment->id, $result->redirectParams['payment']);
     }
 
     #[Test]
@@ -72,7 +73,8 @@ class FakePaymentCallbackHandlerTest extends TestCase
         $this->assertTrue($result->isFailed());
         $this->assertEquals('Insufficient funds', $result->errorMessage);
         $this->assertEquals('INSUFFICIENT_FUNDS', $result->errorCode);
-        $this->assertEquals('dashboard', $result->redirectRoute);
+        $this->assertEquals('payment.failure', $result->redirectRoute);
+        $this->assertEquals($payment->id, $result->redirectParams['payment']);
     }
 
     #[Test]

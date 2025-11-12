@@ -15,6 +15,7 @@ import TagInput from './components/Common/TagInput.vue';
 import DonationForm from './components/Donation/DonationForm.vue';
 import PaymentMethodSelector from './components/Donation/PaymentMethodSelector.vue';
 import FakePaymentService from './components/Payment/FakePaymentService.vue';
+import PaymentSuccess from './components/Payment/PaymentSuccess.vue';
 
 // Create Vue app
 const app = createApp({
@@ -43,6 +44,7 @@ app.component('tag-input', TagInput);
 app.component('donation-form', DonationForm);
 app.component('payment-method-selector', PaymentMethodSelector);
 app.component('fake-payment-service', FakePaymentService);
+app.component('payment-success', PaymentSuccess);
 
 // Mount the app
 app.mount('#app');

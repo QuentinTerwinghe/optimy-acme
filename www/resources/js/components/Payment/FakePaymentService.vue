@@ -191,6 +191,10 @@ const props = defineProps({
         type: Array,
         required: true,
     },
+    callbackUrl: {
+        type: String,
+        required: true,
+    },
 });
 
 // State
@@ -255,6 +259,71 @@ const formatCurrency = (amount, currency) => {
 };
 
 /**
+ * Generate a transaction ID for successful payments
+ */
+const generateTransactionId = () => {
+    return 'FAKE_TXN_' + Date.now() + '_' + Math.random().toString(36).substring(2, 15);
+};
+
+/**
+ * Get the failure reason details
+ */
+const getFailureReasonDetails = (reasonValue) => {
+    const reason = props.failureReasons.find(r => r.value === reasonValue);
+    return reason || { label: 'Unknown error', value: reasonValue };
+};
+
+/**
+ * Build the callback payload based on the selected status
+ */
+const buildCallbackPayload = () => {
+    const payload = {
+        session_id: props.payment.payload?.session_id || null,
+    };
+
+    if (selectedStatus.value === 'succeed') {
+        payload.status = 'success';
+        payload.transaction_id = generateTransactionId();
+    } else if (selectedStatus.value === 'failed') {
+        const failureReason = getFailureReasonDetails(selectedFailureReason.value);
+        payload.status = 'failed';
+        payload.error_message = failureReason.label;
+        payload.error_code = failureReason.value;
+    } else if (selectedStatus.value === 'cancelled') {
+        payload.status = 'failed';
+        payload.error_message = 'Payment cancelled by user';
+        payload.error_code = 'user_cancelled';
+    }
+
+    return payload;
+};
+
+/**
+ * Navigate to callback URL with query parameters
+ */
+const navigateToCallback = (payload) => {
+    // Build URL with query parameters
+    const url = new URL(props.callbackUrl, window.location.origin);
+
+    // Add payload as query parameters
+    Object.keys(payload).forEach(key => {
+        if (payload[key] !== null && payload[key] !== undefined) {
+            url.searchParams.append(key, payload[key]);
+        }
+    });
+
+    // Check if we're in a popup/modal (opened via window.open)
+    if (window.opener && !window.opener.closed) {
+        // We're in a popup - navigate the parent window and close this popup
+        window.opener.location.href = url.toString();
+        window.close();
+    } else {
+        // We're in the main window - navigate normally
+        window.location.href = url.toString();
+    }
+};
+
+/**
  * Handle confirm button click
  */
 const handleConfirm = async () => {
@@ -273,22 +342,20 @@ const handleConfirm = async () => {
     failureReasonError.value = '';
 
     try {
-        // TODO: Send request to backend to process the fake payment
+        // Build the callback payload
+        const payload = buildCallbackPayload();
+
         console.log('Processing payment with status:', selectedStatus.value);
-        console.log('Payment ID:', props.payment.id);
-        if (selectedStatus.value === 'failed') {
-            console.log('Failure reason:', selectedFailureReason.value);
-        }
+        console.log('Callback payload:', payload);
 
-        // Placeholder for actual implementation
-        alert(`Payment ${selectedStatus.value}! This will be implemented in the next step.`);
+        // Small delay to show the loader (improve UX)
+        await new Promise(resolve => setTimeout(resolve, 500));
 
-        // TODO: Redirect back to the application
-        // window.location.href = '/payment-result';
+        // Navigate to the callback URL (this will close/replace the current page)
+        navigateToCallback(payload);
     } catch (error) {
         console.error('Payment processing error:', error);
         errorMessage.value = 'An error occurred while processing the payment status';
-    } finally {
         isProcessing.value = false;
     }
 };

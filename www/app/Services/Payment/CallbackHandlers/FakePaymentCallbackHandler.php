@@ -53,8 +53,8 @@ class FakePaymentCallbackHandler implements PaymentCallbackHandlerInterface
             return PaymentCallbackResultDTO::success(
                 transactionId: $transactionId,
                 gatewayResponse: $gatewayResponse,
-                redirectRoute: 'dashboard',
-                redirectParams: []
+                redirectRoute: 'payment.success',
+                redirectParams: ['payment' => $payment->id]
             );
         }
 
@@ -69,8 +69,8 @@ class FakePaymentCallbackHandler implements PaymentCallbackHandlerInterface
             errorMessage: $errorMessage ?? 'Payment was not successful',
             errorCode: $errorCode,
             gatewayResponse: $gatewayResponse,
-            redirectRoute: 'dashboard',
-            redirectParams: []
+            redirectRoute: 'payment.failure',
+            redirectParams: ['payment' => $payment->id]
         );
     }
 

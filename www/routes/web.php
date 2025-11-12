@@ -7,6 +7,7 @@ use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\Donation\DonationController;
 use App\Http\Controllers\Payment\FakePaymentController;
 use App\Http\Controllers\Payment\PaymentCallbackController;
+use App\Http\Controllers\Payment\PaymentResultController;
 use Illuminate\Support\Facades\Route;
 
 // Redirect root to login
@@ -76,4 +77,10 @@ Route::middleware(['auth'])->group(function () {
     // This route accepts both GET and POST requests as different gateways use different methods
     Route::match(['get', 'post'], '/payment/callback/{payment}', [PaymentCallbackController::class, 'handle'])
         ->name('payment.callback');
+
+    // Payment Result Routes (display success/failure pages after payment)
+    Route::get('/payment/{payment}/success', [PaymentResultController::class, 'success'])
+        ->name('payment.success');
+    Route::get('/payment/{payment}/failure', [PaymentResultController::class, 'failure'])
+        ->name('payment.failure');
 });
