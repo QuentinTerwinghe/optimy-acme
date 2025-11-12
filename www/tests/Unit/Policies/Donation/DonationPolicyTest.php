@@ -37,7 +37,7 @@ class DonationPolicyTest extends TestCase
         ]);
 
         // Act
-        $result = $this->policy->create($this->user, $campaign);
+        $result = $this->policy->create($campaign);
 
         // Assert
         $this->assertTrue($result);
