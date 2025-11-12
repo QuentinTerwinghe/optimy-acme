@@ -113,6 +113,25 @@ class AppServiceProvider extends ServiceProvider
             \App\Services\Payment\PaymentProcessService::class
         );
 
+        // Register PaymentCallbackService as singleton to maintain handler registrations
+        $this->app->singleton(
+            \App\Services\Payment\PaymentCallbackService::class,
+            function ($app) {
+                $service = new \App\Services\Payment\PaymentCallbackService();
+
+                // Register all payment callback handlers
+                $service->registerHandler(
+                    new \App\Services\Payment\CallbackHandlers\FakePaymentCallbackHandler()
+                );
+
+                // Future handlers can be registered here:
+                // $service->registerHandler(new \App\Services\Payment\CallbackHandlers\PayPalCallbackHandler());
+                // $service->registerHandler(new \App\Services\Payment\CallbackHandlers\StripeCallbackHandler());
+
+                return $service;
+            }
+        );
+
         // Bind StatefulGuard for AuthService dependency injection
         $this->app->bind(
             \Illuminate\Contracts\Auth\StatefulGuard::class,

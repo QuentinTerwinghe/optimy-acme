@@ -6,6 +6,7 @@ use App\Http\Controllers\Campaign\CampaignController;
 use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\Donation\DonationController;
 use App\Http\Controllers\Payment\FakePaymentController;
+use App\Http\Controllers\Payment\PaymentCallbackController;
 use Illuminate\Support\Facades\Route;
 
 // Redirect root to login
@@ -70,4 +71,9 @@ Route::middleware(['auth'])->group(function () {
     // Payment Routes (Fake Gateway - for testing/development)
     Route::get('/payment/fake/{payment}/{session?}', [FakePaymentController::class, 'show'])
         ->name('payment.fake.show');
+
+    // Payment Callback Routes (handles callbacks from external payment services)
+    // This route accepts both GET and POST requests as different gateways use different methods
+    Route::match(['get', 'post'], '/payment/callback/{payment}', [PaymentCallbackController::class, 'handle'])
+        ->name('payment.callback');
 });
