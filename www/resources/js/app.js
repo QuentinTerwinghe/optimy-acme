@@ -16,6 +16,7 @@ import DonationForm from './components/Donation/DonationForm.vue';
 import PaymentMethodSelector from './components/Donation/PaymentMethodSelector.vue';
 import FakePaymentService from './components/Payment/FakePaymentService.vue';
 import PaymentSuccess from './components/Payment/PaymentSuccess.vue';
+import PaymentFailure from './components/Payment/PaymentFailure.vue';
 
 // Create Vue app
 const app = createApp({
@@ -45,6 +46,7 @@ app.component('donation-form', DonationForm);
 app.component('payment-method-selector', PaymentMethodSelector);
 app.component('fake-payment-service', FakePaymentService);
 app.component('payment-success', PaymentSuccess);
+app.component('payment-failure', PaymentFailure);
 
 // Mount the app
 app.mount('#app');
