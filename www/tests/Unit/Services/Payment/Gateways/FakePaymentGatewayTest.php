@@ -232,4 +232,29 @@ class FakePaymentGatewayTest extends TestCase
         // Act
         $this->gateway->verifyPaymentStatus($payment);
     }
+
+    public function test_prepare_generates_payload_and_redirect_url(): void
+    {
+        // Arrange
+        $donation = Donation::factory()->create();
+        $payment = Payment::factory()->create([
+            'donation_id' => $donation->id,
+            'payment_method' => PaymentMethodEnum::FAKE,
+            'status' => PaymentStatusEnum::PENDING,
+        ]);
+
+        // Act
+        $result = $this->gateway->prepare($payment);
+
+        // Assert
+        $this->assertNotNull($result->payload);
+        $this->assertNotNull($result->redirectUrl);
+        $this->assertArrayHasKey('session_id', $result->payload);
+        $this->assertArrayHasKey('payment_id', $result->payload);
+        $this->assertArrayHasKey('amount', $result->payload);
+        $this->assertArrayHasKey('currency', $result->payload);
+        $this->assertArrayHasKey('gateway', $result->payload);
+        $this->assertEquals('fake', $result->payload['gateway']);
+        $this->assertStringContainsString('/payment/fake/checkout/', $result->redirectUrl);
+    }
 }

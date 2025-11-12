@@ -65,4 +65,14 @@ Route::middleware(['auth'])->group(function () {
     // Donation Routes
     Route::get('/campaigns/{campaignId}/donate', [DonationController::class, 'create'])
         ->name('donations.create');
+
+    // Payment Routes (Fake Gateway Checkout - for testing/development)
+    // This is a placeholder route for the fake payment gateway
+    // In a real implementation, this would display a checkout page
+    Route::get('/payment/fake/checkout/{payment}/{session}', function () {
+        return response()->json([
+            'message' => 'Fake payment checkout page',
+            'note' => 'This is a placeholder for the fake payment gateway checkout',
+        ]);
+    })->name('payment.fake.checkout');
 });

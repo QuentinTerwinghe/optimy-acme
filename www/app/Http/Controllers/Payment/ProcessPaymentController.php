@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Payment;
 
+use App\Contracts\Payment\PaymentPreparationServiceInterface;
 use App\Contracts\Payment\PaymentProcessServiceInterface;
 use App\Exceptions\Payment\PaymentProcessingException;
 use App\Http\Controllers\Controller;
@@ -19,7 +20,8 @@ use Illuminate\Support\Facades\Log;
 class ProcessPaymentController extends Controller
 {
     public function __construct(
-        private PaymentProcessServiceInterface $paymentProcessService
+        private PaymentProcessServiceInterface $paymentProcessService,
+        private PaymentPreparationServiceInterface $paymentPreparationService
     ) {}
 
     /**
@@ -56,10 +58,13 @@ class ProcessPaymentController extends Controller
                 metadata: $metadata
             );
 
-            // Return success response with both donation and payment
+            // Prepare the payment (generate payload and redirect URL)
+            $redirectUrl = $this->paymentPreparationService->prepare($result['payment']);
+
+            // Return success response with both donation, payment, and redirect URL
             return response()->json([
                 'success' => true,
-                'message' => 'Payment initialized successfully',
+                'message' => 'Payment initialized and prepared successfully',
                 'data' => [
                     'donation' => [
                         'id' => $result['donation']->id,
@@ -75,6 +80,7 @@ class ProcessPaymentController extends Controller
                         'payment_method' => $result['payment']->payment_method->value,
                         'status' => $result['payment']->status->value,
                     ],
+                    'redirect_url' => $redirectUrl,
                 ],
             ], 201);
         } catch (PaymentProcessingException $e) {

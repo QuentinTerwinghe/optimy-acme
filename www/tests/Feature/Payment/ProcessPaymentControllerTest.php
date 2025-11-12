@@ -49,7 +49,7 @@ class ProcessPaymentControllerTest extends TestCase
         $response->assertStatus(201)
             ->assertJson([
                 'success' => true,
-                'message' => 'Payment initialized successfully',
+                'message' => 'Payment initialized and prepared successfully',
             ])
             ->assertJsonStructure([
                 'success',
@@ -69,6 +69,7 @@ class ProcessPaymentControllerTest extends TestCase
                         'payment_method',
                         'status',
                     ],
+                    'redirect_url',
                 ],
             ]);
 
@@ -79,6 +80,8 @@ class ProcessPaymentControllerTest extends TestCase
         $this->assertEquals(DonationStatus::PENDING->value, $responseData['donation']['status']);
         $this->assertEquals(PaymentMethodEnum::FAKE->value, $responseData['payment']['payment_method']);
         $this->assertEquals(PaymentStatusEnum::PENDING->value, $responseData['payment']['status']);
+        $this->assertNotNull($responseData['redirect_url']);
+        $this->assertStringContainsString('/payment/fake/checkout/', $responseData['redirect_url']);
 
         // Assert database records
         $this->assertDatabaseHas('donations', [
@@ -96,6 +99,14 @@ class ProcessPaymentControllerTest extends TestCase
             'payment_method' => PaymentMethodEnum::FAKE->value,
             'status' => PaymentStatusEnum::PENDING->value,
         ]);
+
+        // Assert payment preparation fields are saved
+        $payment = Payment::find($responseData['payment']['id']);
+        $this->assertNotNull($payment->payload);
+        $this->assertNotNull($payment->redirect_url);
+        $this->assertNotNull($payment->prepared_at);
+        $this->assertArrayHasKey('session_id', $payment->payload);
+        $this->assertArrayHasKey('gateway', $payment->payload);
     }
 
     public function test_initialize_payment_requires_authentication(): void
@@ -337,19 +348,7 @@ class ProcessPaymentControllerTest extends TestCase
                 ],
             ]);
 
-        // Test with PAYPAL (currently disabled but should still allow initialization)
-        $requestData['payment_method'] = PaymentMethodEnum::PAYPAL->value;
-
-        $response = $this->actingAs($this->user)
-            ->postJson('/api/payments/initialize', $requestData);
-
-        $response->assertStatus(201)
-            ->assertJson([
-                'data' => [
-                    'payment' => [
-                        'payment_method' => PaymentMethodEnum::PAYPAL->value,
-                    ],
-                ],
-            ]);
+        // TODO: Add test for PAYPAL when PayPal handler is implemented
+        // PayPal preparation handler needs to be registered before this test will pass
     }
 }

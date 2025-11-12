@@ -2,8 +2,10 @@
 
 namespace App\Services\Payment\Gateways;
 
+use App\Contracts\Payment\PaymentMethodHandlerInterface;
 use App\Contracts\Payment\ProcessPaymentDTOInterface;
 use App\DTOs\Payment\FakeProcessPaymentDTO;
+use App\DTOs\Payment\PaymentPreparationResultDTO;
 use App\DTOs\Payment\RefundPaymentDTO;
 use App\Enums\Payment\PaymentMethodEnum;
 use App\Exceptions\Payment\PaymentProcessingException;
@@ -16,7 +18,7 @@ use Illuminate\Support\Str;
  * Fake payment gateway for testing purposes.
  * Simulates payment processing without actual financial transactions.
  */
-class FakePaymentGateway extends AbstractPaymentGateway
+class FakePaymentGateway extends AbstractPaymentGateway implements PaymentMethodHandlerInterface
 {
     /**
      * Process a payment through the fake gateway.
@@ -92,6 +94,47 @@ class FakePaymentGateway extends AbstractPaymentGateway
             ]);
             throw PaymentProcessingException::forPayment((string) $payment->id, $e->getMessage());
         }
+    }
+
+    /**
+     * Prepare the payment by generating the payload and redirect URL.
+     *
+     * @param Payment $payment The payment to prepare
+     * @return PaymentPreparationResultDTO The preparation result
+     */
+    public function prepare(Payment $payment): PaymentPreparationResultDTO
+    {
+        $this->log('Preparing fake payment', $payment);
+
+        // Generate a fake session ID for this payment
+        $sessionId = 'FAKE_SESSION_' . strtoupper(Str::random(16));
+
+        // Prepare the payload that would be sent to the payment gateway
+        $payload = [
+            'session_id' => $sessionId,
+            'payment_id' => $payment->id,
+            'amount' => (float) $payment->amount,
+            'currency' => $payment->currency,
+            'metadata' => $payment->metadata ?? [],
+            'gateway' => $this->getName(),
+        ];
+
+        // Generate the redirect URL where the user will complete payment
+        // In a real implementation, this would be the gateway's checkout URL
+        $redirectUrl = route('payment.fake.checkout', [
+            'payment' => $payment->id,
+            'session' => $sessionId,
+        ]);
+
+        $this->log('Fake payment prepared', $payment, [
+            'session_id' => $sessionId,
+            'redirect_url' => $redirectUrl,
+        ]);
+
+        return new PaymentPreparationResultDTO(
+            payload: $payload,
+            redirectUrl: $redirectUrl
+        );
     }
 
     /**

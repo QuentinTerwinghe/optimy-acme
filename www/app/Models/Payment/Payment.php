@@ -40,6 +40,9 @@ class Payment extends Model
         'error_message',
         'error_code',
         'metadata',
+        'payload',
+        'redirect_url',
+        'prepared_at',
         'initiated_at',
         'completed_at',
         'failed_at',
@@ -49,6 +52,8 @@ class Payment extends Model
     protected $casts = [
         'amount' => 'decimal:2',
         'metadata' => 'array',
+        'payload' => 'array',
+        'prepared_at' => 'datetime',
         'initiated_at' => 'datetime',
         'completed_at' => 'datetime',
         'failed_at' => 'datetime',
@@ -145,6 +150,20 @@ class Payment extends Model
     {
         $this->update([
             'status' => PaymentStatusEnum::PROCESSING,
+        ]);
+    }
+
+    /**
+     * Mark the payment as prepared with payload and redirect URL.
+     *
+     * @param array<string, mixed> $payload
+     */
+    public function markAsPrepared(array $payload, string $redirectUrl): void
+    {
+        $this->update([
+            'payload' => $payload,
+            'redirect_url' => $redirectUrl,
+            'prepared_at' => now(),
         ]);
     }
 

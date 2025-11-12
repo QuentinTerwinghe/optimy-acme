@@ -40,6 +40,9 @@ class PaymentFactory extends Factory
             'error_message' => null,
             'error_code' => null,
             'metadata' => null,
+            'payload' => null,
+            'redirect_url' => null,
+            'prepared_at' => null,
             'initiated_at' => now(),
             'completed_at' => null,
             'failed_at' => null,
@@ -58,6 +61,23 @@ class PaymentFactory extends Factory
             'completed_at' => null,
             'failed_at' => null,
             'refunded_at' => null,
+        ]);
+    }
+
+    /**
+     * Indicate that the payment is prepared.
+     */
+    public function prepared(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => PaymentStatusEnum::PENDING,
+            'payload' => [
+                'session_id' => 'FAKE_SESSION_' . strtoupper($this->faker->bothify('??##??##??##??##')),
+                'gateway' => 'fake',
+            ],
+            'redirect_url' => 'https://fake-gateway.example.com/checkout/' . $this->faker->uuid(),
+            'prepared_at' => now(),
+            'initiated_at' => now(),
         ]);
     }
 
