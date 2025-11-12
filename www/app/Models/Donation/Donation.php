@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * Donation Model
@@ -31,6 +32,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property-read User|null $updater
  * @property-read Campaign $campaign
  * @property-read User $user
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Payment\Payment> $payments
  *
  * @use HasFactory<\Database\Factories\Donation\DonationFactory>
  */
@@ -171,5 +173,15 @@ class Donation extends Model
     public function isPending(): bool
     {
         return $this->status->isPending();
+    }
+
+    /**
+     * Get the payments associated with this donation
+     *
+     * @return HasMany<\App\Models\Payment\Payment, $this>
+     */
+    public function payments(): HasMany
+    {
+        return $this->hasMany(\App\Models\Payment\Payment::class);
     }
 }
