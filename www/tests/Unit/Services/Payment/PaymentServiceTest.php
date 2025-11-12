@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Services\Payment;
 
+use App\DTOs\Payment\FakeProcessPaymentDTO;
 use App\Enums\Donation\DonationStatus;
 use App\Enums\Payment\PaymentMethodEnum;
 use App\Enums\Payment\PaymentStatusEnum;
@@ -65,7 +66,7 @@ class PaymentServiceTest extends TestCase
         ]);
 
         // Act
-        $result = $this->paymentService->processPayment($payment);
+        $result = $this->paymentService->processPayment($payment, new FakeProcessPaymentDTO());
 
         // Assert
         $this->assertEquals(PaymentStatusEnum::COMPLETED, $result->status);
@@ -85,16 +86,16 @@ class PaymentServiceTest extends TestCase
             'donation_id' => $donation->id,
         ]);
 
-        $paymentData = [
-            'simulate_failure' => true,
-            'error_message' => 'Payment declined',
-        ];
+        $paymentDto = new FakeProcessPaymentDTO(
+            simulateFailure: true,
+            errorMessage: 'Payment declined',
+        );
 
         // Assert
         $this->expectException(PaymentProcessingException::class);
 
         // Act
-        $this->paymentService->processPayment($payment, $paymentData);
+        $this->paymentService->processPayment($payment, $paymentDto);
     }
 
     public function test_cannot_process_completed_payment(): void
@@ -110,7 +111,7 @@ class PaymentServiceTest extends TestCase
         $this->expectExceptionMessage('terminal state');
 
         // Act
-        $this->paymentService->processPayment($payment);
+        $this->paymentService->processPayment($payment, new FakeProcessPaymentDTO());
     }
 
     public function test_throws_exception_for_unsupported_payment_method(): void
@@ -127,7 +128,7 @@ class PaymentServiceTest extends TestCase
         $this->expectException(UnsupportedPaymentMethodException::class);
 
         // Act
-        $this->paymentService->processPayment($payment);
+        $this->paymentService->processPayment($payment, new FakeProcessPaymentDTO());
     }
 
     public function test_refunds_payment_successfully(): void

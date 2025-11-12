@@ -2,7 +2,6 @@
 
 namespace App\Contracts\Payment;
 
-use App\DTOs\Payment\ProcessPaymentDTO;
 use App\DTOs\Payment\RefundPaymentDTO;
 use App\Models\Payment\Payment;
 
@@ -16,11 +15,11 @@ interface PaymentGatewayInterface
      * Process a payment through the gateway.
      *
      * @param Payment $payment The payment to process
-     * @param ProcessPaymentDTO $dto Payment processing data
+     * @param ProcessPaymentDTOInterface $dto Payment processing data
      * @return Payment The updated payment with transaction details
      * @throws \App\Exceptions\Payment\PaymentProcessingException
      */
-    public function processPayment(Payment $payment, ProcessPaymentDTO $dto): Payment;
+    public function processPayment(Payment $payment, ProcessPaymentDTOInterface $dto): Payment;
 
     /**
      * Refund a completed payment.

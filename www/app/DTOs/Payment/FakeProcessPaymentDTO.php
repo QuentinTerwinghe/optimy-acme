@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\DTOs\Payment;
 
+use App\Contracts\Payment\ProcessPaymentDTOInterface;
+
 /**
  * DTO for processing payment data.
  */
-final readonly class ProcessPaymentDTO
+final readonly class FakeProcessPaymentDTO implements ProcessPaymentDTOInterface
 {
     /**
      * @param array<string, mixed> $metadata Additional metadata for the payment

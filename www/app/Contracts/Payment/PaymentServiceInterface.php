@@ -29,12 +29,12 @@ interface PaymentServiceInterface
      * Process a payment through the appropriate gateway.
      *
      * @param Payment $payment
-     * @param array<string, mixed> $paymentData
+     * @param ProcessPaymentDTOInterface $paymentDTO
      * @return Payment
      * @throws \App\Exceptions\Payment\PaymentProcessingException
      * @throws \App\Exceptions\Payment\UnsupportedPaymentMethodException
      */
-    public function processPayment(Payment $payment, array $paymentData = []): Payment;
+    public function processPayment(Payment $payment, ProcessPaymentDTOInterface $paymentDTO): Payment;
 
     /**
      * Refund a payment.

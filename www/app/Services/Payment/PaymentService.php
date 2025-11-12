@@ -3,7 +3,7 @@
 namespace App\Services\Payment;
 
 use App\Contracts\Payment\PaymentServiceInterface;
-use App\DTOs\Payment\ProcessPaymentDTO;
+use App\Contracts\Payment\ProcessPaymentDTOInterface;
 use App\DTOs\Payment\RefundPaymentDTO;
 use App\Enums\Donation\DonationStatus;
 use App\Enums\Payment\PaymentMethodEnum;
@@ -54,12 +54,12 @@ class PaymentService implements PaymentServiceInterface
      * Process a payment through the appropriate gateway.
      *
      * @param Payment $payment
-     * @param array<string, mixed> $paymentData
+     * @param ProcessPaymentDTOInterface $paymentDTO
      * @return Payment
      * @throws PaymentProcessingException
      * @throws UnsupportedPaymentMethodException
      */
-    public function processPayment(Payment $payment, array $paymentData = []): Payment
+    public function processPayment(Payment $payment, ProcessPaymentDTOInterface $paymentDTO): Payment
     {
         try {
             // Start a database transaction
@@ -72,9 +72,6 @@ class PaymentService implements PaymentServiceInterface
                     "Payment is in a terminal state: {$payment->status->value}"
                 );
             }
-
-            // Convert array to DTO
-            $dto = ProcessPaymentDTO::fromArray($paymentData);
 
             // Get the appropriate gateway using Strategy pattern
             $gateway = $this->gatewayRegistry->getGateway($payment->payment_method);
@@ -89,7 +86,7 @@ class PaymentService implements PaymentServiceInterface
             ]);
 
             // Process through the gateway
-            $processedPayment = $gateway->processPayment($payment, $dto);
+            $processedPayment = $gateway->processPayment($payment, $paymentDTO);
 
             // If payment is completed, update donation status
             if ($processedPayment->isCompleted()) {

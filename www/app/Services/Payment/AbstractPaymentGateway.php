@@ -3,7 +3,7 @@
 namespace App\Services\Payment;
 
 use App\Contracts\Payment\PaymentGatewayInterface;
-use App\DTOs\Payment\ProcessPaymentDTO;
+use App\Contracts\Payment\ProcessPaymentDTOInterface;
 use App\DTOs\Payment\RefundPaymentDTO;
 use App\Exceptions\Payment\PaymentRefundException;
 use App\Models\Payment\Payment;
@@ -19,10 +19,10 @@ abstract class AbstractPaymentGateway implements PaymentGatewayInterface
      * Must be implemented by concrete gateways.
      *
      * @param Payment $payment
-     * @param ProcessPaymentDTO $dto
+     * @param ProcessPaymentDTOInterface $dto
      * @return Payment
      */
-    abstract public function processPayment(Payment $payment, ProcessPaymentDTO $dto): Payment;
+    abstract public function processPayment(Payment $payment, ProcessPaymentDTOInterface $dto): Payment;
 
     /**
      * Refund a completed payment.

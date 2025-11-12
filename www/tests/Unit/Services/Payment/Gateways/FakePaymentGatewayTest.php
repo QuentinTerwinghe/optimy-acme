@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Services\Payment\Gateways;
 
-use App\DTOs\Payment\ProcessPaymentDTO;
+use App\DTOs\Payment\FakeProcessPaymentDTO;
 use App\DTOs\Payment\RefundPaymentDTO;
 use App\Enums\Payment\PaymentMethodEnum;
 use App\Enums\Payment\PaymentStatusEnum;
@@ -60,7 +60,7 @@ class FakePaymentGatewayTest extends TestCase
             'status' => PaymentStatusEnum::PENDING,
         ]);
 
-        $dto = new ProcessPaymentDTO();
+        $dto = new FakeProcessPaymentDTO();
 
         // Act
         $result = $this->gateway->processPayment($payment, $dto);
@@ -83,7 +83,7 @@ class FakePaymentGatewayTest extends TestCase
             'status' => PaymentStatusEnum::PENDING,
         ]);
 
-        $dto = new ProcessPaymentDTO(
+        $dto = new FakeProcessPaymentDTO(
             simulateFailure: true,
             errorMessage: 'Test error message',
             errorCode: 'TEST_ERROR'

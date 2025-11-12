@@ -2,7 +2,8 @@
 
 namespace App\Services\Payment\Gateways;
 
-use App\DTOs\Payment\ProcessPaymentDTO;
+use App\Contracts\Payment\ProcessPaymentDTOInterface;
+use App\DTOs\Payment\FakeProcessPaymentDTO;
 use App\DTOs\Payment\RefundPaymentDTO;
 use App\Enums\Payment\PaymentMethodEnum;
 use App\Exceptions\Payment\PaymentProcessingException;
@@ -21,13 +22,23 @@ class FakePaymentGateway extends AbstractPaymentGateway
      * Process a payment through the fake gateway.
      *
      * @param Payment $payment The payment to process
-     * @param ProcessPaymentDTO $dto Payment processing data
+     * @param FakeProcessPaymentDTO $dto Payment processing data
      * @return Payment The updated payment with transaction details
      * @throws PaymentProcessingException
      */
-    public function processPayment(Payment $payment, ProcessPaymentDTO $dto): Payment
+    public function processPayment(Payment $payment, ProcessPaymentDTOInterface $dto): Payment
     {
         try {
+            if (!$dto instanceof FakeProcessPaymentDTO) {
+                throw new \InvalidArgumentException(
+                    sprintf(
+                        'FakePaymentGateway requires %s, %s given',
+                        FakeProcessPaymentDTO::class,
+                        get_class($dto)
+                    )
+                );
+            }
+
             $this->log('Starting payment processing', $payment, [
                 'simulate_failure' => $dto->simulateFailure,
             ]);
