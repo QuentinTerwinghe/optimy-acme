@@ -6,6 +6,7 @@ use App\Enums\Payment\FailureReasonEnum;
 use App\Http\Controllers\Controller;
 use App\Models\Payment\Payment;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
 class FakePaymentController extends Controller
@@ -13,10 +14,13 @@ class FakePaymentController extends Controller
     /**
      * Display the fake payment service page.
      */
-    public function show(Payment $payment): View
+    public function show(Payment $payment, Request $request): View
     {
         // Authorize access using the policy
         Gate::authorize('access', $payment);
+
+        // Get the callback URL from the query parameters
+        $callbackUrl = $request->query('callback_url');
 
         // Get all failure reasons for the dropdown
         $failureReasons = collect(FailureReasonEnum::cases())->map(function (FailureReasonEnum $reason) {
@@ -32,6 +36,7 @@ class FakePaymentController extends Controller
         return view($viewName, [
             'payment' => $payment,
             'failureReasons' => $failureReasons,
+            'callbackUrl' => $callbackUrl,
         ]);
     }
 }

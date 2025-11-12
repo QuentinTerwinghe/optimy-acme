@@ -109,25 +109,32 @@ class FakePaymentGateway extends AbstractPaymentGateway implements PaymentMethod
         // Generate a fake session ID for this payment
         $sessionId = 'FAKE_SESSION_' . strtoupper(Str::random(16));
 
+        // Generate the callback URL where the payment gateway will redirect after completion
+        $callbackUrl = route('payment.callback', ['payment' => $payment->id]);
+
         // Prepare the payload that would be sent to the payment gateway
         $payload = [
             'session_id' => $sessionId,
             'payment_id' => $payment->id,
             'amount' => (float) $payment->amount,
             'currency' => $payment->currency,
+            'callback_url' => $callbackUrl,
             'metadata' => $payment->metadata ?? [],
             'gateway' => $this->getName(),
         ];
 
         // Generate the redirect URL where the user will complete payment
-        // In a real implementation, this would be the gateway's show URL
+        // Include the callback URL as a query parameter so the external service knows where to redirect
+        // In a real implementation (PayPal, Stripe, etc.), this would be their payment page URL
         $redirectUrl = route('payment.fake.show', [
             'payment' => $payment->id,
             'session' => $sessionId,
+            'callback_url' => $callbackUrl,
         ]);
 
         $this->log('Fake payment prepared', $payment, [
             'session_id' => $sessionId,
+            'callback_url' => $callbackUrl,
             'redirect_url' => $redirectUrl,
         ]);
 

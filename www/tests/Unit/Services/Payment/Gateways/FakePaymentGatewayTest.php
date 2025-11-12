@@ -246,15 +246,29 @@ class FakePaymentGatewayTest extends TestCase
         // Act
         $result = $this->gateway->prepare($payment);
 
-        // Assert
+        // Assert - Payload validation
         $this->assertNotNull($result->payload);
         $this->assertNotNull($result->redirectUrl);
         $this->assertArrayHasKey('session_id', $result->payload);
         $this->assertArrayHasKey('payment_id', $result->payload);
         $this->assertArrayHasKey('amount', $result->payload);
         $this->assertArrayHasKey('currency', $result->payload);
+        $this->assertArrayHasKey('callback_url', $result->payload);
         $this->assertArrayHasKey('gateway', $result->payload);
         $this->assertEquals('fake', $result->payload['gateway']);
+
+        // Assert - Callback URL is in payload
+        $this->assertStringContainsString('/payment/callback/', $result->payload['callback_url']);
+        $this->assertStringContainsString((string) $payment->id, $result->payload['callback_url']);
+
+        // Assert - Redirect URL structure
         $this->assertStringContainsString('/payment/fake/', $result->redirectUrl);
+
+        // Assert - Callback URL is also sent as query parameter in the redirect URL (for external service)
+        $this->assertStringContainsString('callback_url=', $result->redirectUrl);
+        $parsedUrl = parse_url($result->redirectUrl);
+        parse_str($parsedUrl['query'] ?? '', $queryParams);
+        $this->assertArrayHasKey('callback_url', $queryParams);
+        $this->assertStringContainsString('/payment/callback/', $queryParams['callback_url']);
     }
 }

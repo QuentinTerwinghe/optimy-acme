@@ -20,6 +20,7 @@
         <fake-payment-service
             :payment="{{ Js::from($payment) }}"
             :failure-reasons="{{ Js::from($failureReasons) }}"
+            :callback-url="{{ Js::from($callbackUrl) }}"
         ></fake-payment-service>
     </div>
 
