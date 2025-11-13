@@ -17,6 +17,10 @@ import PaymentMethodSelector from './components/Donation/PaymentMethodSelector.v
 import FakePaymentService from './components/Payment/FakePaymentService.vue';
 import PaymentSuccess from './components/Payment/PaymentSuccess.vue';
 import PaymentFailure from './components/Payment/PaymentFailure.vue';
+import RoleList from './components/Role/RoleList.vue';
+import RoleCreateForm from './components/Role/RoleCreateForm.vue';
+import RoleEditForm from './components/Role/RoleEditForm.vue';
+import DeleteConfirmationModal from './components/Role/DeleteConfirmationModal.vue';
 
 // Create Vue app
 const app = createApp({
@@ -47,6 +51,10 @@ app.component('payment-method-selector', PaymentMethodSelector);
 app.component('fake-payment-service', FakePaymentService);
 app.component('payment-success', PaymentSuccess);
 app.component('payment-failure', PaymentFailure);
+app.component('role-list', RoleList);
+app.component('role-create-form', RoleCreateForm);
+app.component('role-edit-form', RoleEditForm);
+app.component('delete-confirmation-modal', DeleteConfirmationModal);
 
 // Mount the app
 app.mount('#app');

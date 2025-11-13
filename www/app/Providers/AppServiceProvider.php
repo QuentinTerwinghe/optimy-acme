@@ -164,6 +164,18 @@ class AppServiceProvider extends ServiceProvider
                 return $app->make('auth')->guard();
             }
         );
+
+        // Bind Role repository interface to implementation
+        $this->app->bind(
+            \App\Contracts\Role\RoleRepositoryInterface::class,
+            \App\Repositories\Role\RoleRepository::class
+        );
+
+        // Bind Role service interface to implementation
+        $this->app->bind(
+            \App\Contracts\Role\RoleServiceInterface::class,
+            \App\Services\Role\RoleService::class
+        );
     }
 
     /**

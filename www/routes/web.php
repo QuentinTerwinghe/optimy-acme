@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\Campaign\CampaignController;
@@ -81,4 +82,14 @@ Route::middleware(['auth'])->group(function () {
     // Payment Result Route (displays success/failure page based on payment status)
     Route::get('/payment/{payment}', [PaymentResultController::class, 'show'])
         ->name('payment.result');
+});
+
+// Admin Routes - requires wildcard (*) permission
+Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
+    Route::get('/roles/create', [AdminController::class, 'createRole'])
+        ->name('admin.roles.create');
+    Route::get('/roles/{id}/edit', [AdminController::class, 'editRole'])
+        ->name('admin.roles.edit');
+    Route::get('/roles', [AdminController::class, 'roles'])
+        ->name('admin.roles');
 });

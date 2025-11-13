@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Http\Controllers\Api\Campaign\CampaignController;
 use App\Http\Controllers\Payment\PaymentMethodController;
 use App\Http\Controllers\Payment\ProcessPaymentController;
+use App\Http\Controllers\Role\RoleController;
 use Illuminate\Support\Facades\Route;
 
 // Protected API Routes - using web middleware for session-based auth
@@ -38,4 +39,31 @@ Route::middleware(['web', 'auth'])->group(function () {
     // Payment Processing Routes
     Route::post('/payments/initialize', [ProcessPaymentController::class, 'initialize'])
         ->name('api.payments.initialize');
+});
+
+// Admin-only API Routes - requires wildcard (*) permission
+Route::middleware(['web', 'auth', 'admin'])->prefix('admin')->group(function () {
+    // Role Management Routes
+    Route::get('/roles', [RoleController::class, 'index'])
+        ->name('api.admin.roles.index');
+    Route::get('/roles/{id}', [RoleController::class, 'show'])
+        ->name('api.admin.roles.show');
+    Route::post('/roles', [RoleController::class, 'store'])
+        ->name('api.admin.roles.store');
+    Route::put('/roles/{id}', [RoleController::class, 'update'])
+        ->name('api.admin.roles.update');
+    Route::delete('/roles/{id}', [RoleController::class, 'destroy'])
+        ->name('api.admin.roles.destroy');
+
+    // Get all permissions (for role creation/editing)
+    Route::get('/permissions', [RoleController::class, 'permissions'])
+        ->name('api.admin.permissions.index');
+
+    // Get all users (for role assignment)
+    Route::get('/users', [RoleController::class, 'users'])
+        ->name('api.admin.users.index');
+
+    // Get users assigned to a specific role
+    Route::get('/roles/{id}/users', [RoleController::class, 'roleUsers'])
+        ->name('api.admin.roles.users');
 });
