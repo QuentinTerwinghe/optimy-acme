@@ -4,10 +4,15 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Services\Donation;
 
+use App\Contracts\Donation\DonationRepositoryInterface;
 use App\Enums\Common\Currency;
+use App\Enums\Donation\DonationStatus;
 use App\Models\Campaign\Campaign;
+use App\Models\Donation\Donation;
+use App\Models\Payment\Payment;
 use App\Services\Donation\DonationService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Mockery;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
@@ -16,12 +21,23 @@ class DonationServiceTest extends TestCase
     use RefreshDatabase;
 
     private DonationService $service;
+    private DonationRepositoryInterface $mockRepository;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->service = new DonationService();
+        // Mock the repository
+        $this->mockRepository = Mockery::mock(DonationRepositoryInterface::class);
+
+        // Create service with mocked repository
+        $this->service = new DonationService($this->mockRepository);
+    }
+
+    protected function tearDown(): void
+    {
+        Mockery::close();
+        parent::tearDown();
     }
 
     #[Test]
@@ -88,5 +104,121 @@ class DonationServiceTest extends TestCase
         // Assert - All currencies use same standard amounts
         $this->assertEquals([5, 10, 20, 50, 100], $resultEur);
         $this->assertEquals([5, 10, 20, 50, 100], $resultGbp);
+    }
+
+    #[Test]
+    public function it_marks_donation_as_successful(): void
+    {
+        // Arrange
+        $donation = Donation::factory()->make([
+            'status' => DonationStatus::PENDING,
+        ]);
+        $payment = Payment::factory()->make();
+
+        $updatedDonation = clone $donation;
+        $updatedDonation->status = DonationStatus::SUCCESS;
+
+        $this->mockRepository
+            ->shouldReceive('markAsSuccessful')
+            ->once()
+            ->with($donation)
+            ->andReturn($updatedDonation);
+
+        // Act
+        $result = $this->service->markDonationAsSuccessful($donation, $payment);
+
+        // Assert
+        $this->assertEquals(DonationStatus::SUCCESS, $result->status);
+    }
+
+    #[Test]
+    public function it_does_not_update_already_successful_donation(): void
+    {
+        // Arrange
+        $donation = Donation::factory()->make([
+            'status' => DonationStatus::SUCCESS,
+        ]);
+        $payment = Payment::factory()->make();
+
+        $this->mockRepository->shouldNotReceive('markAsSuccessful');
+
+        // Act
+        $result = $this->service->markDonationAsSuccessful($donation, $payment);
+
+        // Assert
+        $this->assertEquals(DonationStatus::SUCCESS, $result->status);
+    }
+
+    #[Test]
+    public function it_marks_donation_as_failed(): void
+    {
+        // Arrange
+        $donation = Donation::factory()->make([
+            'status' => DonationStatus::PENDING,
+        ]);
+        $payment = Payment::factory()->make();
+        $errorMessage = 'Payment failed';
+
+        $updatedDonation = clone $donation;
+        $updatedDonation->status = DonationStatus::FAILED;
+        $updatedDonation->error_message = $errorMessage;
+
+        $this->mockRepository
+            ->shouldReceive('markAsFailed')
+            ->once()
+            ->with($donation, $errorMessage)
+            ->andReturn($updatedDonation);
+
+        // Act
+        $result = $this->service->markDonationAsFailed($donation, $payment, $errorMessage);
+
+        // Assert
+        $this->assertEquals(DonationStatus::FAILED, $result->status);
+        $this->assertEquals($errorMessage, $result->error_message);
+    }
+
+    #[Test]
+    public function it_can_process_pending_donation(): void
+    {
+        // Arrange
+        $donation = Donation::factory()->make([
+            'status' => DonationStatus::PENDING,
+        ]);
+
+        // Act
+        $result = $this->service->canProcessDonation($donation);
+
+        // Assert
+        $this->assertTrue($result);
+    }
+
+    #[Test]
+    public function it_can_process_failed_donation(): void
+    {
+        // Arrange
+        $donation = Donation::factory()->make([
+            'status' => DonationStatus::FAILED,
+        ]);
+
+        // Act
+        $result = $this->service->canProcessDonation($donation);
+
+        // Assert
+        $this->assertTrue($result);
+    }
+
+    #[Test]
+    public function it_cannot_process_successful_donation(): void
+    {
+        // Arrange
+        $donation = Donation::factory()->make([
+            'status' => DonationStatus::SUCCESS,
+        ]);
+
+        // Act
+        $result = $this->service->canProcessDonation($donation);
+
+        // Assert
+        $this->assertFalse($result);
     }
 }

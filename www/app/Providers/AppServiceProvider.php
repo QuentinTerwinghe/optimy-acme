@@ -108,6 +108,24 @@ class AppServiceProvider extends ServiceProvider
             \App\Services\Category\CategoryQueryService::class
         );
 
+        // Bind Donation services interfaces to implementations
+        $this->app->bind(
+            \App\Contracts\Donation\DonationServiceInterface::class,
+            \App\Services\Donation\DonationService::class
+        );
+
+        // Bind Donation repository interface to implementation
+        $this->app->bind(
+            \App\Contracts\Donation\DonationRepositoryInterface::class,
+            \App\Repositories\Donation\DonationRepository::class
+        );
+
+        // Bind Payment Gateway Registry interface to implementation (follows DIP)
+        $this->app->bind(
+            \App\Contracts\Payment\PaymentGatewayRegistryInterface::class,
+            \App\Services\Payment\PaymentGatewayRegistry::class
+        );
+
         // Bind Payment services interfaces to implementations
         $this->app->bind(
             \App\Contracts\Payment\PaymentProcessServiceInterface::class,

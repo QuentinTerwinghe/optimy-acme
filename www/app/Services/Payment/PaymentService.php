@@ -2,10 +2,11 @@
 
 namespace App\Services\Payment;
 
+use App\Contracts\Donation\DonationServiceInterface;
+use App\Contracts\Payment\PaymentGatewayRegistryInterface;
 use App\Contracts\Payment\PaymentServiceInterface;
 use App\Contracts\Payment\ProcessPaymentDTOInterface;
 use App\DTOs\Payment\RefundPaymentDTO;
-use App\Enums\Donation\DonationStatus;
 use App\Enums\Payment\PaymentMethodEnum;
 use App\Enums\Payment\PaymentStatusEnum;
 use App\Exceptions\Payment\PaymentProcessingException;
@@ -19,11 +20,15 @@ use Illuminate\Support\Facades\Log;
 /**
  * Service for handling payment operations.
  * Uses Strategy pattern via PaymentGatewayRegistry to delegate to appropriate gateway.
+ * Follows Single Responsibility Principle (SRP) - handles ONLY payment processing.
+ * Follows Dependency Inversion Principle (DIP) - depends on interfaces.
+ * Donation status updates delegated to DonationService (extracted for better SRP).
  */
 class PaymentService implements PaymentServiceInterface
 {
     public function __construct(
-        private PaymentGatewayRegistry $gatewayRegistry
+        private PaymentGatewayRegistryInterface $gatewayRegistry,
+        private DonationServiceInterface $donationService
     ) {}
 
     /**
@@ -216,48 +221,35 @@ class PaymentService implements PaymentServiceInterface
 
     /**
      * Handle successful payment by updating related donation.
+     * Delegates to DonationService following Single Responsibility Principle (SRP).
      *
      * @param Payment $payment
      * @return void
      */
     private function handleSuccessfulPayment(Payment $payment): void
     {
-        // Update donation status to success
-        // This could be moved to a dedicated DonationService for better separation
         $donation = $payment->donation;
 
-        if ($donation && $donation->status !== DonationStatus::SUCCESS) {
-            $donation->update([
-                'status' => DonationStatus::SUCCESS,
-            ]);
-
-            Log::info('Donation marked as successful after payment', [
-                'donation_id' => $donation->id,
-                'payment_id' => $payment->id,
-            ]);
+        if ($donation) {
+            // Delegate donation status update to DonationService
+            $this->donationService->markDonationAsSuccessful($donation, $payment);
         }
     }
 
     /**
      * Handle refunded payment by updating related donation.
+     * Delegates to DonationService following Single Responsibility Principle (SRP).
      *
      * @param Payment $payment
      * @return void
      */
     private function handleRefundedPayment(Payment $payment): void
     {
-        // Update donation status to failed
         $donation = $payment->donation;
 
         if ($donation) {
-            $donation->update([
-                'status' => DonationStatus::FAILED,
-            ]);
-
-            Log::info('Donation marked as failed after refund', [
-                'donation_id' => $donation->id,
-                'payment_id' => $payment->id,
-            ]);
+            // Delegate donation status update to DonationService
+            $this->donationService->markDonationAsFailed($donation, $payment, 'Payment was refunded');
         }
     }
 

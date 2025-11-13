@@ -1,16 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services\Payment;
 
 use App\Contracts\Payment\PaymentGatewayInterface;
+use App\Contracts\Payment\PaymentGatewayRegistryInterface;
 use App\Enums\Payment\PaymentMethodEnum;
 use App\Exceptions\Payment\UnsupportedPaymentMethodException;
 
 /**
  * Registry for payment gateway implementations.
  * Follows the Registry pattern similar to NotificationChannelRegistry.
+ * Implements PaymentGatewayRegistryInterface for Dependency Inversion Principle (DIP).
  */
-class PaymentGatewayRegistry
+class PaymentGatewayRegistry implements PaymentGatewayRegistryInterface
 {
     /**
      * Registered payment gateways.
