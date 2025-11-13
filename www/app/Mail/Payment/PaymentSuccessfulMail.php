@@ -48,7 +48,7 @@ class PaymentSuccessfulMail extends Mailable implements ShouldQueue
     public function content(): Content
     {
         return new Content(
-            markdown: 'emails.payment.success',
+            markdown: 'emails.payment.sucess',
         );
     }
 

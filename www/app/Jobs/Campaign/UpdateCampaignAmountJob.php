@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Jobs\Campaign;
 
 use App\Contracts\Campaign\CampaignWriteServiceInterface;
+use App\Jobs\Notification\SendCampaignGoalAchievedNotificationJob;
 use App\Models\Campaign\Campaign;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -50,6 +51,7 @@ class UpdateCampaignAmountJob implements ShouldQueue
     /**
      * Execute the job.
      * Recalculates the campaign's total amount based on all successful donations.
+     * Also checks if the campaign goal is achieved and dispatches notification if so.
      *
      * @param CampaignWriteServiceInterface $campaignWriteService
      * @return void
@@ -71,14 +73,39 @@ class UpdateCampaignAmountJob implements ShouldQueue
                 return;
             }
 
+            // Store the previous amount to check if goal was just achieved
+            $previousAmount = (float) $campaign->current_amount;
+            $goalAmount = (float) $campaign->goal_amount;
+            $wasGoalAlreadyAchieved = $previousAmount >= $goalAmount;
+
             // Recalculate the total amount
             $success = $campaignWriteService->recalculateTotalAmount($campaign);
 
             if ($success) {
+                // Refresh the campaign to get the updated amount
+                $campaign->refresh();
+                $newAmount = (float) $campaign->current_amount;
+
                 Log::info('Campaign amount update job completed successfully', [
                     'campaign_id' => $this->campaignId,
-                    'new_amount' => $campaign->current_amount,
+                    'previous_amount' => $previousAmount,
+                    'new_amount' => $newAmount,
+                    'goal_amount' => $goalAmount,
                 ]);
+
+                // Check if goal was just achieved (wasn't achieved before, but is now)
+                $isGoalNowAchieved = $newAmount >= $goalAmount;
+
+                if (!$wasGoalAlreadyAchieved && $isGoalNowAchieved) {
+                    // Goal was just achieved! Dispatch notification job
+                    SendCampaignGoalAchievedNotificationJob::dispatch($this->campaignId);
+
+                    Log::info('Campaign goal achieved! Notification job dispatched', [
+                        'campaign_id' => $this->campaignId,
+                        'goal_amount' => $goalAmount,
+                        'achieved_amount' => $newAmount,
+                    ]);
+                }
             } else {
                 throw new \Exception('Failed to recalculate campaign amount');
             }

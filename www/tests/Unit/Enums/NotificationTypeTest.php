@@ -33,11 +33,15 @@ class NotificationTypeTest extends TestCase
     {
         $cases = NotificationType::cases();
 
-        $this->assertCount(4, $cases);
+        $this->assertCount(8, $cases);
         $this->assertContains(NotificationType::FORGOT_PASSWORD, $cases);
         $this->assertContains(NotificationType::CAMPAIGN_WAITING_FOR_VALIDATION, $cases);
         $this->assertContains(NotificationType::CAMPAIGN_VALIDATED, $cases);
         $this->assertContains(NotificationType::CAMPAIGN_REJECTED, $cases);
+        $this->assertContains(NotificationType::PAYMENT_SUCCESS, $cases);
+        $this->assertContains(NotificationType::PAYMENT_FAILURE, $cases);
+        $this->assertContains(NotificationType::NEW_DONATION, $cases);
+        $this->assertContains(NotificationType::CAMPAIGN_GOAL_ACHIEVED, $cases);
     }
 
     public function test_notification_type_can_be_compared(): void

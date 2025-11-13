@@ -6,10 +6,14 @@ namespace App\Providers;
 
 use App\Contracts\Notifications\NotificationRegistryInterface;
 use App\Contracts\Notifications\NotificationServiceInterface;
+use App\Services\Notifications\Handlers\CampaignGoalAchievedHandler;
 use App\Services\Notifications\Handlers\CampaignRejectedHandler;
 use App\Services\Notifications\Handlers\CampaignValidatedHandler;
 use App\Services\Notifications\Handlers\CampaignWaitingForValidationHandler;
 use App\Services\Notifications\Handlers\ForgotPasswordHandler;
+use App\Services\Notifications\Handlers\NewDonationHandler;
+use App\Services\Notifications\Handlers\PaymentFailureHandler;
+use App\Services\Notifications\Handlers\PaymentSuccessHandler;
 use App\Services\Notifications\NotificationRegistry;
 use App\Services\Notifications\NotificationService;
 use Illuminate\Support\ServiceProvider;
@@ -46,5 +50,9 @@ class NotificationServiceProvider extends ServiceProvider
         $registry->register($this->app->make(CampaignWaitingForValidationHandler::class));
         $registry->register($this->app->make(CampaignRejectedHandler::class));
         $registry->register($this->app->make(CampaignValidatedHandler::class));
+        $registry->register($this->app->make(PaymentSuccessHandler::class));
+        $registry->register($this->app->make(PaymentFailureHandler::class));
+        $registry->register($this->app->make(NewDonationHandler::class));
+        $registry->register($this->app->make(CampaignGoalAchievedHandler::class));
     }
 }

@@ -6,10 +6,13 @@ use App\Contracts\Payment\PaymentCallbackHandlerInterface;
 use App\Contracts\Payment\PaymentCallbackServiceInterface;
 use App\DTOs\Payment\PaymentCallbackResultDTO;
 use App\Enums\Donation\DonationStatus;
+use App\Enums\Notification\NotificationType;
 use App\Enums\Payment\PaymentMethodEnum;
 use App\Enums\Payment\PaymentStatusEnum;
 use App\Exceptions\Payment\PaymentCallbackException;
 use App\Jobs\Campaign\UpdateCampaignAmountJob;
+use App\Jobs\Notification\SendNewDonationNotificationJob;
+use App\Jobs\Notification\SendPaymentNotificationJob;
 use App\Models\Payment\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -128,6 +131,7 @@ class PaymentCallbackService implements PaymentCallbackServiceInterface
 
     /**
      * Update the payment model based on the callback result.
+     * Also dispatches notification jobs to inform the payment initiator.
      *
      * @param Payment $payment
      * @param PaymentCallbackResultDTO $result
@@ -135,17 +139,49 @@ class PaymentCallbackService implements PaymentCallbackServiceInterface
      */
     private function updatePayment(Payment $payment, PaymentCallbackResultDTO $result): void
     {
+        // Load donation with user relationship to get the payment initiator
+        $payment->load('donation.user');
+        $donation = $payment->donation;
+
         if ($result->isSuccessful()) {
             $payment->markAsCompleted(
                 $result->transactionId ?? '',
                 $result->gatewayResponse
             );
+
+            // Dispatch job to send payment success notification to the payment initiator
+            if ($donation) {
+                SendPaymentNotificationJob::dispatch(
+                    $donation->user_id,
+                    (string) $payment->id,
+                    NotificationType::PAYMENT_SUCCESS
+                );
+
+                Log::info('Payment success notification job dispatched', [
+                    'payment_id' => $payment->id,
+                    'user_id' => $donation->user_id,
+                ]);
+            }
         } elseif ($result->isFailed()) {
             $payment->markAsFailed(
                 $result->errorMessage ?? 'Payment failed',
                 $result->errorCode,
                 $result->gatewayResponse
             );
+
+            // Dispatch job to send payment failure notification to the payment initiator
+            if ($donation) {
+                SendPaymentNotificationJob::dispatch(
+                    $donation->user_id,
+                    (string) $payment->id,
+                    NotificationType::PAYMENT_FAILURE
+                );
+
+                Log::info('Payment failure notification job dispatched', [
+                    'payment_id' => $payment->id,
+                    'user_id' => $donation->user_id,
+                ]);
+            }
         }
     }
 
@@ -184,6 +220,14 @@ class PaymentCallbackService implements PaymentCallbackServiceInterface
             UpdateCampaignAmountJob::dispatch($donation->campaign_id);
 
             Log::info('Campaign amount update job dispatched', [
+                'donation_id' => $donation->id,
+                'campaign_id' => $donation->campaign_id,
+            ]);
+
+            // Dispatch job to send new donation notification to campaign creator
+            SendNewDonationNotificationJob::dispatch($donation->id);
+
+            Log::info('New donation notification job dispatched', [
                 'donation_id' => $donation->id,
                 'campaign_id' => $donation->campaign_id,
             ]);
