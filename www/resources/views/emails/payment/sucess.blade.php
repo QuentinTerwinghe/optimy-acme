@@ -3,15 +3,11 @@
 
 Hello {{ $receiver->name }},
 
-Congratulations! Your donation was successful!
+Congratulations! Your payment was successful!
 
 **Campaign Details:**
 - **Title:** {{ $campaign['title'] }}
-- **Goal Amount:** {{ $campaign['currency']->value ?? '' }} {{ number_format($campaign['goal_amount'], 2) }}
-
-<x-mail::button :url="route('campaigns.show', $campaign['id'])">
-View Campaign
-</x-mail::button>
+- **Amount:** {{ $campaign['currency']->value ?? '' }} {{ number_format($campaign['goal_amount'], 2) }}
 
 Thanks,<br>
 {{ config('app.name') }}
