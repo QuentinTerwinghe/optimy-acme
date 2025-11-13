@@ -28,7 +28,7 @@ class UpdateRoleRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, array<int, string|\Illuminate\Contracts\Validation\ValidationRule>>
+     * @return array<string, mixed>
      */
     public function rules(): array
     {

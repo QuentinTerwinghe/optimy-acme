@@ -168,16 +168,45 @@ class DonationSeeder extends Seeder
         }
 
         // Add the remaining amount as the last donation to ensure exact sum
-        // Ensure it's at least 5.00
-        $lastAmount = max(5.00, round($remaining, 2));
+        // Ensure it's at least 5.00, but if remaining is less than 5.00, adjust the previous amounts
+        $lastAmount = round($remaining, 2);
+
+        if ($lastAmount < 5.00) {
+            // Need to redistribute - take from previous amounts to meet minimum
+            $deficit = 5.00 - $lastAmount;
+            $lastAmount = 5.00;
+
+            // Redistribute deficit across previous donations
+            $redistributeAmount = round($deficit / (count($amounts)), 2);
+            for ($i = 0; $i < count($amounts); $i++) {
+                if ($amounts[$i] > 5.00 + $redistributeAmount) {
+                    $amounts[$i] -= $redistributeAmount;
+                    $amounts[$i] = round($amounts[$i], 2);
+                }
+            }
+        }
+
         $amounts[] = $lastAmount;
 
-        // Adjust if the last amount brought us over the total
+        // Adjust if the total doesn't match exactly
         $actualTotal = array_sum($amounts);
-        if ($actualTotal !== $totalAmount) {
+        if (abs($actualTotal - $totalAmount) > 0.01) {
             $difference = $actualTotal - $totalAmount;
-            $amounts[count($amounts) - 1] -= $difference;
-            $amounts[count($amounts) - 1] = round($amounts[count($amounts) - 1], 2);
+            // Find the largest amount to adjust
+            $maxIndex = array_search(max($amounts), $amounts);
+            $amounts[$maxIndex] -= $difference;
+            $amounts[$maxIndex] = round($amounts[$maxIndex], 2);
+
+            // Ensure the adjusted amount is still positive
+            if ($amounts[$maxIndex] < 5.00) {
+                // Fall back to simple distribution
+                $amounts = [];
+                $amountPerDonation = round($totalAmount / $numberOfDonations, 2);
+                for ($i = 0; $i < $numberOfDonations - 1; $i++) {
+                    $amounts[] = $amountPerDonation;
+                }
+                $amounts[] = round($totalAmount - (array_sum($amounts)), 2);
+            }
         }
 
         return $amounts;

@@ -49,7 +49,7 @@ class RoleServiceTest extends TestCase
 
     public function test_get_role_by_id_returns_role_when_found(): void
     {
-        $role = Mockery::mock(Role::class);
+        $role = Mockery::mock(Role::class)->makePartial();
         $role->id = 1;
 
         $this->mockRepository
@@ -110,7 +110,7 @@ class RoleServiceTest extends TestCase
 
     public function test_update_role_throws_exception_when_renaming_protected_role(): void
     {
-        $role = Mockery::mock(Role::class);
+        $role = Mockery::mock(Role::class)->makePartial();
         $role->id = 1;
         $role->name = 'admin';
         $role->guard_name = 'web';
@@ -144,7 +144,7 @@ class RoleServiceTest extends TestCase
 
     public function test_delete_role_throws_exception_when_deleting_protected_role(): void
     {
-        $role = Mockery::mock(Role::class);
+        $role = Mockery::mock(Role::class)->makePartial();
         $role->id = 1;
         $role->name = 'admin';
 
@@ -176,7 +176,7 @@ class RoleServiceTest extends TestCase
 
     public function test_get_users_by_role_returns_users_collection(): void
     {
-        $role = Mockery::mock(Role::class);
+        $role = Mockery::mock(Role::class)->makePartial();
         $role->users = new Collection([]);
 
         $this->mockRepository

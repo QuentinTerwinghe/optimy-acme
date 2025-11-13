@@ -85,7 +85,7 @@ interface RoleRepositoryInterface
     /**
      * Get all available permissions
      *
-     * @return Collection
+     * @return Collection<int, \Spatie\Permission\Models\Permission>
      */
     public function getAllPermissions(): Collection;
 

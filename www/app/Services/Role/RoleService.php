@@ -244,7 +244,7 @@ final class RoleService implements RoleServiceInterface
     /**
      * Get all available permissions
      *
-     * @return Collection
+     * @return Collection<int, \Spatie\Permission\Models\Permission>
      */
     public function getAllPermissions(): Collection
     {
@@ -255,12 +255,13 @@ final class RoleService implements RoleServiceInterface
      * Get users assigned to a specific role
      *
      * @param int $roleId
-     * @return Collection
+     * @return Collection<int, \App\Models\Auth\User>
      */
     public function getUsersByRole(int $roleId): Collection
     {
         $role = $this->getRoleById($roleId);
 
+        /** @var Collection<int, \App\Models\Auth\User> */
         return $role->users;
     }
 }
