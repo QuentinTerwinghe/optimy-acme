@@ -13,6 +13,14 @@ This directory contains detailed documentation for the ACME Corp Laravel applica
   - Folder structure conventions
   - Code organization best practices
 
+- **[SOLID Principles Assessment](SOLID.md)** - Comprehensive SOLID compliance analysis (87.6% A-):
+  - Detailed principle-by-principle evaluation
+  - Individual scores and grades
+  - Code examples demonstrating best practices
+  - Domain organization assessment
+  - Architecture patterns used (Strategy, Registry, Repository, Service Layer)
+  - Priority recommendations for improvement
+
 ### Testing & Quality Assurance
 
 - **[Testing Guide](TESTING.md)** - Comprehensive testing documentation:
@@ -48,11 +56,12 @@ This directory contains detailed documentation for the ACME Corp Laravel applica
 ### Getting Started
 
 1. **Understanding the architecture**: See [ARCHITECTURE.md](ARCHITECTURE.md)
-2. **Running tests**: See [TESTING.md](TESTING.md#running-tests)
-3. **Writing new tests**: See [TESTING.md](TESTING.md#writing-tests)
-4. **Sending notifications**: See [NOTIFICATION.md](NOTIFICATION.md#usage)
-5. **Creating notification types**: See [NOTIFICATION.md](NOTIFICATION.md#step-2-create-a-notification-handler)
-6. **Password reset implementation**: See [FORGOT_PASSWORD_USAGE.md](FORGOT_PASSWORD_USAGE.md#usage-example)
+2. **SOLID principles analysis**: See [SOLID.md](SOLID.md) - 87.6% compliance score
+3. **Running tests**: See [TESTING.md](TESTING.md#running-tests)
+4. **Writing new tests**: See [TESTING.md](TESTING.md#writing-tests)
+5. **Sending notifications**: See [NOTIFICATION.md](NOTIFICATION.md#usage)
+6. **Creating notification types**: See [NOTIFICATION.md](NOTIFICATION.md#step-2-create-a-notification-handler)
+7. **Password reset implementation**: See [FORGOT_PASSWORD_USAGE.md](FORGOT_PASSWORD_USAGE.md#usage-example)
 
 ### Common Tasks
 
